@@ -8,6 +8,8 @@
 #include "widgets/dialogs/LoginDialog.hpp"
 #include "widgets/helper/EditableModelView.hpp"
 
+#include <typeinfo>
+#include <QLabel>
 #include <QDialogButtonBox>
 #include <QHeaderView>
 #include <QTableView>
@@ -19,52 +21,109 @@ namespace chatterino {
 AccountsPage::AccountsPage()
 {
     auto *app = getApp();
-
     LayoutCreator<AccountsPage> layoutCreator(this);
-    auto layout = layoutCreator.emplace<QVBoxLayout>().withoutMargin();
 
-    EditableModelView *view =
-        layout
-            .emplace<EditableModelView>(app->accounts->createModel(nullptr),
-                                        false)
-            .getElement();
+    auto tabs = layoutCreator.emplace<QTabWidget>();
 
-    view->getTableView()->horizontalHeader()->setVisible(false);
-    view->getTableView()->horizontalHeader()->setStretchLastSection(true);
+    auto accounts_tab = tabs.appendTab(new QVBoxLayout, "Accounts");
+    {
+        EditableModelView *view =
+                accounts_tab
+                        .emplace<EditableModelView>(app->accounts->createModel(nullptr),
+                                                    false)
+                        .getElement();
 
-    view->addButtonPressed.connect([this] {
-        static auto loginWidget = new LoginWidget(this);
+        view->getTableView()->horizontalHeader()->setVisible(false);
+        view->getTableView()->horizontalHeader()->setStretchLastSection(true);
 
-        loginWidget->show();
-        loginWidget->raise();
-    });
+        view->addButtonPressed.connect([this] {
+            static auto loginWidget = new LoginWidget(this);
 
-    view->getTableView()->setStyleSheet("background: #333");
+            loginWidget->show();
+            loginWidget->raise();
+        });
 
-    //    auto buttons = layout.emplace<QDialogButtonBox>();
-    //    {
-    //        this->addButton = buttons->addButton("Add",
-    //        QDialogButtonBox::YesRole); this->removeButton =
-    //        buttons->addButton("Remove", QDialogButtonBox::NoRole);
-    //    }
+        view->getTableView()->setStyleSheet("background: #333");
+    }
 
-    //    layout.emplace<AccountSwitchWidget>(this).assign(&this->accSwitchWidget);
+    auto accountsSettings = tabs.appendTab(new QVBoxLayout, "Accounts settings");
+    {
+        auto anyways = accountsSettings.emplace<QHBoxLayout>().withoutMargin();
+        {
+            anyways.emplace<QLabel>("Select username:");
+            auto combo = anyways.emplace<QComboBox>().getElement();
 
-    // ----
-    //    QObject::connect(this->addButton, &QPushButton::clicked, []() {
-    //        static auto loginWidget = new LoginWidget();
-    //        loginWidget->show();
-    //    });
+            for (const auto &userName : app->accounts->twitch.getUsernames())
+            {
+                combo->addItem(userName);
+            }
 
-    //    QObject::connect(this->removeButton, &QPushButton::clicked, [this] {
-    //        auto selectedUser = this->accSwitchWidget->currentItem()->text();
-    //        if (selectedUser == ANONYMOUS_USERNAME_LABEL) {
-    //            // Do nothing
-    //            return;
-    //        }
+            app->accounts->twitch.userListUpdated.connect([=]() {
+                combo->blockSignals(true);
 
-    //        getApp()->accounts->Twitch.removeUser(selectedUser);
-    //    });
+                combo->clear();
+
+                for (const auto &userName : app->accounts->twitch.getUsernames())
+                {
+                    combo->addItem(userName);
+                }
+
+                combo->blockSignals(false);
+            });
+
+            anyways->addStretch(1);
+            anyways->setAlignment(Qt::AlignTop);
+        }
+
+        auto hashes_form = accountsSettings.emplace<QFormLayout>().withoutMargin();
+        {
+            hashes_form->addRow("Follow hash", &this->followHashInput);
+            hashes_form->addRow("Unfollow hash", &this->unfollowHashInput);
+        }
+
+        clearFieldsButton = new QPushButton();
+        {
+            clearFieldsButton->setText("Clear fields");
+        }
+
+        accountsSettingsButton = new QPushButton();
+        {
+            accountsSettingsButton->setText("Save settings");
+        }
+
+        refreshButtons();
+
+        accountsSettings->addWidget(clearFieldsButton);
+        accountsSettings->addWidget(accountsSettingsButton);
+
+        connect(&followHashInput, &QLineEdit::textChanged, [=]() {
+            refreshButtons();
+        });
+
+        connect(&unfollowHashInput, &QLineEdit::textChanged, [=]() {
+            refreshButtons();
+        });
+
+        connect(clearFieldsButton, &QPushButton::clicked, [=]() {
+            this->unfollowHashInput.clear();
+            this->followHashInput.clear();
+        });
+
+        connect(accountsSettingsButton, &QPushButton::clicked, [=]() {
+
+        });
+    }
 }
 
-}  // namespace chatterino
+void AccountsPage::refreshButtons()
+{
+    if (this->unfollowHashInput.text().isEmpty() ||
+        this->followHashInput.text().isEmpty())
+    {
+        accountsSettingsButton->setEnabled(false);
+    } else
+    {
+        accountsSettingsButton->setEnabled(true);
+    }
+}
+} // namespace chatterino

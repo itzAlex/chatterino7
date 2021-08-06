@@ -571,6 +571,7 @@ void GeneralPage::initLayout(GeneralPageView &layout)
     layout.addCheckbox("SevenTV", s.showBadgesSeventv);
     layout.addCheckbox("FrankerFaceZ (Bot, FFZ Supporter, FFZ Developer)",
                        s.showBadgesFfz);
+    layout.addCheckbox("itzAlex (Custom badges)", s.showBadgesitzAlex);
     layout.addSeperator();
     layout.addCheckbox("Use custom FrankerFaceZ moderator badges",
                        s.useCustomFfzModeratorBadges);

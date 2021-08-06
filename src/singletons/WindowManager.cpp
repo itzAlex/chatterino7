@@ -111,6 +111,7 @@ WindowManager::WindowManager()
     this->wordFlagsListener_.addSetting(settings->showBadgesChatterino);
     this->wordFlagsListener_.addSetting(settings->showBadgesSeventv);
     this->wordFlagsListener_.addSetting(settings->showBadgesFfz);
+    this->wordFlagsListener_.addSetting(settings->showBadgesitzAlex);
     this->wordFlagsListener_.addSetting(settings->enableEmoteImages);
     this->wordFlagsListener_.addSetting(settings->boldUsernames);
     this->wordFlagsListener_.addSetting(settings->lowercaseDomains);
@@ -176,10 +177,10 @@ void WindowManager::updateWordTypeMask()
     flags.set(settings->showBadgesSubscription ? MEF::BadgeSubscription
                                                : MEF::None);
     flags.set(settings->showBadgesVanity ? MEF::BadgeVanity : MEF::None);
-    flags.set(settings->showBadgesChatterino ? MEF::BadgeChatterino
-                                             : MEF::None);
+    flags.set(settings->showBadgesChatterino ? MEF::BadgeChatterino : MEF::None);
     flags.set(settings->showBadgesSeventv ? MEF::BadgeSeventv : MEF::None);
     flags.set(settings->showBadgesFfz ? MEF::BadgeFfz : MEF::None);
+    flags.set(settings->showBadgesitzAlex ? MEF::BadgeitzAlex : MEF::None);
 
     // username
     flags.set(MEF::Username);

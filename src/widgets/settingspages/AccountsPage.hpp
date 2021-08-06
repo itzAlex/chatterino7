@@ -12,6 +12,16 @@ class AccountsPage : public SettingsPage
 public:
     AccountsPage();
 
+    void refreshButtons();
+
+    QPushButton* clearFieldsButton;
+    QPushButton* accountsSettingsButton;
+    QFormLayout* hashes_form;
+
+    QLineEdit followHashInput;
+    QLineEdit unfollowHashInput;
+
+
 private:
     QPushButton *addButton_;
     QPushButton *removeButton_;

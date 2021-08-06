@@ -8,6 +8,7 @@
 #include "providers/chatterino/ChatterinoBadges.hpp"
 #include "providers/ffz/FfzBadges.hpp"
 #include "providers/seventv/SeventvBadges.hpp"
+#include "providers/itzalex/itzAlexBadges.hpp"
 #include "providers/twitch/TwitchBadges.hpp"
 #include "providers/twitch/TwitchChannel.hpp"
 #include "providers/twitch/TwitchIrcServer.hpp"
@@ -217,6 +218,7 @@ MessagePtr TwitchMessageBuilder::build()
     this->appendChatterinoBadges();
     this->appendSeventvBadges();
     this->appendFfzBadges();
+    this->appenditzAlexBadges();
 
     this->appendUsername();
 
@@ -1164,6 +1166,14 @@ void TwitchMessageBuilder::appendFfzBadges()
             this->emplace<FfzBadgeElement>(*badge, MessageElementFlag::BadgeFfz,
                                            color.get());
         }
+    }
+}
+
+void TwitchMessageBuilder::appenditzAlexBadges()
+{
+    if (auto badge = getApp()->itzalexBadges->getBadge({this->userId_}))
+    {
+        this->emplace<BadgeElement>(*badge, MessageElementFlag::BadgeitzAlex);
     }
 }
 

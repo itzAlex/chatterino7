@@ -147,6 +147,7 @@ public:
     BoolSetting showBadgesChatterino = {"/appearance/badges/chatterino", true};
     BoolSetting showBadgesSeventv = {"/appearance/badges/seventv", true};
     BoolSetting showBadgesFfz = {"/appearance/badges/ffz", true};
+    BoolSetting showBadgesitzAlex = {"/appearance/badges/itzalex", true};
     BoolSetting useCustomFfzModeratorBadges = {
         "/appearance/badges/useCustomFfzModeratorBadges", true};
     BoolSetting useCustomFfzVipBadges = {

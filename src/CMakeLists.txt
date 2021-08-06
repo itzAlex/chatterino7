@@ -175,6 +175,9 @@ set(SOURCE_FILES
         providers/chatterino/ChatterinoBadges.cpp
         providers/chatterino/ChatterinoBadges.hpp
 
+        providers/itzalex/itzAlexBadges.cpp
+        providers/itzalex/itzAlexBadges.hpp
+
         providers/colors/ColorProvider.cpp
         providers/colors/ColorProvider.hpp
 

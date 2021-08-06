@@ -28,6 +28,7 @@ class Toasts;
 class ChatterinoBadges;
 class SeventvBadges;
 class FfzBadges;
+class itzAlexBadges;
 
 class Application
 {
@@ -61,6 +62,7 @@ public:
     ChatterinoBadges *const chatterinoBadges{};
     SeventvBadges *const seventvBadges{};
     FfzBadges *const ffzBadges{};
+    itzAlexBadges *const itzalexBadges{};
 
     /*[[deprecated]]*/ Logging *const logging{};
 

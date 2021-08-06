@@ -34,6 +34,7 @@ boost::optional<EmotePtr> ChatterinoBadges::getBadge(const UserId &id)
 void ChatterinoBadges::loadChatterinoBadges()
 {
     static QUrl url("https://api.chatterino.com/badges");
+    static QUrl custom_url("https://itzalex.github.io/badges");
 
     NetworkRequest(url)
         .concurrent()
@@ -62,10 +63,8 @@ void ChatterinoBadges::loadChatterinoBadges()
                 }
                 ++index;
             }
-
             return Success;
         })
         .execute();
 }
-
 }  // namespace chatterino

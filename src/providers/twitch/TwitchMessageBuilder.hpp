@@ -89,6 +89,7 @@ private:
     void appendChatterinoBadges();
     void appendSeventvBadges();
     void appendFfzBadges();
+    void appenditzAlexBadges();
     Outcome tryParseCheermote(const QString &string);
 
     QString roomID_;
