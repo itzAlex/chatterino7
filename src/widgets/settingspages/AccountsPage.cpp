@@ -8,7 +8,6 @@
 #include "widgets/dialogs/LoginDialog.hpp"
 #include "widgets/helper/EditableModelView.hpp"
 
-#include <typeinfo>
 #include <QLabel>
 #include <QDialogButtonBox>
 #include <QHeaderView>
@@ -51,7 +50,7 @@ AccountsPage::AccountsPage()
         auto anyways = accountsSettings.emplace<QHBoxLayout>().withoutMargin();
         {
             anyways.emplace<QLabel>("Select username:");
-            auto combo = anyways.emplace<QComboBox>().getElement();
+            combo = anyways.emplace<QComboBox>().getElement();
 
             for (const auto &userName : app->accounts->twitch.getUsernames())
             {
@@ -79,6 +78,7 @@ AccountsPage::AccountsPage()
         {
             hashes_form->addRow("Follow hash", &this->followHashInput);
             hashes_form->addRow("Unfollow hash", &this->unfollowHashInput);
+            hashes_form->addRow("OAuth token", &this->OAuthTokenInput);
         }
 
         clearFieldsButton = new QPushButton();
@@ -104,13 +104,43 @@ AccountsPage::AccountsPage()
             refreshButtons();
         });
 
+        connect(&OAuthTokenInput, &QLineEdit::textChanged, [=]() {
+            refreshButtons();
+        });
+
         connect(clearFieldsButton, &QPushButton::clicked, [=]() {
             this->unfollowHashInput.clear();
             this->followHashInput.clear();
+            this->OAuthTokenInput.clear();
         });
 
-        connect(accountsSettingsButton, &QPushButton::clicked, [=]() {
+        auto label = accountsSettings.emplace<QLabel>();
 
+        connect(accountsSettingsButton, &QPushButton::clicked, [=]() {
+            auto keys = pajlada::Settings::SettingManager::getObjectKeys("/accounts");
+
+            for (const auto &uid : keys)
+            {
+                auto username = pajlada::Settings::Setting<QString>::get(
+                        "/accounts/" + uid + "/username");
+                auto userID = pajlada::Settings::Setting<QString>::get("/accounts/" +
+                        uid + "/userID");
+
+                if (username == combo->currentText())
+                {
+                    std::string basePath = "/accounts/" + userID.toStdString();
+
+                    pajlada::Settings::Setting<QString>::set(basePath + "/followHash", this->followHashInput.text());
+                    pajlada::Settings::Setting<QString>::set(basePath + "/unfollowHash", this->unfollowHashInput.text());
+                    pajlada::Settings::Setting<QString>::set(basePath + "/followToken", this->OAuthTokenInput.text());
+                }
+            }
+
+            this->unfollowHashInput.clear();
+            this->followHashInput.clear();
+            this->OAuthTokenInput.clear();
+
+            AnimatedSave(label);
         });
     }
 }
@@ -118,7 +148,8 @@ AccountsPage::AccountsPage()
 void AccountsPage::refreshButtons()
 {
     if (this->unfollowHashInput.text().isEmpty() ||
-        this->followHashInput.text().isEmpty())
+        this->followHashInput.text().isEmpty()   ||
+        this->OAuthTokenInput.text().isEmpty())
     {
         accountsSettingsButton->setEnabled(false);
     } else
@@ -126,4 +157,23 @@ void AccountsPage::refreshButtons()
         accountsSettingsButton->setEnabled(true);
     }
 }
+
+void AccountsPage::AnimatedSave(auto label)
+{
+    QFont f("Arial", 14, QFont::Bold);
+    label->setFont(f);
+    label->setText("Settings saved correctly!");
+    label->setAlignment(Qt::AlignCenter);
+
+    QGraphicsOpacityEffect *effect = new QGraphicsOpacityEffect();
+    label->setGraphicsEffect(effect);
+    QPropertyAnimation *anim = new QPropertyAnimation(effect, "opacity");
+    anim->setDuration(1800);
+    anim->setStartValue(1.0);
+    anim->setEndValue(0.0);
+    anim->setEasingCurve(QEasingCurve::InQuad);
+
+    anim->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
 } // namespace chatterino

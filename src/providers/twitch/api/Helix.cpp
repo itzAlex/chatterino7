@@ -142,6 +142,25 @@ void Helix::getUserFollowers(
                             std::move(failureCallback));
 }
 
+void Helix::getUserFollow(
+        QString userId, QString targetId,
+        ResultCallback<bool, HelixUsersFollowsRecord> successCallback,
+        HelixFailureCallback failureCallback)
+{
+    this->fetchUsersFollows(
+            std::move(userId), std::move(targetId),
+            [successCallback](const auto &response) {
+                if (response.data.empty())
+                {
+                    successCallback(false, HelixUsersFollowsRecord());
+                    return;
+                }
+
+                successCallback(true, response.data[0]);
+            },
+            std::move(failureCallback));
+}
+
 void Helix::fetchStreams(
     QStringList userIds, QStringList userLogins,
     ResultCallback<std::vector<HelixStream>> successCallback,
@@ -333,6 +352,36 @@ void Helix::getGameById(QString gameId,
             successCallback(games[0]);
         },
         failureCallback);
+}
+
+void Helix::followUser(QString userId, QString targetId, QString hash, QString followToken,
+                       std::function<void()> successCallback,
+                       HelixFailureCallback failureCallback)
+{
+    this->makeRequestGQL("FollowButton_FollowUser", targetId, hash, followToken)
+            .onSuccess([successCallback](auto /*result*/) -> Outcome {
+                successCallback();
+                return Success;
+            })
+            .onError([failureCallback](auto /*result*/) {
+                failureCallback();
+            })
+            .execute();
+}
+
+void Helix::unfollowUser(QString userId, QString targetId, QString hash, QString followToken,
+                         std::function<void()> successCallback,
+                         HelixFailureCallback failureCallback)
+{
+    this->makeRequestGQL("FollowButton_UnfollowUser", targetId, hash, followToken)
+            .onSuccess([successCallback](auto /*result*/) -> Outcome {
+                successCallback();
+                return Success;
+            })
+            .onError([failureCallback](auto /*result*/) {
+                failureCallback();
+            })
+            .execute();
 }
 
 void Helix::createClip(QString channelId,
@@ -765,6 +814,39 @@ void Helix::getChannelEmotes(
             failureCallback();
         })
         .execute();
+}
+
+// operationName: FollowButton_FollowUser, FollowButton_UnfollowUser
+NetworkRequest Helix::makeRequestGQL(QString operationName, QString targetID, QString hash, QString followToken)
+{
+    QJsonObject payload, variables, input, extensions, persistedQuery;
+
+    if (this->oauthToken.isEmpty())
+    {
+        qCDebug(chatterinoTwitch)
+                << "Helix::makeRequest called without an oauth token set BabyRage";
+        // return boost::none;
+    }
+
+    input.insert("disableNotifications", true);
+    input.insert("targetID", targetID);
+
+    variables.insert("input", input);
+
+    persistedQuery.insert("sha256Hash", hash);
+    persistedQuery.insert("version", 1);
+
+    extensions.insert("persistedQuery", persistedQuery);
+
+    payload.insert("operationName", operationName);
+    payload.insert("variables", variables);
+    payload.insert("extensions", extensions);
+
+    return NetworkRequest(GQLUrl, NetworkRequestType::Post)
+        .timeout(5 * 1000)
+        .header("Content-Type", "application/json")
+        .header("Authorization", "OAuth " + followToken)
+        .payload(QJsonDocument(payload).toJson(QJsonDocument::Compact));
 }
 
 NetworkRequest Helix::makeRequest(QString url, QUrlQuery urlQuery)

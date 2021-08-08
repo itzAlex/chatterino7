@@ -13,14 +13,15 @@ public:
     AccountsPage();
 
     void refreshButtons();
+    void AnimatedSave(auto label);
 
     QPushButton* clearFieldsButton;
     QPushButton* accountsSettingsButton;
-    QFormLayout* hashes_form;
+    QComboBox* combo;
 
     QLineEdit followHashInput;
     QLineEdit unfollowHashInput;
-
+    QLineEdit OAuthTokenInput;
 
 private:
     QPushButton *addButton_;

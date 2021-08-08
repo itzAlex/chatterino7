@@ -374,18 +374,111 @@ void CommandController::initialize(Settings &, Paths &paths)
         });
 
     this->registerCommand("/follow", [](const auto &words, auto channel) {
-        channel->addMessage(makeSystemMessage(
-            "Twitch has removed the ability to follow users through "
-            "third-party applications. For more information, see "
-            "https://github.com/Chatterino/chatterino2/issues/3076"));
+        auto currentUser = getApp()->accounts->twitch.getCurrent();
+
+        if (currentUser->isAnon())
+        {
+            channel->addMessage(
+                    makeSystemMessage("You must be logged in to follow someone!"));
+            return "";
+        }
+
+        if (words.size() < 2)
+        {
+            channel->addMessage(makeSystemMessage("Usage: /follow [user]"));
+            return "";
+        }
+
+        auto followHash = pajlada::Settings::Setting<QString>::get("/accounts/" + currentUser->getUserId().toStdString() + "/followHash");
+        auto followToken = pajlada::Settings::Setting<QString>::get("/accounts/" + currentUser->getUserId().toStdString() + "/followToken");
+
+        if (followHash.isEmpty() ||
+            followToken.isEmpty())
+        {
+            channel->addMessage(makeSystemMessage("In order to follow someone you have to introduce the needed hashes and tokens in: Settings ➜ Accounts ➜ Accounts settings"));
+            return "";
+        }
+
+        auto target = words.at(1);
+
+        getHelix()->getUserByName(
+                target,
+                [currentUser, channel, target, followHash, followToken](const auto &targetUser) {
+                    getHelix()->followUser(
+                            currentUser->getUserId(), targetUser.id, followHash, followToken,
+                            [channel, target]() {
+                                channel->addMessage(makeSystemMessage(
+                                        "You successfully followed " + target));
+                            },
+                            [channel, target]() {
+                                channel->addMessage(makeSystemMessage(
+                                        QString("User %1 could not be followed, an "
+                                                "error occurred! Please check that you have "
+                                                "introduced the correct values in: Settings ➜ Accounts ➜ Accounts settings")
+                                                .arg(target)));
+                            });
+                },
+                [channel, target] {
+                    channel->addMessage(
+                            makeSystemMessage(QString("User %1 could not be followed, "
+                                                      "no user with that name found!")
+                                                      .arg(target)));
+                });
+
         return "";
     });
 
     this->registerCommand("/unfollow", [](const auto &words, auto channel) {
-        channel->addMessage(makeSystemMessage(
-            "Twitch has removed the ability to unfollow users through "
-            "third-party applications. For more information, see "
-            "https://github.com/Chatterino/chatterino2/issues/3076"));
+        auto currentUser = getApp()->accounts->twitch.getCurrent();
+
+        if (currentUser->isAnon())
+        {
+            channel->addMessage(
+                    makeSystemMessage("You must be logged in to unfollow someone!"));
+            return "";
+        }
+
+        if (words.size() < 2)
+        {
+            channel->addMessage(makeSystemMessage("Usage: /unfollow [user]"));
+            return "";
+        }
+
+        auto unfollowHash = pajlada::Settings::Setting<QString>::get("/accounts/" + currentUser->getUserId().toStdString() + "/unfollowHash");
+        auto followToken = pajlada::Settings::Setting<QString>::get("/accounts/" + currentUser->getUserId().toStdString() + "/followToken");
+
+        if (unfollowHash.isEmpty() ||
+            followToken.isEmpty())
+        {
+            channel->addMessage(makeSystemMessage("In order to unfollow someone you have to introduce the needed hashes and tokens in: Settings ➜ Accounts ➜ Accounts settings"));
+            return "";
+        }
+
+        auto target = words.at(1);
+
+        getHelix()->getUserByName(
+                target,
+                [currentUser, channel, target, unfollowHash, followToken](const auto &targetUser) {
+                    getHelix()->unfollowUser(
+                            currentUser->getUserId(), targetUser.id, unfollowHash, followToken,
+                            [channel, target]() {
+                                channel->addMessage(makeSystemMessage(
+                                        "You successfully unfollowed " + target));
+                            },
+                            [channel, target]() {
+                                channel->addMessage(makeSystemMessage(
+                                        QString("User %1 could not be unfollowed, an error "
+                                                "occurred! Please check that you have "
+                                                "introduced the correct values in: Settings ➜ Accounts ➜ Accounts settings")
+                                                .arg(target)));
+                            });
+                },
+                [channel, target] {
+                    channel->addMessage(makeSystemMessage(QString("User %1 could not be unfollowed, "
+                                                                  "no user with that name found!")
+                                                                  .arg(target)));
+                });
+
         return "";
     });
 
