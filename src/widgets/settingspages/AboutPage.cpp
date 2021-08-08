@@ -85,11 +85,11 @@ AboutPage::AboutPage()
         auto versionInfo = layout.emplace<QGroupBox>("Version");
         {
             auto version = Version::instance();
-            QString text = QString("%1 (commit %2%3)")
+            QString text = QString("%1 Homies (commit %2%3)")
                                .arg(version.fullVersion())
                                .arg("<a "
-                                    "href=\"https://github.com/Chatterino/"
-                                    "chatterino2/commit/" +
+                                    "href=\"https://github.com/itzAlex/"
+                                    "chatterino7/commit/" +
                                     version.commitHash() + "\">" +
                                     version.commitHash() + "</a>")
                                .arg(Modes::instance().isNightly
