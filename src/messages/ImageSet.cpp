@@ -8,23 +8,27 @@ ImageSet::ImageSet()
     : imageX1_(Image::getEmpty())
     , imageX2_(Image::getEmpty())
     , imageX3_(Image::getEmpty())
+    , imageX4_(Image::getEmpty())
 {
 }
 
 ImageSet::ImageSet(const ImagePtr &image1, const ImagePtr &image2,
-                   const ImagePtr &image3)
+                   const ImagePtr &image3, const ImagePtr &image4)
     : imageX1_(image1)
     , imageX2_(image2)
     , imageX3_(image3)
+    , imageX4_(image4)
 {
 }
 
-ImageSet::ImageSet(const Url &image1, const Url &image2, const Url &image3)
+ImageSet::ImageSet(const Url &image1, const Url &image2, const Url &image3, const Url &image4)
     : imageX1_(Image::fromUrl(image1, 1))
     , imageX2_(image2.string.isEmpty() ? Image::getEmpty()
-                                       : Image::fromUrl(image2, 0.5))
+                                       : Image::fromUrl(image2, 0.75))
     , imageX3_(image3.string.isEmpty() ? Image::getEmpty()
-                                       : Image::fromUrl(image3, 0.25))
+                                       : Image::fromUrl(image3, 0.50))
+    , imageX4_(image4.string.isEmpty() ? Image::getEmpty()
+                                       : Image::fromUrl(image4, 0.75))
 {
 }
 
@@ -43,6 +47,11 @@ void ImageSet::setImage3(const ImagePtr &image)
     this->imageX3_ = image;
 }
 
+void ImageSet::setImage4(const ImagePtr &image)
+{
+    this->imageX4_ = image;
+}
+
 const ImagePtr &ImageSet::getImage1() const
 {
     return this->imageX1_;
@@ -56,6 +65,11 @@ const ImagePtr &ImageSet::getImage2() const
 const ImagePtr &ImageSet::getImage3() const
 {
     return this->imageX3_;
+}
+
+const ImagePtr &ImageSet::getImage4() const
+{
+    return this->imageX4_;
 }
 
 const std::shared_ptr<Image> &getImagePriv(const ImageSet &set, float scale)

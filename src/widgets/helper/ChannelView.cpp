@@ -110,6 +110,7 @@ namespace {
 
         if (creatorFlags.has(MessageElementFlag::SeventvEmote))
         {
+            addImageLink(emote.images.getImage4(), '4');
             addPageLink("7TV");
         }
         else if (creatorFlags.has(MessageElementFlag::BttvEmote))
