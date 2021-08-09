@@ -11,6 +11,7 @@ public:
     struct {
         QPixmap alazymeme;
         QPixmap fourtf;
+        QPixmap itzalex;
         QPixmap kararty;
         QPixmap mm2pl;
         QPixmap pajlada;
