@@ -1,6 +1,11 @@
 # Changelog
 
-## Unversioned
+## Homies (#1)
+
+- Major: Added again `/(un)follow` using the GraphQL API
+- Major: Added custom badges for the homies
+- Minor: Added 4x links for 7TV emotes
+  
 
 - Minor: Remove TwitchEmotes.com attribution and the open/copy options when right-clicking a Twitch Emote. (#2214, #3136)
 - Minor: Strip leading @ and trailing , from username in /user and /usercard commands. (#3143)
