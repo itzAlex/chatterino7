@@ -13,11 +13,12 @@ public:
     AccountsPage();
 
     void refreshButtons();
-    void AnimatedSave(auto label);
+    void AnimatedSave();
 
     QPushButton* clearFieldsButton;
     QPushButton* accountsSettingsButton;
     QComboBox* combo;
+    QLabel *label;
 
     QLineEdit followHashInput;
     QLineEdit unfollowHashInput;

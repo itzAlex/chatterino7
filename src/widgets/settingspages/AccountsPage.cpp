@@ -114,7 +114,8 @@ AccountsPage::AccountsPage()
             this->OAuthTokenInput.clear();
         });
 
-        auto label = accountsSettings.emplace<QLabel>();
+        label = new QLabel;
+        accountsSettings->addWidget(label);
 
         connect(accountsSettingsButton, &QPushButton::clicked, [=]() {
             auto keys = pajlada::Settings::SettingManager::getObjectKeys("/accounts");
@@ -140,7 +141,7 @@ AccountsPage::AccountsPage()
             this->followHashInput.clear();
             this->OAuthTokenInput.clear();
 
-            AnimatedSave(label);
+            AnimatedSave();
         });
     }
 }
@@ -158,7 +159,7 @@ void AccountsPage::refreshButtons()
     }
 }
 
-void AccountsPage::AnimatedSave(auto label)
+void AccountsPage::AnimatedSave()
 {
     QFont f("Arial", 14, QFont::Bold);
     label->setFont(f);
