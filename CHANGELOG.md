@@ -5,6 +5,8 @@
 - Major: Added again `/(un)follow` using the GraphQL API
 - Major: Added custom badges for the homies
 - Minor: Added 4x links for 7TV emotes
+- Minor: Added `Clear cache` button
+- Minor: Changed global emotes order (7TV - BetterTTV - FrankerFaceZ - Twitch)
   
 
 - Minor: Remove TwitchEmotes.com attribution and the open/copy options when right-clicking a Twitch Emote. (#2214, #3136)
