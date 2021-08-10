@@ -3,6 +3,8 @@
 #include <QFontDialog>
 #include <QLabel>
 #include <QScrollArea>
+#include <QApplication>
+#include <QProcess>
 
 #include "Application.hpp"
 #include "common/Version.hpp"
@@ -18,6 +20,7 @@
 #include "widgets/BaseWindow.hpp"
 #include "widgets/helper/Line.hpp"
 #include "widgets/settingspages/GeneralPageView.hpp"
+#include "boost/filesystem.hpp"
 
 #include <QDesktopServices>
 #include <QFileDialog>
@@ -504,6 +507,11 @@ void GeneralPage::initLayout(GeneralPageView &layout)
         }));
         box->addWidget(layout.makeButton("Reset", []() {
             getSettings()->cachePath = "";
+        }));
+        box->addWidget(layout.makeButton("Clear cache", []() {
+            boost::filesystem::remove_all((getPaths()->cacheDirectory()).toStdString());
+            qApp->quit();
+            QProcess::startDetached(qApp->arguments()[0], qApp->arguments());
         }));
         box->addStretch(1);
 
