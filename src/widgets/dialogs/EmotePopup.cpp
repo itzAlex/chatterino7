@@ -224,11 +224,6 @@ void EmotePopup::loadChannel(ChannelPtr _channel)
     auto globalChannel = std::make_shared<Channel>("", Channel::Type::None);
     auto channelChannel = std::make_shared<Channel>("", Channel::Type::None);
 
-    // twitch
-    addEmoteSets(
-        getApp()->accounts->twitch.getCurrent()->accessEmotes()->emoteSets,
-        *globalChannel, *subChannel, _channel->getName());
-
     // global
     addEmotes(*globalChannel, *getApp()->twitch2->getSeventvEmotes().emotes(),
               "7TV", MessageElementFlag::SeventvEmote);
@@ -236,6 +231,11 @@ void EmotePopup::loadChannel(ChannelPtr _channel)
               "BetterTTV", MessageElementFlag::BttvEmote);
     addEmotes(*globalChannel, *getApp()->twitch2->getFfzEmotes().emotes(),
               "FrankerFaceZ", MessageElementFlag::FfzEmote);
+
+    // twitch
+    addEmoteSets(
+            getApp()->accounts->twitch.getCurrent()->accessEmotes()->emoteSets,
+            *globalChannel, *subChannel, _channel->getName());
 
     // channel
     addEmotes(*channelChannel, *twitchChannel->seventvEmotes(), "7TV",
