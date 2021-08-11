@@ -187,26 +187,26 @@ MessagePtr TwitchMessageBuilder::build()
         calculateMessageTimestamp(this->ircMessage));
 
     bool addModerationElement = true;
-    if (this->senderIsBroadcaster)
+    auto currentUser = getApp()->accounts->twitch.getCurrent();
+
+    if (this->channel->getName() == currentUser->getUserName())
     {
-        addModerationElement = false;
+        addModerationElement = true;
     }
-    else
-    {
+    else {
         bool hasUserType = this->tags.contains("user-type");
-        if (hasUserType)
-        {
+        if (hasUserType) {
             QString userType = this->tags.value("user-type").toString();
 
-            if (userType == "mod")
-            {
-                if (!args.isStaffOrBroadcaster)
-                {
+            if (userType == "mod") {
+                if (!args.isStaffOrBroadcaster) {
                     addModerationElement = false;
                 }
             }
         }
     }
+
+    if (this->senderIsBroadcaster) addModerationElement = false;
 
     if (addModerationElement)
     {
