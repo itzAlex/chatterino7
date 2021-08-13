@@ -34,6 +34,7 @@
 #include "widgets/splits/SplitHeader.hpp"
 #include "widgets/splits/SplitInput.hpp"
 #include "widgets/splits/SplitOverlay.hpp"
+#include "util/Helpers.hpp"
 
 #include <QApplication>
 #include <QClipboard>
@@ -734,6 +735,7 @@ void Split::showViewerList()
         labelList.append(label);
     }
     auto loadingLabel = new QLabel("Loading...");
+    auto chattersCount = new QLabel();
 
     NetworkRequest::twitchRequest("https://tmi.twitch.tv/group/user/" +
                                   this->getChannel()->getName() + "/chatters")
@@ -743,6 +745,21 @@ void Split::showViewerList()
             QJsonObject chattersObj = obj.value("chatters").toObject();
 
             loadingLabel->hide();
+
+            ChannelPtr channel = this->getChannel();
+
+            if (auto twitchChannel = dynamic_cast<TwitchChannel *>(channel.get()))
+            {
+                chattersCount->setFont(getApp()->fonts->getFont(FontStyle::ChatMedium, 1.0));
+                chattersCount->setWordWrap(true);
+                chattersCount->setText(QString("<span style=\"color:" + this->theme->accent.name() +
+                                                ";\">Chatter count:<span style=\"color:white;\"> %1" +
+                                                "<div style=\"line-height:10%;\"><br></div>")
+                                                .arg(localizeNumbers(twitchChannel->chatterCount())));
+            } else {
+                chattersCount->hide();
+            }
+
             for (int i = 0; i < jsonLabels.size(); i++)
             {
                 auto currentCategory =
@@ -770,6 +787,7 @@ void Split::showViewerList()
         if (!query.isEmpty())
         {
             auto results = chattersList->findItems(query, Qt::MatchContains);
+            chattersCount->hide();
             chattersList->hide();
             resultList->clear();
             for (auto &item : results)
@@ -785,6 +803,7 @@ void Split::showViewerList()
         {
             resultList->hide();
             chattersList->show();
+            chattersCount->show();
         }
     });
 
@@ -809,6 +828,7 @@ void Split::showViewerList()
 
     dockVbox->addWidget(searchBar);
     dockVbox->addWidget(loadingLabel);
+    dockVbox->addWidget(chattersCount);
     dockVbox->addWidget(chattersList);
     dockVbox->addWidget(resultList);
     resultList->hide();
