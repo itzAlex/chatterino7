@@ -751,7 +751,6 @@ void Split::showViewerList()
             if (auto twitchChannel = dynamic_cast<TwitchChannel *>(channel.get()))
             {
                 chattersCount->setFont(getApp()->fonts->getFont(FontStyle::ChatMedium, 1.0));
-                chattersCount->setWordWrap(true);
                 chattersCount->setText(QString("<span style=\"color:" + this->theme->accent.name() +
                                                 ";\">Chatter count:<span style=\"color:white;\"> %1" +
                                                 "<div style=\"line-height:10%;\"><br></div>")
