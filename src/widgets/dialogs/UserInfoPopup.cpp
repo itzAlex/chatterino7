@@ -363,6 +363,19 @@ UserInfoPopup::UserInfoPopup(bool closeAutomatically, QWidget *parent)
         this->ui_.latestMessages->setSizePolicy(QSizePolicy::Expanding,
                                                 QSizePolicy::Expanding);
 
+        this->userStateChanged_.connect([this]() mutable {
+            TwitchChannel *twitchChannel =
+                    dynamic_cast<TwitchChannel *>(this->channel_.get());
+
+            bool isModUsercard =
+                    twitchChannel ? twitchChannel->hasModRights() : false;
+
+            if (isModUsercard)
+            {
+                this->ui_.latestMessages->setModerationModeUsercard();
+            }
+        });
+
         logs->addWidget(this->ui_.noMessagesLabel);
         logs->addWidget(this->ui_.latestMessages);
         logs->setAlignment(this->ui_.noMessagesLabel, Qt::AlignHCenter);

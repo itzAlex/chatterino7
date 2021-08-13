@@ -469,6 +469,20 @@ void TwitchModerationElement::addToContainer(MessageLayoutContainer &container,
             }
         }
     }
+
+    if (flags.has(MessageElementFlag::ModeratorUsercard))
+    {
+        QSize size(int(container.getScale() * 16),
+                   int(container.getScale() * 16));
+
+        auto action = ModerationAction("/delete {msg-id}");
+
+        auto image = action.getImage();
+
+        container.addElement(
+                (new ImageLayoutElement(*this, image.get(), size))
+                        ->setLink(Link(Link::UserAction, action.getAction())));
+    }
 }
 
 // TEXT

@@ -97,6 +97,7 @@ public:
 
     void clearMessages();
     void showUserInfoPopup(const QString &userName);
+    void setModerationModeUsercard();
 
     pajlada::Signals::Signal<QMouseEvent *> mouseDown;
     pajlada::Signals::NoArgSignal selectionChanged;
@@ -186,6 +187,7 @@ private:
     int pauseSelectionOffset_ = 0;
 
     boost::optional<MessageElementFlags> overrideFlags_;
+    bool moderationModeUsercard = false;
     MessageLayoutPtr lastReadMessage_;
 
     LimitedQueueSnapshot<MessageLayoutPtr> snapshot_;

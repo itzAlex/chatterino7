@@ -7,7 +7,8 @@
 - Minor: Added 4x links for 7TV emotes
 - Minor: Added `Clear cache` button
 - Minor: Changed global emotes order (7TV - BetterTTV - FrankerFaceZ - Twitch)
-- Minor: Fixed a bug that caused moderation buttons not to appear in historical messages if they were in your own channel.
+- Minor: Fixed a bug that caused moderation buttons not to appear in historical messages if they were in your own channel
+- Minor: Added delete message button to the usercard if you have mod rights
 
 - Minor: Remove TwitchEmotes.com attribution and the open/copy options when right-clicking a Twitch Emote. (#2214, #3136)
 - Minor: Strip leading @ and trailing , from username in /user and /usercard commands. (#3143)

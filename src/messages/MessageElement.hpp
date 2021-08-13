@@ -124,6 +124,8 @@ enum class MessageElementFlag : int64_t {
 
     ModeratorTools = (1LL << 22),
 
+    ModeratorUsercard = (1LL << 42),
+
     EmojiImage = (1LL << 23),
     EmojiText = (1LL << 24),
     EmojiAll = EmojiImage | EmojiText,

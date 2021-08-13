@@ -990,6 +990,11 @@ void ChannelView::setSelection(const SelectionItem &start,
     this->selectionChanged.invoke();
 }
 
+void ChannelView::setModerationModeUsercard()
+{
+    this->moderationModeUsercard = true;
+}
+
 MessageElementFlags ChannelView::getFlags() const
 {
     auto app = getApp();
@@ -1029,6 +1034,11 @@ MessageElementFlags ChannelView::getFlags() const
 
     if (this->sourceChannel_ == app->twitch.server->mentionsChannel)
         flags.set(MessageElementFlag::ChannelName);
+
+    if (this->moderationModeUsercard)
+    {
+        flags.set(MessageElementFlag::ModeratorUsercard);
+    }
 
     return flags;
 }
@@ -2093,7 +2103,7 @@ void ChannelView::handleLinkClick(QMouseEvent *event, const Link &link,
         case Link::UserAction: {
             QString value = link.value;
 
-            ChannelPtr channel = this->underlyingChannel_;
+            ChannelPtr channel = this->hasSourceChannel() ? this->sourceChannel_ : this->underlyingChannel_;
             SearchPopup *searchPopup =
                 dynamic_cast<SearchPopup *>(this->parentWidget());
             if (searchPopup != nullptr)
