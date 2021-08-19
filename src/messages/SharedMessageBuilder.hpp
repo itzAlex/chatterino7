@@ -65,6 +65,7 @@ protected:
 
     bool highlightAlert_ = false;
     bool highlightSound_ = false;
+    bool highlightEnabled_ = false;
 
     QUrl highlightSoundUrl_;
 };

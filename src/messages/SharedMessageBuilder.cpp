@@ -13,6 +13,8 @@
 
 #include <QFileInfo>
 #include <QMediaPlayer>
+#include <algorithm>
+#include <boost/algorithm/string/predicate.hpp>
 
 namespace chatterino {
 
@@ -288,6 +290,23 @@ void SharedMessageBuilder::parseHighlights()
             continue;
         }
 
+        std::vector<std::string> channels = highlight.getChannels();
+        std::string currentChannel = this->channel->getName().toStdString();
+        const auto it = std::find_if(
+                std::begin(channels),
+                std::end(channels),
+                [&currentChannel](const auto& str) { return boost::iequals(currentChannel, str); }
+        );
+
+        if (highlight.isGlobalHighlight() || (it != std::end(channels)))
+        {
+            this->highlightEnabled_ = true;
+        }
+        else
+        {
+            continue;
+        }
+
         this->message().flags.set(MessageFlag::Highlighted);
         this->message().highlightColor = highlight.getColor();
 
@@ -450,28 +469,26 @@ void SharedMessageBuilder::triggerHighlights()
         return;
     }
 
-    bool hasFocus = (QApplication::focusWidget() != nullptr);
-    bool resolveFocus = !hasFocus || getSettings()->highlightAlwaysPlaySound;
+    if (this->highlightEnabled_) {
+        bool hasFocus = (QApplication::focusWidget() != nullptr);
+        bool resolveFocus = !hasFocus || getSettings()->highlightAlwaysPlaySound;
 
-    if (this->highlightSound_ && resolveFocus)
-    {
-        if (auto player = getPlayer())
-        {
-            // update the media player url if necessary
-            if (currentPlayerUrl != this->highlightSoundUrl_)
-            {
-                player->setMedia(this->highlightSoundUrl_);
+        if (this->highlightSound_ && resolveFocus) {
+            if (auto player = getPlayer()) {
+                // update the media player url if necessary
+                if (currentPlayerUrl != this->highlightSoundUrl_) {
+                    player->setMedia(this->highlightSoundUrl_);
 
-                currentPlayerUrl = this->highlightSoundUrl_;
+                    currentPlayerUrl = this->highlightSoundUrl_;
+                }
+
+                player->play();
             }
-
-            player->play();
         }
-    }
 
-    if (this->highlightAlert_)
-    {
-        getApp()->windows->sendAlert();
+        if (this->highlightAlert_) {
+            getApp()->windows->sendAlert();
+        }
     }
 }
 

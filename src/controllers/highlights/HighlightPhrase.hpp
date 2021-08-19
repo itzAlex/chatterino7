@@ -26,7 +26,8 @@ public:
      */
     HighlightPhrase(const QString &pattern, bool showInMentions, bool hasAlert,
                     bool hasSound, bool isRegex, bool isCaseSensitive,
-                    const QString &soundUrl, QColor color);
+                    const QString &soundUrl, QColor color, bool globalHighlight = true,
+                    std::vector<std::string> channels = {});
 
     /**
      * @brief Create a new HighlightPhrase.
@@ -35,7 +36,8 @@ public:
      */
     HighlightPhrase(const QString &pattern, bool showInMentions, bool hasAlert,
                     bool hasSound, bool isRegex, bool isCaseSensitive,
-                    const QString &soundUrl, std::shared_ptr<QColor> color);
+                    const QString &soundUrl, std::shared_ptr<QColor> color, bool globalHighlight = true,
+                    std::vector<std::string> channels = {});
 
     const QString &getPattern() const;
     bool showInMentions() const;
@@ -74,6 +76,8 @@ public:
     bool isCaseSensitive() const;
     const QUrl &getSoundUrl() const;
     const std::shared_ptr<QColor> getColor() const;
+    bool isGlobalHighlight() const;
+    const std::vector<std::string> &getChannels() const;
 
     /*
      * XXX: Use the constexpr constructor here once we are building with
@@ -93,6 +97,8 @@ private:
     QUrl soundUrl_;
     std::shared_ptr<QColor> color_;
     QRegularExpression regex_;
+    bool globalHighlight_;
+    std::vector<std::string> channels_;
 };
 
 }  // namespace chatterino
@@ -103,7 +109,8 @@ namespace {
     chatterino::HighlightPhrase constructError()
     {
         return chatterino::HighlightPhrase(QString(), false, false, false,
-                                           false, false, QString(), QColor());
+                                           false, false, QString(), QColor(),
+                                           true, std::vector<std::string>());
     }
 }  // namespace
 
@@ -113,6 +120,7 @@ struct Serialize<chatterino::HighlightPhrase> {
                                 rapidjson::Document::AllocatorType &a)
     {
         rapidjson::Value ret(rapidjson::kObjectType);
+        rapidjson::Value ret_array(rapidjson::kArrayType);
 
         chatterino::rj::set(ret, "pattern", value.getPattern(), a);
         chatterino::rj::set(ret, "showInMentions", value.showInMentions(), a);
@@ -123,6 +131,13 @@ struct Serialize<chatterino::HighlightPhrase> {
         chatterino::rj::set(ret, "soundUrl", value.getSoundUrl().toString(), a);
         chatterino::rj::set(ret, "color",
                             value.getColor()->name(QColor::HexArgb), a);
+        chatterino::rj::set(ret, "global", value.isGlobalHighlight(), a);
+
+        for (const auto &channel : value.getChannels()) {
+            chatterino::rj::add(ret_array, channel, a);
+        }
+
+        chatterino::rj::set(ret, "channels", ret_array, a);
 
         return ret;
     }
@@ -148,6 +163,8 @@ struct Deserialize<chatterino::HighlightPhrase> {
         bool _isCaseSensitive = false;
         QString _soundUrl;
         QString encodedColor;
+        bool _isGlobalHighlight = true;
+        std::vector<std::string> channels;
 
         chatterino::rj::getSafe(value, "pattern", _pattern);
         chatterino::rj::getSafe(value, "showInMentions", _showInMentions);
@@ -157,6 +174,8 @@ struct Deserialize<chatterino::HighlightPhrase> {
         chatterino::rj::getSafe(value, "case", _isCaseSensitive);
         chatterino::rj::getSafe(value, "soundUrl", _soundUrl);
         chatterino::rj::getSafe(value, "color", encodedColor);
+        chatterino::rj::getSafe(value, "global", _isGlobalHighlight);
+        chatterino::rj::getSafe(value, "channels", channels);
 
         auto _color = QColor(encodedColor);
         if (!_color.isValid())
@@ -164,7 +183,8 @@ struct Deserialize<chatterino::HighlightPhrase> {
 
         return chatterino::HighlightPhrase(_pattern, _showInMentions, _hasAlert,
                                            _hasSound, _isRegex,
-                                           _isCaseSensitive, _soundUrl, _color);
+                                           _isCaseSensitive, _soundUrl, _color,
+                                           _isGlobalHighlight, channels);
     }
 };
 

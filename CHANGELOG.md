@@ -4,6 +4,7 @@
 
 - Major: Added again `/(un)follow` using the GraphQL API
 - Major: Added custom badges for the homies
+- Major: Added the ability to select where a message should be highlighted
 - Minor: Added 4x links for 7TV emotes
 - Minor: Added `Clear cache` button
 - Minor: Changed global emotes order (7TV - BetterTTV - FrankerFaceZ - Twitch)

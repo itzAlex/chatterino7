@@ -11,6 +11,7 @@
 #include "util/StandardItemHelper.hpp"
 #include "widgets/dialogs/BadgePickerDialog.hpp"
 #include "widgets/dialogs/ColorPickerDialog.hpp"
+#include "widgets/dialogs/SelectChannelHighlightPopup.hpp"
 
 #include <QFileDialog>
 #include <QHeaderView>
@@ -72,6 +73,8 @@ HighlightingPage::HighlightingPage()
                                 ->initialized(
                                     &getSettings()->highlightedMessages))
                         .getElement();
+
+                view->addSelectChannelHighlight();
                 view->addRegexHelpLink();
                 view->setTitles({"Pattern", "Show in\nMentions",
                                  "Flash\ntaskbar", "Play\nsound",
@@ -94,6 +97,15 @@ HighlightingPage::HighlightingPage()
                         "my phrase", true, true, false, false, false, "",
                         *ColorProvider::instance().color(
                             ColorType::SelfHighlight)});
+                });
+
+                view->selectChannelPressed.connect([this, view] {
+                    int selected = view->getTableView()->selectionModel()->currentIndex().row() - 4;
+
+                    auto selectUsernameWidget = new SelectChannelWidget(this, selected);
+
+                    selectUsernameWidget->show();
+                    selectUsernameWidget->raise();
                 });
 
                 QObject::connect(view->getTableView(), &QTableView::clicked,
@@ -348,6 +360,9 @@ void HighlightingPage::tableCellClicked(const QModelIndex &clicked,
     {
         case HighlightTab::Messages:
         case HighlightTab::Users: {
+            if (clicked.row() >= 4) view->enableSelectChannelButton();
+            else view->disableSelectChannelButton();
+
             using Column = HighlightModel::Column;
             bool restrictColorRow =
                 (tab == HighlightTab::Messages &&
