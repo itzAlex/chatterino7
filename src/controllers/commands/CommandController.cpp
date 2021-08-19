@@ -417,8 +417,8 @@ void CommandController::initialize(Settings &, Paths &paths)
             return "";
         }
 
-        auto followHash = pajlada::Settings::Setting<QString>::get("/accounts/" + currentUser->getUserId().toStdString() + "/followHash");
-        auto followToken = pajlada::Settings::Setting<QString>::get("/accounts/" + currentUser->getUserId().toStdString() + "/followToken");
+        auto followHash = pajlada::Settings::Setting<QString>::get("/accounts/uid" + currentUser->getUserId().toStdString() + "/followHash");
+        auto followToken = pajlada::Settings::Setting<QString>::get("/accounts/uid" + currentUser->getUserId().toStdString() + "/followToken");
 
         if (followHash.isEmpty() ||
             followToken.isEmpty())
@@ -472,8 +472,8 @@ void CommandController::initialize(Settings &, Paths &paths)
             return "";
         }
 
-        auto unfollowHash = pajlada::Settings::Setting<QString>::get("/accounts/" + currentUser->getUserId().toStdString() + "/unfollowHash");
-        auto followToken = pajlada::Settings::Setting<QString>::get("/accounts/" + currentUser->getUserId().toStdString() + "/followToken");
+        auto unfollowHash = pajlada::Settings::Setting<QString>::get("/accounts/uid" + currentUser->getUserId().toStdString() + "/unfollowHash");
+        auto followToken = pajlada::Settings::Setting<QString>::get("/accounts/uid" + currentUser->getUserId().toStdString() + "/followToken");
 
         if (unfollowHash.isEmpty() ||
             followToken.isEmpty())

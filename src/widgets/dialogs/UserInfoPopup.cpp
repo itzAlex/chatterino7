@@ -440,8 +440,8 @@ void UserInfoPopup::installEvents()
                 switch (newState)
                 {
                     case Qt::CheckState::Unchecked: {
-                        auto unfollowHash = pajlada::Settings::Setting<QString>::get("/accounts/" + currentUser->getUserId().toStdString() + "/unfollowHash");
-                        auto followToken = pajlada::Settings::Setting<QString>::get("/accounts/" + currentUser->getUserId().toStdString() + "/followToken");
+                        auto unfollowHash = pajlada::Settings::Setting<QString>::get("/accounts/uid" + currentUser->getUserId().toStdString() + "/unfollowHash");
+                        auto followToken = pajlada::Settings::Setting<QString>::get("/accounts/uid" + currentUser->getUserId().toStdString() + "/followToken");
 
                         this->ui_.follow->setEnabled(false);
                         getHelix()->unfollowUser(currentUser->getUserId(),
@@ -460,8 +460,8 @@ void UserInfoPopup::installEvents()
                         break;
 
                     case Qt::CheckState::Checked: {
-                        auto followHash = pajlada::Settings::Setting<QString>::get("/accounts/" + currentUser->getUserId().toStdString() + "/followHash");
-                        auto followToken = pajlada::Settings::Setting<QString>::get("/accounts/" + currentUser->getUserId().toStdString() + "/followToken");
+                        auto followHash = pajlada::Settings::Setting<QString>::get("/accounts/uid" + currentUser->getUserId().toStdString() + "/followHash");
+                        auto followToken = pajlada::Settings::Setting<QString>::get("/accounts/uid" + currentUser->getUserId().toStdString() + "/followToken");
 
                         this->ui_.follow->setEnabled(false);
                         getHelix()->followUser(currentUser->getUserId(),

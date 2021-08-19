@@ -81,6 +81,8 @@ AccountsPage::AccountsPage()
             hashes_form->addRow("OAuth token", &this->OAuthTokenInput);
         }
 
+        QHBoxLayout *buttons = new QHBoxLayout();
+
         clearFieldsButton = new QPushButton();
         {
             clearFieldsButton->setText("Clear fields");
@@ -91,10 +93,12 @@ AccountsPage::AccountsPage()
             accountsSettingsButton->setText("Save settings");
         }
 
+        buttons->addWidget(clearFieldsButton);
+        buttons->addWidget(accountsSettingsButton);
+
         refreshButtons();
 
-        accountsSettings->addWidget(clearFieldsButton);
-        accountsSettings->addWidget(accountsSettingsButton);
+        accountsSettings->addLayout(buttons);
 
         connect(&followHashInput, &QLineEdit::textChanged, [=]() {
             refreshButtons();
@@ -129,7 +133,7 @@ AccountsPage::AccountsPage()
 
                 if (username == combo->currentText())
                 {
-                    std::string basePath = "/accounts/" + userID.toStdString();
+                    std::string basePath = "/accounts/uid" + userID.toStdString();
 
                     pajlada::Settings::Setting<QString>::set(basePath + "/followHash", this->followHashInput.text());
                     pajlada::Settings::Setting<QString>::set(basePath + "/unfollowHash", this->unfollowHashInput.text());
