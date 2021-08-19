@@ -24,12 +24,14 @@
 #include "widgets/Window.hpp"
 #include "widgets/dialogs/UserInfoPopup.hpp"
 #include "widgets/splits/Split.hpp"
+#include "boost/filesystem.hpp"
 
 #include <QApplication>
 #include <QDesktopServices>
 #include <QFile>
 #include <QRegularExpression>
 #include <QUrl>
+#include <QProcess>
 
 namespace {
 using namespace chatterino;
@@ -599,6 +601,15 @@ void CommandController::initialize(Settings &, Paths &paths)
 
             return "";
         });
+
+    this->registerCommand(
+            "/reset", [](const auto & /*words*/, auto channel) {
+                boost::filesystem::remove_all((getPaths()->cacheDirectory()).toStdString());
+                qApp->quit();
+                QProcess::startDetached(qApp->arguments()[0], qApp->arguments());
+
+                return "";
+            });
 
     this->registerCommand("/clip", [](const auto & /*words*/, auto channel) {
         if (const auto type = channel->getType();
