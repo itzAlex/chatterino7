@@ -1,11 +1,8 @@
 # Changelog
 
-## Homies (#1)
+## Homies (#2)
 
-- Major: Added again `/(un)follow` using the GraphQL API
-- Major: Added custom badges for the homies
 - Major: Added the ability to select where a message should be highlighted
-- Minor: Added 4x links for 7TV emotes
 - Minor: Added `Clear cache` button
 - Minor: Changed global emotes order (7TV - BetterTTV - FrankerFaceZ - Twitch)
 - Minor: Added delete message button to the usercard if you have mod rights
@@ -14,15 +11,22 @@
 - Bugfix: Fixed a bug that caused moderation buttons not to appear in historical messages if they were in your own channel
 - Bugfix: The needed tokens and hashes to follow/unfollow someone now are stored correctly
 
-- Minor: Remove TwitchEmotes.com attribution and the open/copy options when right-clicking a Twitch Emote. (#2214, #3136)
-- Minor: Strip leading @ and trailing , from username in /user and /usercard commands. (#3143)
-- Minor: Display a system message when reloading subscription emotes to match BTTV/FFZ behavior (#3135)
 - Minor: Allow resub messages to show in `/mentions` tab (#3148)
 - Minor: Added a setting to hide similar messages by any user. (#2716)
 - Minor: Duplicate spaces now count towards the display message length. (#3002)
 - Minor: Commands are now backed up. (#3168)
 - Bugfix: Restored ability to send duplicate `/me` messages. (#3166)
 - Bugfix: Notifications for moderators about other moderators deleting messages can now be disabled. (#3121)
+
+## Homies (#1)
+
+- Major: Added again `/(un)follow` using the GraphQL API
+- Major: Added custom badges for the homies
+- Minor: Added 4x links for 7TV emotes
+
+- Minor: Remove TwitchEmotes.com attribution and the open/copy options when right-clicking a Twitch Emote. (#2214, #3136)
+- Minor: Strip leading @ and trailing , from username in /user and /usercard commands. (#3143)
+- Minor: Display a system message when reloading subscription emotes to match BTTV/FFZ behavior (#3135)
 - Bugfix: Moderation mode and active filters are now preserved when opening a split as a popup. (#3113, #3130)
 - Bugfix: Fixed a bug that caused all badge highlights to use the same color. (#3132, #3134)
 - Dev: Renamed CMake's build option `USE_SYSTEM_QT5KEYCHAIN` to `USE_SYSTEM_QTKEYCHAIN`. (#3103)
