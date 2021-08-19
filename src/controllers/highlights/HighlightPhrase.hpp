@@ -26,7 +26,8 @@ public:
      */
     HighlightPhrase(const QString &pattern, bool showInMentions, bool hasAlert,
                     bool hasSound, bool isRegex, bool isCaseSensitive,
-                    const QString &soundUrl, QColor color, bool globalHighlight = true,
+                    const QString &soundUrl, QColor color,
+                    bool globalHighlight = true,
                     std::vector<std::string> channels = {});
 
     /**
@@ -36,7 +37,8 @@ public:
      */
     HighlightPhrase(const QString &pattern, bool showInMentions, bool hasAlert,
                     bool hasSound, bool isRegex, bool isCaseSensitive,
-                    const QString &soundUrl, std::shared_ptr<QColor> color, bool globalHighlight = true,
+                    const QString &soundUrl, std::shared_ptr<QColor> color,
+                    bool globalHighlight = true,
                     std::vector<std::string> channels = {});
 
     const QString &getPattern() const;
@@ -133,7 +135,8 @@ struct Serialize<chatterino::HighlightPhrase> {
                             value.getColor()->name(QColor::HexArgb), a);
         chatterino::rj::set(ret, "global", value.isGlobalHighlight(), a);
 
-        for (const auto &channel : value.getChannels()) {
+        for (const auto &channel : value.getChannels())
+        {
             chatterino::rj::add(ret_array, channel, a);
         }
 
@@ -181,10 +184,9 @@ struct Deserialize<chatterino::HighlightPhrase> {
         if (!_color.isValid())
             _color = chatterino::HighlightPhrase::FALLBACK_HIGHLIGHT_COLOR;
 
-        return chatterino::HighlightPhrase(_pattern, _showInMentions, _hasAlert,
-                                           _hasSound, _isRegex,
-                                           _isCaseSensitive, _soundUrl, _color,
-                                           _isGlobalHighlight, channels);
+        return chatterino::HighlightPhrase(
+            _pattern, _showInMentions, _hasAlert, _hasSound, _isRegex,
+            _isCaseSensitive, _soundUrl, _color, _isGlobalHighlight, channels);
     }
 };
 

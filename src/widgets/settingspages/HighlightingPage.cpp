@@ -100,9 +100,14 @@ HighlightingPage::HighlightingPage()
                 });
 
                 view->selectChannelPressed.connect([this, view] {
-                    int selected = view->getTableView()->selectionModel()->currentIndex().row() - 4;
+                    int selected = view->getTableView()
+                                       ->selectionModel()
+                                       ->currentIndex()
+                                       .row() -
+                                   4;
 
-                    auto selectUsernameWidget = new SelectChannelWidget(this, selected);
+                    auto selectUsernameWidget =
+                        new SelectChannelWidget(this, selected);
 
                     selectUsernameWidget->show();
                     selectUsernameWidget->raise();
@@ -360,8 +365,10 @@ void HighlightingPage::tableCellClicked(const QModelIndex &clicked,
     {
         case HighlightTab::Messages:
         case HighlightTab::Users: {
-            if (clicked.row() >= 4) view->enableSelectChannelButton();
-            else view->disableSelectChannelButton();
+            if (clicked.row() >= 4)
+                view->enableSelectChannelButton();
+            else
+                view->disableSelectChannelButton();
 
             using Column = HighlightModel::Column;
             bool restrictColorRow =

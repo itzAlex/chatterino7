@@ -8,13 +8,13 @@
 #include "controllers/commands/CommandController.hpp"
 #include "singletons/Settings.hpp"
 
-#include <QPushButton>
-#include <QTableView>
-#include <QHBoxLayout>
-#include <QString>
 #include <QFontMetrics>
 #include <QFrame>
+#include <QHBoxLayout>
+#include <QPushButton>
 #include <QStandardItem>
+#include <QString>
+#include <QTableView>
 
 namespace chatterino {
 
@@ -37,8 +37,8 @@ SelectChannelWidget::SelectChannelWidget(QWidget *parent, int selected)
     this->setLayout(&this->ui_.mainLayout);
     this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     this->setWindowFlags(
-            (this->windowFlags() & ~(Qt::WindowContextHelpButtonHint)) |
-            Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+        (this->windowFlags() & ~(Qt::WindowContextHelpButtonHint)) |
+        Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
 
     // Separator line
     QFrame *line = new QFrame(this);
@@ -109,7 +109,7 @@ SelectChannelWidget::SelectChannelWidget(QWidget *parent, int selected)
 
     // OK and Cancel buttons & Checkbox
     auto buttonBox =
-            new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
+        new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
     buttonBox->setCenterButtons(true);
     this->ui_.mainLayout.addWidget(buttonBox);
 
@@ -130,54 +130,58 @@ SelectChannelWidget::SelectChannelWidget(QWidget *parent, int selected)
 
     for (std::string channel : row.getChannels())
     {
-        QStandardItem *item = new QStandardItem(QString::fromStdString(channel));
+        QStandardItem *item =
+            new QStandardItem(QString::fromStdString(channel));
         this->ui_.model_->appendRow(item);
     }
 
     // Signals
-    QObject::connect(buttonBox, &QDialogButtonBox::accepted,
-                     [=]() {
-                        std::vector<std::string> channels;
+    QObject::connect(buttonBox, &QDialogButtonBox::accepted, [=]() {
+        std::vector<std::string> channels;
 
-                        for (int row = 0; row < this->ui_.model_->rowCount(); row++)
-                        {
-                            channels.push_back(this->ui_.model_->index(row, 0).data().toString().toStdString());
-                        }
+        for (int row = 0; row < this->ui_.model_->rowCount(); row++)
+        {
+            channels.push_back(this->ui_.model_->index(row, 0)
+                                   .data()
+                                   .toString()
+                                   .toStdString());
+        }
 
-                         getSettings()->highlightedMessages.insert(HighlightPhrase{
-                                 row.getPattern(), row.showInMentions(), row.hasAlert(), row.hasSound(), row.isRegex(), row.isCaseSensitive(), row.getSoundUrl().toString(),
-                                 row.getColor(), checkbox->isChecked(), channels}, selected);
+        getSettings()->highlightedMessages.insert(
+            HighlightPhrase{row.getPattern(), row.showInMentions(),
+                            row.hasAlert(), row.hasSound(), row.isRegex(),
+                            row.isCaseSensitive(), row.getSoundUrl().toString(),
+                            row.getColor(), checkbox->isChecked(), channels},
+            selected);
 
-                        getSettings()->highlightedMessages.removeAt(selected + 1);
+        getSettings()->highlightedMessages.removeAt(selected + 1);
 
-                        this->accept();
-                        this->close();
-                     });
+        this->accept();
+        this->close();
+    });
 
-    QObject::connect(buttonBox, &QDialogButtonBox::rejected,
-                     [this]() {
-                         this->reject();
-                         this->close();
-                     });
+    QObject::connect(buttonBox, &QDialogButtonBox::rejected, [this]() {
+        this->reject();
+        this->close();
+    });
 
-    QObject::connect(checkbox, &QCheckBox::stateChanged,
-                     [=](int state) {
-                         if (state)
-                         {
-                             add->hide();
-                             remove->hide();
-                             this->ui_.tableView_->hide();
-                             line->hide();
-                             this->adjustSize();
-                         }
-                         else
-                         {
-                             add->show();
-                             remove->show();
-                             this->ui_.tableView_->show();
-                             line->show();
-                             this->adjustSize();
-                         }
-                     });
+    QObject::connect(checkbox, &QCheckBox::stateChanged, [=](int state) {
+        if (state)
+        {
+            add->hide();
+            remove->hide();
+            this->ui_.tableView_->hide();
+            line->hide();
+            this->adjustSize();
+        }
+        else
+        {
+            add->show();
+            remove->show();
+            this->ui_.tableView_->show();
+            line->show();
+            this->adjustSize();
+        }
+    });
 }
-} // namespace chatterino
+}  // namespace chatterino

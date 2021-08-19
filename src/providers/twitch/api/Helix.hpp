@@ -320,6 +320,7 @@ enum class HelixAutoModMessageError {
 class Helix final : boost::noncopyable
 {
     static constexpr const char *GQLUrl = "https://gql.twitch.tv/gql";
+
 public:
     // https://dev.twitch.tv/docs/api/reference#get-users
     void fetchUsers(QStringList userIds, QStringList userLogins,
@@ -343,9 +344,9 @@ public:
         HelixFailureCallback failureCallback);
 
     void getUserFollow(
-            QString userId, QString targetId,
-            ResultCallback<bool, HelixUsersFollowsRecord> successCallback,
-            HelixFailureCallback failureCallback);
+        QString userId, QString targetId,
+        ResultCallback<bool, HelixUsersFollowsRecord> successCallback,
+        HelixFailureCallback failureCallback);
 
     // https://dev.twitch.tv/docs/api/reference#get-streams
     void fetchStreams(QStringList userIds, QStringList userLogins,
@@ -374,12 +375,13 @@ public:
                      HelixFailureCallback failureCallback);
 
     // Not using the API (GraphQL instead)
-    void followUser(QString userId, QString targetId, QString hash, QString followToken,
-                    std::function<void()> successCallback,
+    void followUser(QString userId, QString targetId, QString hash,
+                    QString followToken, std::function<void()> successCallback,
                     HelixFailureCallback failureCallback);
 
     // Not using the API (GraphQL instead)
-    void unfollowUser(QString userId, QString targetlId, QString hash, QString followToken,
+    void unfollowUser(QString userId, QString targetlId, QString hash,
+                      QString followToken,
                       std::function<void()> successCallback,
                       HelixFailureCallback failureCallback);
 
@@ -449,7 +451,8 @@ public:
 
 private:
     NetworkRequest makeRequest(QString url, QUrlQuery urlQuery);
-    NetworkRequest makeRequestGQL(QString operationName, QString targetID, QString hash, QString followToken);
+    NetworkRequest makeRequestGQL(QString operationName, QString targetID,
+                                  QString hash, QString followToken);
 
     QString clientId;
     QString oauthToken;

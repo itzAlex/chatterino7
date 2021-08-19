@@ -36,34 +36,34 @@ void itzAlexBadges::loaditzAlexBadges()
     static QUrl url("https://itzalex.github.io/badges");
 
     NetworkRequest(url)
-            .concurrent()
-            .onSuccess([this](auto result) -> Outcome {
-                auto jsonRoot = result.parseJson();
+        .concurrent()
+        .onSuccess([this](auto result) -> Outcome {
+            auto jsonRoot = result.parseJson();
 
-                std::unique_lock lock(this->mutex_);
+            std::unique_lock lock(this->mutex_);
 
-                int index = 0;
-                for (const auto &jsonBadge_ : jsonRoot.value("badges").toArray())
+            int index = 0;
+            for (const auto &jsonBadge_ : jsonRoot.value("badges").toArray())
+            {
+                auto jsonBadge = jsonBadge_.toObject();
+                auto emote = Emote{
+                    EmoteName{},
+                    ImageSet{Url{jsonBadge.value("image1").toString()},
+                             Url{jsonBadge.value("image2").toString()},
+                             Url{jsonBadge.value("image3").toString()}},
+                    Tooltip{jsonBadge.value("tooltip").toString()}, Url{}};
+
+                emotes.push_back(
+                    std::make_shared<const Emote>(std::move(emote)));
+
+                for (const auto &user : jsonBadge.value("users").toArray())
                 {
-                    auto jsonBadge = jsonBadge_.toObject();
-                    auto emote = Emote{
-                            EmoteName{},
-                            ImageSet{Url{jsonBadge.value("image1").toString()},
-                                     Url{jsonBadge.value("image2").toString()},
-                                     Url{jsonBadge.value("image3").toString()}},
-                            Tooltip{jsonBadge.value("tooltip").toString()}, Url{}};
-
-                    emotes.push_back(
-                            std::make_shared<const Emote>(std::move(emote)));
-
-                    for (const auto &user : jsonBadge.value("users").toArray())
-                    {
-                        badgeMap[user.toString()] = index;
-                    }
-                    ++index;
+                    badgeMap[user.toString()] = index;
                 }
-                return Success;
-            })
-            .execute();
+                ++index;
+            }
+            return Success;
+        })
+        .execute();
 }
 }  // namespace chatterino

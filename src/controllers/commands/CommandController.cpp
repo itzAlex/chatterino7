@@ -1,6 +1,7 @@
 #include "CommandController.hpp"
 
 #include "Application.hpp"
+#include "boost/filesystem.hpp"
 #include "common/SignalVector.hpp"
 #include "controllers/accounts/AccountController.hpp"
 #include "controllers/commands/Command.hpp"
@@ -24,14 +25,13 @@
 #include "widgets/Window.hpp"
 #include "widgets/dialogs/UserInfoPopup.hpp"
 #include "widgets/splits/Split.hpp"
-#include "boost/filesystem.hpp"
 
 #include <QApplication>
 #include <QDesktopServices>
 #include <QFile>
+#include <QProcess>
 #include <QRegularExpression>
 #include <QUrl>
-#include <QProcess>
 
 namespace {
 using namespace chatterino;
@@ -409,7 +409,7 @@ void CommandController::initialize(Settings &, Paths &paths)
         if (currentUser->isAnon())
         {
             channel->addMessage(
-                    makeSystemMessage("You must be logged in to follow someone!"));
+                makeSystemMessage("You must be logged in to follow someone!"));
             return "";
         }
 
@@ -419,41 +419,51 @@ void CommandController::initialize(Settings &, Paths &paths)
             return "";
         }
 
-        auto followHash = pajlada::Settings::Setting<QString>::get("/accounts/uid" + currentUser->getUserId().toStdString() + "/followHash");
-        auto followToken = pajlada::Settings::Setting<QString>::get("/accounts/uid" + currentUser->getUserId().toStdString() + "/followToken");
+        auto followHash = pajlada::Settings::Setting<QString>::get(
+            "/accounts/uid" + currentUser->getUserId().toStdString() +
+            "/followHash");
+        auto followToken = pajlada::Settings::Setting<QString>::get(
+            "/accounts/uid" + currentUser->getUserId().toStdString() +
+            "/followToken");
 
-        if (followHash.isEmpty() ||
-            followToken.isEmpty())
+        if (followHash.isEmpty() || followToken.isEmpty())
         {
-            channel->addMessage(makeSystemMessage("In order to follow someone you have to introduce the needed hashes and tokens in: Settings ➜ Accounts ➜ Accounts settings"));
+            channel->addMessage(
+                makeSystemMessage("In order to follow someone you have to "
+                                  "introduce the needed hashes and tokens in: "
+                                  "Settings ➜ Accounts ➜ Accounts settings"));
             return "";
         }
 
         auto target = words.at(1);
 
         getHelix()->getUserByName(
-                target,
-                [currentUser, channel, target, followHash, followToken](const auto &targetUser) {
-                    getHelix()->followUser(
-                            currentUser->getUserId(), targetUser.id, followHash, followToken,
-                            [channel, target]() {
-                                channel->addMessage(makeSystemMessage(
-                                        "You successfully followed " + target));
-                            },
-                            [channel, target]() {
-                                channel->addMessage(makeSystemMessage(
-                                        QString("User %1 could not be followed, an "
-                                                "error occurred! Please check that you have "
-                                                "introduced the correct values in: Settings ➜ Accounts ➜ Accounts settings")
-                                                .arg(target)));
-                            });
-                },
-                [channel, target] {
-                    channel->addMessage(
-                            makeSystemMessage(QString("User %1 could not be followed, "
-                                                      "no user with that name found!")
-                                                      .arg(target)));
-                });
+            target,
+            [currentUser, channel, target, followHash,
+             followToken](const auto &targetUser) {
+                getHelix()->followUser(
+                    currentUser->getUserId(), targetUser.id, followHash,
+                    followToken,
+                    [channel, target]() {
+                        channel->addMessage(makeSystemMessage(
+                            "You successfully followed " + target));
+                    },
+                    [channel, target]() {
+                        channel->addMessage(makeSystemMessage(
+                            QString(
+                                "User %1 could not be followed, an "
+                                "error occurred! Please check that you have "
+                                "introduced the correct values in: Settings ➜ "
+                                "Accounts ➜ Accounts settings")
+                                .arg(target)));
+                    });
+            },
+            [channel, target] {
+                channel->addMessage(
+                    makeSystemMessage(QString("User %1 could not be followed, "
+                                              "no user with that name found!")
+                                          .arg(target)));
+            });
 
         return "";
     });
@@ -463,8 +473,8 @@ void CommandController::initialize(Settings &, Paths &paths)
 
         if (currentUser->isAnon())
         {
-            channel->addMessage(
-                    makeSystemMessage("You must be logged in to unfollow someone!"));
+            channel->addMessage(makeSystemMessage(
+                "You must be logged in to unfollow someone!"));
             return "";
         }
 
@@ -474,40 +484,50 @@ void CommandController::initialize(Settings &, Paths &paths)
             return "";
         }
 
-        auto unfollowHash = pajlada::Settings::Setting<QString>::get("/accounts/uid" + currentUser->getUserId().toStdString() + "/unfollowHash");
-        auto followToken = pajlada::Settings::Setting<QString>::get("/accounts/uid" + currentUser->getUserId().toStdString() + "/followToken");
+        auto unfollowHash = pajlada::Settings::Setting<QString>::get(
+            "/accounts/uid" + currentUser->getUserId().toStdString() +
+            "/unfollowHash");
+        auto followToken = pajlada::Settings::Setting<QString>::get(
+            "/accounts/uid" + currentUser->getUserId().toStdString() +
+            "/followToken");
 
-        if (unfollowHash.isEmpty() ||
-            followToken.isEmpty())
+        if (unfollowHash.isEmpty() || followToken.isEmpty())
         {
-            channel->addMessage(makeSystemMessage("In order to unfollow someone you have to introduce the needed hashes and tokens in: Settings ➜ Accounts ➜ Accounts settings"));
+            channel->addMessage(
+                makeSystemMessage("In order to unfollow someone you have to "
+                                  "introduce the needed hashes and tokens in: "
+                                  "Settings ➜ Accounts ➜ Accounts settings"));
             return "";
         }
 
         auto target = words.at(1);
 
         getHelix()->getUserByName(
-                target,
-                [currentUser, channel, target, unfollowHash, followToken](const auto &targetUser) {
-                    getHelix()->unfollowUser(
-                            currentUser->getUserId(), targetUser.id, unfollowHash, followToken,
-                            [channel, target]() {
-                                channel->addMessage(makeSystemMessage(
-                                        "You successfully unfollowed " + target));
-                            },
-                            [channel, target]() {
-                                channel->addMessage(makeSystemMessage(
-                                        QString("User %1 could not be unfollowed, an error "
-                                                "occurred! Please check that you have "
-                                                "introduced the correct values in: Settings ➜ Accounts ➜ Accounts settings")
-                                                .arg(target)));
-                            });
-                },
-                [channel, target] {
-                    channel->addMessage(makeSystemMessage(QString("User %1 could not be unfollowed, "
-                                                                  "no user with that name found!")
-                                                                  .arg(target)));
-                });
+            target,
+            [currentUser, channel, target, unfollowHash,
+             followToken](const auto &targetUser) {
+                getHelix()->unfollowUser(
+                    currentUser->getUserId(), targetUser.id, unfollowHash,
+                    followToken,
+                    [channel, target]() {
+                        channel->addMessage(makeSystemMessage(
+                            "You successfully unfollowed " + target));
+                    },
+                    [channel, target]() {
+                        channel->addMessage(makeSystemMessage(
+                            QString("User %1 could not be unfollowed, an error "
+                                    "occurred! Please check that you have "
+                                    "introduced the correct values in: "
+                                    "Settings ➜ Accounts ➜ Accounts settings")
+                                .arg(target)));
+                    });
+            },
+            [channel, target] {
+                channel->addMessage(makeSystemMessage(
+                    QString("User %1 could not be unfollowed, "
+                            "no user with that name found!")
+                        .arg(target)));
+            });
 
         return "";
     });
@@ -604,14 +624,14 @@ void CommandController::initialize(Settings &, Paths &paths)
             return "";
         });
 
-    this->registerCommand(
-            "/reset", [](const auto & /*words*/, auto channel) {
-                boost::filesystem::remove_all((getPaths()->cacheDirectory()).toStdString());
-                qApp->quit();
-                QProcess::startDetached(qApp->arguments()[0], qApp->arguments());
+    this->registerCommand("/reset", [](const auto & /*words*/, auto channel) {
+        boost::filesystem::remove_all(
+            (getPaths()->cacheDirectory()).toStdString());
+        qApp->quit();
+        QProcess::startDetached(qApp->arguments()[0], qApp->arguments());
 
-                return "";
-            });
+        return "";
+    });
 
     this->registerCommand("/clip", [](const auto & /*words*/, auto channel) {
         if (const auto type = channel->getType();

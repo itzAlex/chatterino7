@@ -143,22 +143,22 @@ void Helix::getUserFollowers(
 }
 
 void Helix::getUserFollow(
-        QString userId, QString targetId,
-        ResultCallback<bool, HelixUsersFollowsRecord> successCallback,
-        HelixFailureCallback failureCallback)
+    QString userId, QString targetId,
+    ResultCallback<bool, HelixUsersFollowsRecord> successCallback,
+    HelixFailureCallback failureCallback)
 {
     this->fetchUsersFollows(
-            std::move(userId), std::move(targetId),
-            [successCallback](const auto &response) {
-                if (response.data.empty())
-                {
-                    successCallback(false, HelixUsersFollowsRecord());
-                    return;
-                }
+        std::move(userId), std::move(targetId),
+        [successCallback](const auto &response) {
+            if (response.data.empty())
+            {
+                successCallback(false, HelixUsersFollowsRecord());
+                return;
+            }
 
-                successCallback(true, response.data[0]);
-            },
-            std::move(failureCallback));
+            successCallback(true, response.data[0]);
+        },
+        std::move(failureCallback));
 }
 
 void Helix::fetchStreams(
@@ -354,34 +354,37 @@ void Helix::getGameById(QString gameId,
         failureCallback);
 }
 
-void Helix::followUser(QString userId, QString targetId, QString hash, QString followToken,
+void Helix::followUser(QString userId, QString targetId, QString hash,
+                       QString followToken,
                        std::function<void()> successCallback,
                        HelixFailureCallback failureCallback)
 {
     this->makeRequestGQL("FollowButton_FollowUser", targetId, hash, followToken)
-            .onSuccess([successCallback](auto /*result*/) -> Outcome {
-                successCallback();
-                return Success;
-            })
-            .onError([failureCallback](auto /*result*/) {
-                failureCallback();
-            })
-            .execute();
+        .onSuccess([successCallback](auto /*result*/) -> Outcome {
+            successCallback();
+            return Success;
+        })
+        .onError([failureCallback](auto /*result*/) {
+            failureCallback();
+        })
+        .execute();
 }
 
-void Helix::unfollowUser(QString userId, QString targetId, QString hash, QString followToken,
+void Helix::unfollowUser(QString userId, QString targetId, QString hash,
+                         QString followToken,
                          std::function<void()> successCallback,
                          HelixFailureCallback failureCallback)
 {
-    this->makeRequestGQL("FollowButton_UnfollowUser", targetId, hash, followToken)
-            .onSuccess([successCallback](auto /*result*/) -> Outcome {
-                successCallback();
-                return Success;
-            })
-            .onError([failureCallback](auto /*result*/) {
-                failureCallback();
-            })
-            .execute();
+    this->makeRequestGQL("FollowButton_UnfollowUser", targetId, hash,
+                         followToken)
+        .onSuccess([successCallback](auto /*result*/) -> Outcome {
+            successCallback();
+            return Success;
+        })
+        .onError([failureCallback](auto /*result*/) {
+            failureCallback();
+        })
+        .execute();
 }
 
 void Helix::createClip(QString channelId,
@@ -817,14 +820,15 @@ void Helix::getChannelEmotes(
 }
 
 // operationName: FollowButton_FollowUser, FollowButton_UnfollowUser
-NetworkRequest Helix::makeRequestGQL(QString operationName, QString targetID, QString hash, QString followToken)
+NetworkRequest Helix::makeRequestGQL(QString operationName, QString targetID,
+                                     QString hash, QString followToken)
 {
     QJsonObject payload, variables, input, extensions, persistedQuery;
 
     if (this->oauthToken.isEmpty())
     {
         qCDebug(chatterinoTwitch)
-                << "Helix::makeRequest called without an oauth token set BabyRage";
+            << "Helix::makeRequest called without an oauth token set BabyRage";
         // return boost::none;
     }
 

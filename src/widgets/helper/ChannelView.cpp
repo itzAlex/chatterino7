@@ -2103,7 +2103,9 @@ void ChannelView::handleLinkClick(QMouseEvent *event, const Link &link,
         case Link::UserAction: {
             QString value = link.value;
 
-            ChannelPtr channel = this->hasSourceChannel() ? this->sourceChannel_ : this->underlyingChannel_;
+            ChannelPtr channel = this->hasSourceChannel()
+                                     ? this->sourceChannel_
+                                     : this->underlyingChannel_;
             SearchPopup *searchPopup =
                 dynamic_cast<SearchPopup *>(this->parentWidget());
             if (searchPopup != nullptr)

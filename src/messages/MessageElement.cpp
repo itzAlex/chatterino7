@@ -480,8 +480,8 @@ void TwitchModerationElement::addToContainer(MessageLayoutContainer &container,
         auto image = action.getImage();
 
         container.addElement(
-                (new ImageLayoutElement(*this, image.get(), size))
-                        ->setLink(Link(Link::UserAction, action.getAction())));
+            (new ImageLayoutElement(*this, image.get(), size))
+                ->setLink(Link(Link::UserAction, action.getAction())));
     }
 }
 

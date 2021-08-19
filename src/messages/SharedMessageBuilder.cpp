@@ -291,11 +291,11 @@ void SharedMessageBuilder::parseHighlights()
 
         std::vector<std::string> channels = highlight.getChannels();
         std::string currentChannel = this->channel->getName().toStdString();
-        const auto it = std::find_if(
-                std::begin(channels),
-                std::end(channels),
-                [&currentChannel](const auto& str) { return boost::iequals(currentChannel, str); }
-        );
+        const auto it =
+            std::find_if(std::begin(channels), std::end(channels),
+                         [&currentChannel](const auto &str) {
+                             return boost::iequals(currentChannel, str);
+                         });
 
         if (highlight.isGlobalHighlight() || (it != std::end(channels)))
         {
@@ -475,14 +475,19 @@ void SharedMessageBuilder::triggerHighlights()
         return;
     }
 
-    if (this->highlightEnabled_) {
+    if (this->highlightEnabled_)
+    {
         bool hasFocus = (QApplication::focusWidget() != nullptr);
-        bool resolveFocus = !hasFocus || getSettings()->highlightAlwaysPlaySound;
+        bool resolveFocus =
+            !hasFocus || getSettings()->highlightAlwaysPlaySound;
 
-        if (this->highlightSound_ && resolveFocus) {
-            if (auto player = getPlayer()) {
+        if (this->highlightSound_ && resolveFocus)
+        {
+            if (auto player = getPlayer())
+            {
                 // update the media player url if necessary
-                if (currentPlayerUrl != this->highlightSoundUrl_) {
+                if (currentPlayerUrl != this->highlightSoundUrl_)
+                {
                     player->setMedia(this->highlightSoundUrl_);
 
                     currentPlayerUrl = this->highlightSoundUrl_;
@@ -492,7 +497,8 @@ void SharedMessageBuilder::triggerHighlights()
             }
         }
 
-        if (this->highlightAlert_) {
+        if (this->highlightAlert_)
+        {
             getApp()->windows->sendAlert();
         }
     }

@@ -8,9 +8,9 @@
 #include "widgets/dialogs/LoginDialog.hpp"
 #include "widgets/helper/EditableModelView.hpp"
 
-#include <QLabel>
 #include <QDialogButtonBox>
 #include <QHeaderView>
+#include <QLabel>
 #include <QTableView>
 #include <QVBoxLayout>
 #include <algorithm>
@@ -27,10 +27,10 @@ AccountsPage::AccountsPage()
     auto accounts_tab = tabs.appendTab(new QVBoxLayout, "Accounts");
     {
         EditableModelView *view =
-                accounts_tab
-                        .emplace<EditableModelView>(app->accounts->createModel(nullptr),
-                                                    false)
-                        .getElement();
+            accounts_tab
+                .emplace<EditableModelView>(app->accounts->createModel(nullptr),
+                                            false)
+                .getElement();
 
         view->getTableView()->horizontalHeader()->setVisible(false);
         view->getTableView()->horizontalHeader()->setStretchLastSection(true);
@@ -45,7 +45,8 @@ AccountsPage::AccountsPage()
         view->getTableView()->setStyleSheet("background: #333");
     }
 
-    auto accountsSettings = tabs.appendTab(new QVBoxLayout, "Accounts settings");
+    auto accountsSettings =
+        tabs.appendTab(new QVBoxLayout, "Accounts settings");
     {
         auto anyways = accountsSettings.emplace<QHBoxLayout>().withoutMargin();
         {
@@ -62,7 +63,8 @@ AccountsPage::AccountsPage()
 
                 combo->clear();
 
-                for (const auto &userName : app->accounts->twitch.getUsernames())
+                for (const auto &userName :
+                     app->accounts->twitch.getUsernames())
                 {
                     combo->addItem(userName);
                 }
@@ -74,7 +76,8 @@ AccountsPage::AccountsPage()
             anyways->setAlignment(Qt::AlignTop);
         }
 
-        auto hashes_form = accountsSettings.emplace<QFormLayout>().withoutMargin();
+        auto hashes_form =
+            accountsSettings.emplace<QFormLayout>().withoutMargin();
         {
             hashes_form->addRow("Follow hash", &this->followHashInput);
             hashes_form->addRow("Unfollow hash", &this->unfollowHashInput);
@@ -122,22 +125,29 @@ AccountsPage::AccountsPage()
         accountsSettings->addWidget(label);
 
         connect(accountsSettingsButton, &QPushButton::clicked, [=]() {
-            auto keys = pajlada::Settings::SettingManager::getObjectKeys("/accounts");
+            auto keys =
+                pajlada::Settings::SettingManager::getObjectKeys("/accounts");
 
             for (const auto &uid : keys)
             {
                 auto username = pajlada::Settings::Setting<QString>::get(
-                        "/accounts/" + uid + "/username");
-                auto userID = pajlada::Settings::Setting<QString>::get("/accounts/" +
-                        uid + "/userID");
+                    "/accounts/" + uid + "/username");
+                auto userID = pajlada::Settings::Setting<QString>::get(
+                    "/accounts/" + uid + "/userID");
 
                 if (username == combo->currentText())
                 {
-                    std::string basePath = "/accounts/uid" + userID.toStdString();
+                    std::string basePath =
+                        "/accounts/uid" + userID.toStdString();
 
-                    pajlada::Settings::Setting<QString>::set(basePath + "/followHash", this->followHashInput.text());
-                    pajlada::Settings::Setting<QString>::set(basePath + "/unfollowHash", this->unfollowHashInput.text());
-                    pajlada::Settings::Setting<QString>::set(basePath + "/followToken", this->OAuthTokenInput.text());
+                    pajlada::Settings::Setting<QString>::set(
+                        basePath + "/followHash", this->followHashInput.text());
+                    pajlada::Settings::Setting<QString>::set(
+                        basePath + "/unfollowHash",
+                        this->unfollowHashInput.text());
+                    pajlada::Settings::Setting<QString>::set(
+                        basePath + "/followToken",
+                        this->OAuthTokenInput.text());
                 }
             }
 
@@ -153,11 +163,12 @@ AccountsPage::AccountsPage()
 void AccountsPage::refreshButtons()
 {
     if (this->unfollowHashInput.text().isEmpty() ||
-        this->followHashInput.text().isEmpty()   ||
+        this->followHashInput.text().isEmpty() ||
         this->OAuthTokenInput.text().isEmpty())
     {
         accountsSettingsButton->setEnabled(false);
-    } else
+    }
+    else
     {
         accountsSettingsButton->setEnabled(true);
     }
@@ -181,4 +192,4 @@ void AccountsPage::AnimatedSave()
     anim->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
-} // namespace chatterino
+}  // namespace chatterino

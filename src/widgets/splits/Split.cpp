@@ -15,6 +15,7 @@
 #include "singletons/Theme.hpp"
 #include "singletons/WindowManager.hpp"
 #include "util/Clipboard.hpp"
+#include "util/Helpers.hpp"
 #include "util/NuulsUploader.hpp"
 #include "util/Shortcut.hpp"
 #include "util/StreamLink.hpp"
@@ -34,7 +35,6 @@
 #include "widgets/splits/SplitHeader.hpp"
 #include "widgets/splits/SplitInput.hpp"
 #include "widgets/splits/SplitOverlay.hpp"
-#include "util/Helpers.hpp"
 
 #include <QApplication>
 #include <QClipboard>
@@ -749,14 +749,20 @@ void Split::showViewerList()
 
             ChannelPtr channel = this->getChannel();
 
-            if (auto twitchChannel = dynamic_cast<TwitchChannel *>(channel.get()))
+            if (auto twitchChannel =
+                    dynamic_cast<TwitchChannel *>(channel.get()))
             {
-                chattersCount->setFont(getApp()->fonts->getFont(FontStyle::ChatMedium, 1.0));
-                chattersCount->setText(QString("<span style=\"color:" + this->theme->accent.name() +
-                                                ";\">Chatter count:<span style=\"color:white;\"> %1" +
-                                                "<div style=\"line-height:10%;\"><br></div>")
-                                                .arg(localizeNumbers(twitchChannel->chatterCount())));
-            } else {
+                chattersCount->setFont(
+                    getApp()->fonts->getFont(FontStyle::ChatMedium, 1.0));
+                chattersCount->setText(
+                    QString(
+                        "<span style=\"color:" + this->theme->accent.name() +
+                        ";\">Chatter count:<span style=\"color:white;\"> %1" +
+                        "<div style=\"line-height:10%;\"><br></div>")
+                        .arg(localizeNumbers(twitchChannel->chatterCount())));
+            }
+            else
+            {
                 chattersCount->hide();
             }
 

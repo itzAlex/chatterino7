@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QWidget>
 #include <QPushButton>
+#include <QWidget>
 
 #include <pajlada/signals/signal.hpp>
 

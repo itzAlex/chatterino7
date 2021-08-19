@@ -4,12 +4,11 @@
 #include <QAbstractTableModel>
 #include <QHBoxLayout>
 #include <QHeaderView>
+#include <QLabel>
 #include <QModelIndex>
 #include <QPushButton>
 #include <QTableView>
 #include <QVBoxLayout>
-#include <QLabel>
-#include <QTableView>
 
 namespace chatterino {
 

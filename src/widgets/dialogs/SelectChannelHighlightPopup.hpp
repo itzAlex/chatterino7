@@ -3,10 +3,10 @@
 #include "controllers/highlights/HighlightModel.hpp"
 
 #include <QDialog>
-#include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QStandardItemModel>
 #include <QString>
+#include <QVBoxLayout>
 
 class QTableView;
 class QHBoxLayout;
@@ -27,7 +27,6 @@ private:
         QStandardItemModel *model_;
         QTableView *tableView_;
     } ui_;
-
 };
 
 }  // namespace chatterino

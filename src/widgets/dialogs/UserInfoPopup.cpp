@@ -365,10 +365,10 @@ UserInfoPopup::UserInfoPopup(bool closeAutomatically, QWidget *parent)
 
         this->userStateChanged_.connect([this]() mutable {
             TwitchChannel *twitchChannel =
-                    dynamic_cast<TwitchChannel *>(this->channel_.get());
+                dynamic_cast<TwitchChannel *>(this->channel_.get());
 
             bool isModUsercard =
-                    twitchChannel ? twitchChannel->hasModRights() : false;
+                twitchChannel ? twitchChannel->hasModRights() : false;
 
             if (isModUsercard)
             {
@@ -420,61 +420,69 @@ void UserInfoPopup::installEvents()
 
     // follow
     QObject::connect(
-            this->ui_.follow, &QCheckBox::stateChanged,
-            [this](int newState) mutable {
-                auto currentUser = getApp()->accounts->twitch.getCurrent();
+        this->ui_.follow, &QCheckBox::stateChanged,
+        [this](int newState) mutable {
+            auto currentUser = getApp()->accounts->twitch.getCurrent();
 
-                const auto reenableFollowCheckbox = [this] {
-                    this->ui_.follow->setEnabled(true);
-                };
+            const auto reenableFollowCheckbox = [this] {
+                this->ui_.follow->setEnabled(true);
+            };
 
-                if (!this->ui_.follow->isEnabled())
-                {
-                    // We received a state update while the checkbox was disabled
-                    // This can only happen from the "check current follow state" call
-                    // The state has been updated to properly reflect the users current follow state
-                    reenableFollowCheckbox();
-                    return;
+            if (!this->ui_.follow->isEnabled())
+            {
+                // We received a state update while the checkbox was disabled
+                // This can only happen from the "check current follow state" call
+                // The state has been updated to properly reflect the users current follow state
+                reenableFollowCheckbox();
+                return;
+            }
+
+            switch (newState)
+            {
+                case Qt::CheckState::Unchecked: {
+                    auto unfollowHash =
+                        pajlada::Settings::Setting<QString>::get(
+                            "/accounts/uid" +
+                            currentUser->getUserId().toStdString() +
+                            "/unfollowHash");
+                    auto followToken = pajlada::Settings::Setting<QString>::get(
+                        "/accounts/uid" +
+                        currentUser->getUserId().toStdString() +
+                        "/followToken");
+
+                    this->ui_.follow->setEnabled(false);
+                    getHelix()->unfollowUser(
+                        currentUser->getUserId(), this->userId_, unfollowHash,
+                        followToken, reenableFollowCheckbox, [] {
+                            //
+                        });
                 }
+                break;
 
-                switch (newState)
-                {
-                    case Qt::CheckState::Unchecked: {
-                        auto unfollowHash = pajlada::Settings::Setting<QString>::get("/accounts/uid" + currentUser->getUserId().toStdString() + "/unfollowHash");
-                        auto followToken = pajlada::Settings::Setting<QString>::get("/accounts/uid" + currentUser->getUserId().toStdString() + "/followToken");
-
-                        this->ui_.follow->setEnabled(false);
-                        getHelix()->unfollowUser(currentUser->getUserId(),
-                                                 this->userId_,
-                                                 unfollowHash,
-                                                 followToken,
-                                                 reenableFollowCheckbox, [] {
-                                    //
-                                });
-                    }
-                        break;
-
-                    case Qt::CheckState::PartiallyChecked: {
-                        // We deliberately ignore this state
-                    }
-                        break;
-
-                    case Qt::CheckState::Checked: {
-                        auto followHash = pajlada::Settings::Setting<QString>::get("/accounts/uid" + currentUser->getUserId().toStdString() + "/followHash");
-                        auto followToken = pajlada::Settings::Setting<QString>::get("/accounts/uid" + currentUser->getUserId().toStdString() + "/followToken");
-
-                        this->ui_.follow->setEnabled(false);
-                        getHelix()->followUser(currentUser->getUserId(),
-                                               this->userId_,
-                                               followHash,
-                                               followToken,
-                                               reenableFollowCheckbox, [] {
-                                    //
-                                });
-                    }
-                        break;
+                case Qt::CheckState::PartiallyChecked: {
+                    // We deliberately ignore this state
                 }
-            });
+                break;
+
+                case Qt::CheckState::Checked: {
+                    auto followHash = pajlada::Settings::Setting<QString>::get(
+                        "/accounts/uid" +
+                        currentUser->getUserId().toStdString() + "/followHash");
+                    auto followToken = pajlada::Settings::Setting<QString>::get(
+                        "/accounts/uid" +
+                        currentUser->getUserId().toStdString() +
+                        "/followToken");
+
+                    this->ui_.follow->setEnabled(false);
+                    getHelix()->followUser(
+                        currentUser->getUserId(), this->userId_, followHash,
+                        followToken, reenableFollowCheckbox, [] {
+                            //
+                        });
+                }
+                break;
+            }
+        });
 
     std::shared_ptr<bool> ignoreNext = std::make_shared<bool>(false);
 

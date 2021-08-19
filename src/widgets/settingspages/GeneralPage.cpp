@@ -1,12 +1,13 @@
 #include "GeneralPage.hpp"
 
+#include <QApplication>
 #include <QFontDialog>
 #include <QLabel>
-#include <QScrollArea>
-#include <QApplication>
 #include <QProcess>
+#include <QScrollArea>
 
 #include "Application.hpp"
+#include "boost/filesystem.hpp"
 #include "common/Version.hpp"
 #include "singletons/Fonts.hpp"
 #include "singletons/NativeMessaging.hpp"
@@ -20,7 +21,6 @@
 #include "widgets/BaseWindow.hpp"
 #include "widgets/helper/Line.hpp"
 #include "widgets/settingspages/GeneralPageView.hpp"
-#include "boost/filesystem.hpp"
 
 #include <QDesktopServices>
 #include <QFileDialog>
@@ -509,7 +509,8 @@ void GeneralPage::initLayout(GeneralPageView &layout)
             getSettings()->cachePath = "";
         }));
         box->addWidget(layout.makeButton("Clear cache", []() {
-            boost::filesystem::remove_all((getPaths()->cacheDirectory()).toStdString());
+            boost::filesystem::remove_all(
+                (getPaths()->cacheDirectory()).toStdString());
             qApp->quit();
             QProcess::startDetached(qApp->arguments()[0], qApp->arguments());
         }));
@@ -579,7 +580,7 @@ void GeneralPage::initLayout(GeneralPageView &layout)
     layout.addCheckbox("SevenTV", s.showBadgesSeventv);
     layout.addCheckbox("FrankerFaceZ (Bot, FFZ Supporter, FFZ Developer)",
                        s.showBadgesFfz);
-    layout.addCheckbox("itzAlex (Custom badges)", s.showBadgesitzAlex);
+    layout.addCheckbox("Custom badges (itzAlex)", s.showBadgesitzAlex);
     layout.addSeperator();
     layout.addCheckbox("Use custom FrankerFaceZ moderator badges",
                        s.useCustomFfzModeratorBadges);
