@@ -39,6 +39,7 @@ SelectChannelWidget::SelectChannelWidget(QWidget *parent, int selected)
     this->setWindowFlags(
         (this->windowFlags() & ~(Qt::WindowContextHelpButtonHint)) |
         Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+    this->setWindowFlag(Qt::WindowStaysOnTopHint, true);
 
     // Separator line
     QFrame *line = new QFrame(this);
