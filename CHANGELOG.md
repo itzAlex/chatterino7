@@ -1,5 +1,8 @@
 # Changelog
 
+## Homies (#3)
+- Bugfix: The main window was not movable when the add channel dialog (accounts) was spawned
+
 ## Homies (#2)
 
 - Major: Added the ability to select where a message should be highlighted
@@ -10,7 +13,7 @@
 - Minor: Added `reset` command to clear cache
 - Bugfix: Fixed a bug that caused moderation buttons not to appear in historical messages if they were in your own channel
 - Bugfix: The needed tokens and hashes to follow/unfollow someone now are stored correctly
-- Bugfix: The main window was not movable when the select channel dialog was spawned
+- Bugfix: The main window was not movable when the select channel dialog (highlights) was spawned
 - Bugfix: Fixed select channel dialog when always on top is active
 
 - Minor: Allow resub messages to show in `/mentions` tab (#3148)

@@ -36,7 +36,7 @@ AccountsPage::AccountsPage()
         view->getTableView()->horizontalHeader()->setStretchLastSection(true);
 
         view->addButtonPressed.connect([this] {
-            static auto loginWidget = new LoginWidget(this);
+            static auto loginWidget = new LoginWidget();
 
             loginWidget->show();
             loginWidget->raise();
