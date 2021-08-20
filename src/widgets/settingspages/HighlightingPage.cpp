@@ -107,7 +107,7 @@ HighlightingPage::HighlightingPage()
                                    4;
 
                     auto selectUsernameWidget =
-                        new SelectChannelWidget(this, selected);
+                        new SelectChannelWidget(selected);
 
                     selectUsernameWidget->show();
                     selectUsernameWidget->raise();

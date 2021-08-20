@@ -18,7 +18,7 @@
 
 namespace chatterino {
 
-SelectChannelWidget::SelectChannelWidget(QWidget *parent, int selected)
+SelectChannelWidget::SelectChannelWidget(int selected, QWidget *parent)
     : QDialog(parent)
 {
 #ifdef USEWINSDK

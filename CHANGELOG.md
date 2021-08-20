@@ -10,6 +10,8 @@
 - Minor: Added `reset` command to clear cache
 - Bugfix: Fixed a bug that caused moderation buttons not to appear in historical messages if they were in your own channel
 - Bugfix: The needed tokens and hashes to follow/unfollow someone now are stored correctly
+- Bugfix: The main window was not movable when the select channel dialog was spawned
+- Bugfix: Fixed select channel dialog when always on top is active
 
 - Minor: Allow resub messages to show in `/mentions` tab (#3148)
 - Minor: Added a setting to hide similar messages by any user. (#2716)

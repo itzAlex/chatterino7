@@ -18,7 +18,7 @@ namespace chatterino {
 class SelectChannelWidget : public QDialog
 {
 public:
-    SelectChannelWidget(QWidget *parent, int selected);
+    SelectChannelWidget(int selected, QWidget *parent = 0);
 
 private:
     struct {
