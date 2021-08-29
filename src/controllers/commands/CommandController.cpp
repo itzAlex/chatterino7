@@ -403,6 +403,88 @@ void CommandController::initialize(Settings &, Paths &paths)
             return "";
         });
 
+    this->registerCommand("/massban", [](const auto &words, auto channel) {
+        auto currentUser = getApp()->accounts->twitch.getCurrent();
+
+        if (currentUser->isAnon())
+        {
+            channel->addMessage(
+                    makeSystemMessage("You must be logged in to perform this action!"));
+            return "";
+        }
+
+        if (words.size() < 2)
+        {
+            channel->addMessage(makeSystemMessage("Usage: /massban [username1] [username2] ..."));
+            return "";
+        }
+
+        for (int i = 1; i < words.size(); i++)
+        {
+            QString channelTarget = words.at(i);
+            stripChannelName(channelTarget);
+            if (i == 1)
+            {
+                channel->sendMessage("/ban " + channelTarget);
+            }
+            else if (words.size() < 50)
+            {
+                QTimer::singleShot((i - 1) * 100, [channel, channelTarget]() {
+                    channel->sendMessage("/ban " + channelTarget);
+                });
+            }
+            else
+            {
+                QTimer::singleShot((i - 1) * 250, [channel, channelTarget]() {
+                    channel->sendMessage("/ban " + channelTarget);
+                });
+            }
+        }
+
+        return "";
+    });
+
+    this->registerCommand("/massunban", [](const auto &words, auto channel) {
+        auto currentUser = getApp()->accounts->twitch.getCurrent();
+
+        if (currentUser->isAnon())
+        {
+            channel->addMessage(
+                    makeSystemMessage("You must be logged in to perform this action!"));
+            return "";
+        }
+
+        if (words.size() < 2)
+        {
+            channel->addMessage(makeSystemMessage("Usage: /massunban [username1] [username2] ..."));
+            return "";
+        }
+
+        for (int i = 1; i < words.size(); i++)
+        {
+            QString channelTarget = words.at(i);
+            stripChannelName(channelTarget);
+            if (i == 1)
+            {
+                channel->sendMessage("/unban " + channelTarget);
+            }
+            else if (words.size() < 50)
+            {
+                QTimer::singleShot((i - 1) * 100, [channel, channelTarget]() {
+                    channel->sendMessage("/unban " + channelTarget);
+                });
+            }
+            else
+            {
+                QTimer::singleShot((i - 1) * 250, [channel, channelTarget]() {
+                    channel->sendMessage("/unban " + channelTarget);
+                });
+            }
+        }
+
+        return "";
+    });
+
     this->registerCommand("/follow", [](const auto &words, auto channel) {
         auto currentUser = getApp()->accounts->twitch.getCurrent();
 

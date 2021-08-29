@@ -1,6 +1,7 @@
 # Changelog
 
 ## Homies (#3)
+- Minor: Added `/massban` and `/massunban` commands to ban/unban a list of usernames
 - Bugfix: The main window was not movable when the add channel dialog (accounts) was spawned
 
 ## Homies (#2)
