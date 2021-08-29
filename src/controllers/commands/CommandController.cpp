@@ -439,15 +439,9 @@ void CommandController::initialize(Settings &, Paths &paths)
             {
                 channel->sendMessage("/ban " + channelTarget);
             }
-            else if (words.size() < 50)
-            {
-                QTimer::singleShot((i - 1) * 100, [channel, channelTarget]() {
-                    channel->sendMessage("/ban " + channelTarget);
-                });
-            }
             else
             {
-                QTimer::singleShot((i - 1) * 250, [channel, channelTarget]() {
+                QTimer::singleShot((i - 1) * 1000, [channel, channelTarget]() {
                     channel->sendMessage("/ban " + channelTarget);
                 });
             }
@@ -492,15 +486,9 @@ void CommandController::initialize(Settings &, Paths &paths)
             {
                 channel->sendMessage("/unban " + channelTarget);
             }
-            else if (words.size() < 50)
-            {
-                QTimer::singleShot((i - 1) * 100, [channel, channelTarget]() {
-                    channel->sendMessage("/unban " + channelTarget);
-                });
-            }
             else
             {
-                QTimer::singleShot((i - 1) * 250, [channel, channelTarget]() {
+                QTimer::singleShot((i - 1) * 1000, [channel, channelTarget]() {
                     channel->sendMessage("/unban " + channelTarget);
                 });
             }
