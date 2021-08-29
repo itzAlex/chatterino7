@@ -75,6 +75,7 @@ HighlightingPage::HighlightingPage()
                         .getElement();
 
                 view->addSelectChannelHighlight();
+                view->addExcludeChannelHighlight();
                 view->addRegexHelpLink();
                 view->setTitles({"Pattern", "Show in\nMentions",
                                  "Flash\ntaskbar", "Play\nsound",
@@ -111,6 +112,20 @@ HighlightingPage::HighlightingPage()
 
                     selectUsernameWidget->show();
                     selectUsernameWidget->raise();
+                });
+
+                view->excludeChannelPressed.connect([this, view] {
+                    int selected = view->getTableView()
+                                           ->selectionModel()
+                                           ->currentIndex()
+                                           .row() -
+                                   4;
+
+                    auto excludeChannelWidget =
+                            new ExcludeChannelWidget(selected);
+
+                    excludeChannelWidget->show();
+                    excludeChannelWidget->raise();
                 });
 
                 QObject::connect(view->getTableView(), &QTableView::clicked,
@@ -366,10 +381,15 @@ void HighlightingPage::tableCellClicked(const QModelIndex &clicked,
         case HighlightTab::Messages:
         case HighlightTab::Users: {
             if (clicked.row() >= 4)
+            {
                 view->enableSelectChannelButton();
+                view->enableExcludeChannelButton();
+            }
             else
+            {
                 view->disableSelectChannelButton();
-
+                view->disableExcludeChannelButton();
+            }
             using Column = HighlightModel::Column;
             bool restrictColorRow =
                 (tab == HighlightTab::Messages &&

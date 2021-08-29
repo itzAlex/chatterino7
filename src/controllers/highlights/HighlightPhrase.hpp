@@ -28,7 +28,8 @@ public:
                     bool hasSound, bool isRegex, bool isCaseSensitive,
                     const QString &soundUrl, QColor color,
                     bool globalHighlight = true,
-                    std::vector<std::string> channels = {});
+                    std::vector<std::string> channels = {},
+                    std::vector<std::string> ExcludedChannels = {});
 
     /**
      * @brief Create a new HighlightPhrase.
@@ -39,7 +40,8 @@ public:
                     bool hasSound, bool isRegex, bool isCaseSensitive,
                     const QString &soundUrl, std::shared_ptr<QColor> color,
                     bool globalHighlight = true,
-                    std::vector<std::string> channels = {});
+                    std::vector<std::string> channels = {},
+                    std::vector<std::string> ExcludedChannels = {});
 
     const QString &getPattern() const;
     bool showInMentions() const;
@@ -80,6 +82,7 @@ public:
     const std::shared_ptr<QColor> getColor() const;
     bool isGlobalHighlight() const;
     const std::vector<std::string> &getChannels() const;
+    const std::vector<std::string> &getExcludedChannels() const;
 
     /*
      * XXX: Use the constexpr constructor here once we are building with
@@ -101,6 +104,7 @@ private:
     QRegularExpression regex_;
     bool globalHighlight_;
     std::vector<std::string> channels_;
+    std::vector<std::string> ExcludedChannels_;
 };
 
 }  // namespace chatterino
@@ -112,7 +116,8 @@ namespace {
     {
         return chatterino::HighlightPhrase(QString(), false, false, false,
                                            false, false, QString(), QColor(),
-                                           true, std::vector<std::string>());
+                                           true, std::vector<std::string>(),
+                                           std::vector<std::string>());
     }
 }  // namespace
 
@@ -123,6 +128,7 @@ struct Serialize<chatterino::HighlightPhrase> {
     {
         rapidjson::Value ret(rapidjson::kObjectType);
         rapidjson::Value ret_array(rapidjson::kArrayType);
+        rapidjson::Value ret_array2(rapidjson::kArrayType);
 
         chatterino::rj::set(ret, "pattern", value.getPattern(), a);
         chatterino::rj::set(ret, "showInMentions", value.showInMentions(), a);
@@ -141,6 +147,13 @@ struct Serialize<chatterino::HighlightPhrase> {
         }
 
         chatterino::rj::set(ret, "channels", ret_array, a);
+
+        for (const auto &channel : value.getExcludedChannels())
+        {
+            chatterino::rj::add(ret_array2, channel, a);
+        }
+
+        chatterino::rj::set(ret, "ExcludedChannels", ret_array2, a);
 
         return ret;
     }
@@ -168,6 +181,7 @@ struct Deserialize<chatterino::HighlightPhrase> {
         QString encodedColor;
         bool _isGlobalHighlight = true;
         std::vector<std::string> channels;
+        std::vector<std::string> ExcludedChannels;
 
         chatterino::rj::getSafe(value, "pattern", _pattern);
         chatterino::rj::getSafe(value, "showInMentions", _showInMentions);
@@ -179,6 +193,7 @@ struct Deserialize<chatterino::HighlightPhrase> {
         chatterino::rj::getSafe(value, "color", encodedColor);
         chatterino::rj::getSafe(value, "global", _isGlobalHighlight);
         chatterino::rj::getSafe(value, "channels", channels);
+        chatterino::rj::getSafe(value, "ExcludedChannels", ExcludedChannels);
 
         auto _color = QColor(encodedColor);
         if (!_color.isValid())
@@ -186,7 +201,8 @@ struct Deserialize<chatterino::HighlightPhrase> {
 
         return chatterino::HighlightPhrase(
             _pattern, _showInMentions, _hasAlert, _hasSound, _isRegex,
-            _isCaseSensitive, _soundUrl, _color, _isGlobalHighlight, channels);
+            _isCaseSensitive, _soundUrl, _color, _isGlobalHighlight, channels,
+            ExcludedChannels);
     }
 };
 

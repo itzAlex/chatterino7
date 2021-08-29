@@ -29,4 +29,18 @@ private:
     } ui_;
 };
 
+class ExcludeChannelWidget : public QDialog
+{
+public:
+    ExcludeChannelWidget(int selected, QWidget *parent = 0);
+
+private:
+    struct {
+        QVBoxLayout mainLayout;
+        QHBoxLayout *buttons_;
+        QStandardItemModel *model_;
+        QTableView *tableView_;
+    } ui_;
+};
+
 }  // namespace chatterino

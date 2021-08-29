@@ -290,14 +290,22 @@ void SharedMessageBuilder::parseHighlights()
         }
 
         std::vector<std::string> channels = highlight.getChannels();
+        std::vector<std::string> ExcludedChannels = highlight.getExcludedChannels();
         std::string currentChannel = this->channel->getName().toStdString();
+
         const auto it =
             std::find_if(std::begin(channels), std::end(channels),
                          [&currentChannel](const auto &str) {
                              return boost::iequals(currentChannel, str);
                          });
 
-        if (highlight.isGlobalHighlight() || (it != std::end(channels)))
+        const auto it2 =
+                std::find_if(std::begin(ExcludedChannels), std::end(ExcludedChannels),
+                             [&currentChannel](const auto &str) {
+                                 return boost::iequals(currentChannel, str);
+                             });
+
+        if ((highlight.isGlobalHighlight() || it != std::end(channels)) && it2 == std::end(ExcludedChannels))
         {
             this->highlightEnabled_ = true;
         }

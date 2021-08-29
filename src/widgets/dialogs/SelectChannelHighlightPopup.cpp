@@ -185,4 +185,122 @@ SelectChannelWidget::SelectChannelWidget(int selected, QWidget *parent)
         }
     });
 }
+
+ExcludeChannelWidget::ExcludeChannelWidget(int selected, QWidget *parent)
+        : QDialog(parent)
+{
+#ifdef USEWINSDK
+    ::SetWindowPos(HWND(this->winId()), HWND_TOPMOST, 0, 0, 0, 0,
+               SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+#endif
+
+    // Highlight
+    HighlightPhrase &row = getSettings()->highlightedMessages[selected];
+
+    // Layout properties
+    this->setModal(true);
+    this->setMinimumWidth(250);
+    this->adjustSize();
+    this->setWindowTitle("Blacklist channels");
+    this->setLayout(&this->ui_.mainLayout);
+    this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    this->setWindowFlags(
+            (this->windowFlags() & ~(Qt::WindowContextHelpButtonHint)) |
+            Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+    this->setWindowFlag(Qt::WindowStaysOnTopHint, true);
+
+    // Add & Remove buttons
+    QHBoxLayout *buttons = new QHBoxLayout();
+
+    QPushButton *add = new QPushButton("Add");
+    buttons->addWidget(add);
+
+    QObject::connect(add, &QPushButton::clicked, [this] {
+        QStandardItem *item = new QStandardItem("Username");
+        this->ui_.model_->appendRow(item);
+    });
+
+    QPushButton *remove = new QPushButton("Remove");
+    buttons->addWidget(remove);
+
+    QObject::connect(remove, &QPushButton::clicked, [this] {
+        auto selected = this->ui_.tableView_->selectionModel()->selectedRows(0);
+
+        // Remove rows backwards so indices don't shift.
+        std::vector<int> rows;
+        for (auto &&index : selected)
+            rows.push_back(index.row());
+
+        std::sort(rows.begin(), rows.end(), std::greater{});
+
+        for (auto &&row : rows)
+            this->ui_.model_->removeRow(row);
+    });
+
+    buttons->addStretch();
+
+    // Table
+    this->ui_.model_ = new QStandardItemModel(0, 1, this);
+    this->ui_.tableView_ = new QTableView(this);
+
+    this->ui_.model_->setParent(this);
+    this->ui_.model_->setHeaderData(0, Qt::Horizontal, QObject::tr("Channels"));
+
+    this->ui_.tableView_->setModel(this->ui_.model_);
+
+    this->ui_.tableView_->setSelectionMode(QAbstractItemView::SingleSelection);
+    this->ui_.tableView_->setSelectionBehavior(QAbstractItemView::SelectRows);
+    this->ui_.tableView_->horizontalHeader()->setStretchLastSection(true);
+    this->ui_.tableView_->verticalHeader()->setVisible(false);
+
+    // Widgets and layouts
+    this->ui_.mainLayout.addLayout(buttons);
+    this->ui_.mainLayout.addWidget(this->ui_.tableView_);
+
+    this->ui_.buttons_ = buttons;
+
+    // OK and Cancel buttons & Checkbox
+    auto buttonBox =
+            new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
+    buttonBox->setCenterButtons(true);
+    this->ui_.mainLayout.addWidget(buttonBox);
+
+    for (std::string channel : row.getExcludedChannels())
+    {
+        QStandardItem *item =
+                new QStandardItem(QString::fromStdString(channel));
+        this->ui_.model_->appendRow(item);
+    }
+
+    // Signals
+    QObject::connect(buttonBox, &QDialogButtonBox::accepted, [=]() {
+        std::vector<std::string> ExcludedChannels;
+
+        for (int row = 0; row < this->ui_.model_->rowCount(); row++)
+        {
+            ExcludedChannels.push_back(this->ui_.model_->index(row, 0)
+                                       .data()
+                                       .toString()
+                                       .toStdString());
+        }
+
+        getSettings()->highlightedMessages.insert(
+                HighlightPhrase{row.getPattern(), row.showInMentions(),
+                                row.hasAlert(), row.hasSound(), row.isRegex(),
+                                row.isCaseSensitive(), row.getSoundUrl().toString(),
+                                row.getColor(), row.isGlobalHighlight(), row.getChannels(),
+                                ExcludedChannels},
+                selected);
+
+        getSettings()->highlightedMessages.removeAt(selected + 1);
+
+        this->accept();
+        this->close();
+    });
+
+    QObject::connect(buttonBox, &QDialogButtonBox::rejected, [this]() {
+        this->reject();
+        this->close();
+    });
+}
 }  // namespace chatterino

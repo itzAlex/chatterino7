@@ -15,6 +15,7 @@ namespace chatterino {
 EditableModelView::EditableModelView(QAbstractTableModel *model, bool movable)
     : tableView_(new QTableView(this))
     , selectChannel(new QPushButton())
+    , excludeChannel(new QPushButton())
     , model_(model)
 {
     this->model_->setParent(this);
@@ -62,6 +63,7 @@ EditableModelView::EditableModelView(QAbstractTableModel *model, bool movable)
         if (selected.size() == 0)
         {
             disableSelectChannelButton();
+            disableExcludeChannelButton();
         }
     });
 
@@ -147,6 +149,28 @@ void EditableModelView::disableSelectChannelButton()
 void EditableModelView::enableSelectChannelButton()
 {
     this->selectChannel->setEnabled(true);
+}
+
+void EditableModelView::addExcludeChannelHighlight()
+{
+    this->excludeChannel->setText("Exclude channels");
+    this->excludeChannel->setEnabled(false);
+
+    this->buttons_->addWidget(this->excludeChannel);
+
+    QObject::connect(excludeChannel, &QPushButton::clicked, [this] {
+        this->excludeChannelPressed.invoke();
+    });
+}
+
+void EditableModelView::disableExcludeChannelButton()
+{
+    this->excludeChannel->setEnabled(false);
+}
+
+void EditableModelView::enableExcludeChannelButton()
+{
+    this->excludeChannel->setEnabled(true);
 }
 
 void EditableModelView::addRegexHelpLink()
