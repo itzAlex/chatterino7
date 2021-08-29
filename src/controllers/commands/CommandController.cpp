@@ -413,6 +413,18 @@ void CommandController::initialize(Settings &, Paths &paths)
             return "";
         }
 
+        TwitchChannel *twitchChannel =
+                dynamic_cast<TwitchChannel *>(channel.get());
+
+        bool isModOrBroadcaster =
+                twitchChannel ? twitchChannel->hasModRights() : false;
+
+        if (!isModOrBroadcaster)
+        {
+            channel->addMessage(makeSystemMessage("You don't have permissions to execute this command in this channel!"));
+            return "";
+        }
+
         if (words.size() < 2)
         {
             channel->addMessage(makeSystemMessage("Usage: /massban [username1] [username2] ..."));
@@ -451,6 +463,18 @@ void CommandController::initialize(Settings &, Paths &paths)
         {
             channel->addMessage(
                     makeSystemMessage("You must be logged in to perform this action!"));
+            return "";
+        }
+
+        TwitchChannel *twitchChannel =
+                dynamic_cast<TwitchChannel *>(channel.get());
+
+        bool isModOrBroadcaster =
+                twitchChannel ? twitchChannel->hasModRights() : false;
+
+        if (!isModOrBroadcaster)
+        {
+            channel->addMessage(makeSystemMessage("You don't have permissions to execute this command in this channel!"));
             return "";
         }
 
