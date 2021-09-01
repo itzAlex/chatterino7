@@ -8,6 +8,7 @@
 #include "providers/ffz/FfzEmotes.hpp"
 #include "providers/irc/AbstractIrcServer.hpp"
 #include "providers/seventv/SeventvEmotes.hpp"
+#include "providers/itzalex/HomiesEmotes.hpp"
 
 #include <chrono>
 #include <memory>
@@ -44,6 +45,7 @@ public:
     const SeventvEmotes &getSeventvEmotes() const;
     const BttvEmotes &getBttvEmotes() const;
     const FfzEmotes &getFfzEmotes() const;
+    const HomiesEmotes &getHomiesEmotes() const;
 
 protected:
     virtual void initializeConnection(IrcConnection *connection,
@@ -77,6 +79,7 @@ private:
     SeventvEmotes seventv;
     BttvEmotes bttv;
     FfzEmotes ffz;
+    HomiesEmotes homies;
 
     pajlada::Signals::SignalHolder signalHolder_;
 };

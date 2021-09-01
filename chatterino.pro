@@ -193,6 +193,7 @@ SOURCES += \
     src/providers/bttv/LoadBttvChannelEmote.cpp \
     src/providers/chatterino/ChatterinoBadges.cpp \
     src/providers/itzalex/itzAlexBadges.cpp \
+    src/providers/itzalex/HomiesEmotes.cpp \
     src/providers/colors/ColorProvider.cpp \
     src/providers/emoji/Emojis.cpp \
     src/providers/ffz/FfzBadges.cpp \
@@ -438,6 +439,7 @@ HEADERS += \
     src/providers/bttv/LoadBttvChannelEmote.hpp \
     src/providers/chatterino/ChatterinoBadges.hpp \
     src/providers/itzalex/itzAlexBadges.hpp \
+    src/providers/itzalex/HomiesEmotes.hpp \
     src/providers/colors/ColorProvider.hpp \
     src/providers/emoji/Emojis.hpp \
     src/providers/ffz/FfzBadges.hpp \
@@ -662,9 +664,9 @@ DEFINES += CHATTERINO_GIT_RELEASE=\\\"$$git_release\\\"
 DEFINES += CHATTERINO_GIT_HASH=\\\"$$git_hash\\\"
 
 CONFIG(debug, debug|release) {
-    message("Building Chatterino2 DEBUG")
+    message("Building Chatterino Homies DEBUG")
 } else {
-    message("Building Chatterino2 RELEASE")
+    message("Building Chatterino Homies RELEASE")
     DEFINES += DEBUG_OFF
 }
 

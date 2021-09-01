@@ -177,6 +177,8 @@ set(SOURCE_FILES
 
         providers/itzalex/itzAlexBadges.cpp
         providers/itzalex/itzAlexBadges.hpp
+        providers/itzalex/HomiesEmotes.cpp
+        providers/itzalex/HomiesEmotes.hpp
 
         providers/colors/ColorProvider.cpp
         providers/colors/ColorProvider.hpp

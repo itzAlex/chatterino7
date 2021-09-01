@@ -6,6 +6,7 @@
 #include "providers/bttv/BttvEmotes.hpp"
 #include "providers/ffz/FfzEmotes.hpp"
 #include "providers/seventv/SeventvEmotes.hpp"
+#include "providers/itzalex/HomiesEmotes.hpp"
 #include "providers/twitch/TwitchChannel.hpp"
 #include "providers/twitch/TwitchIrcServer.hpp"
 #include "singletons/Emotes.hpp"
@@ -107,6 +108,8 @@ void InputCompletionPopup::updateEmotes(const QString &text, ChannelPtr channel)
                 addEmotes(emotes, *bttv, text, "Channel BetterTTV");
             if (auto ffz = tc->ffzEmotes())
                 addEmotes(emotes, *ffz, text, "Channel FrankerFaceZ");
+            if (auto homies = tc->homiesEmotes())
+                addEmotes(emotes, *homies, text, "Channel Homies");
         }
 
         if (auto seventvG = getApp()->twitch2->getSeventvEmotes().emotes())
@@ -115,6 +118,8 @@ void InputCompletionPopup::updateEmotes(const QString &text, ChannelPtr channel)
             addEmotes(emotes, *bttvG, text, "Global BetterTTV");
         if (auto ffzG = getApp()->twitch2->getFfzEmotes().emotes())
             addEmotes(emotes, *ffzG, text, "Global FrankerFaceZ");
+        if (auto homiesG = getApp()->twitch2->getHomiesEmotes().emotes())
+            addEmotes(emotes, *homiesG, text, "Global Homies");
 
         addEmojis(emotes, getApp()->emotes->emojis.emojis, text);
     }

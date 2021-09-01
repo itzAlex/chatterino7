@@ -51,6 +51,7 @@ void TwitchIrcServer::initialize(Settings &settings, Paths &paths)
     this->seventv.loadEmotes();
     this->bttv.loadEmotes();
     this->ffz.loadEmotes();
+    this->homies.loadEmotes();
 }
 
 void TwitchIrcServer::initializeConnection(IrcConnection *connection,
@@ -380,6 +381,11 @@ const BttvEmotes &TwitchIrcServer::getBttvEmotes() const
 const FfzEmotes &TwitchIrcServer::getFfzEmotes() const
 {
     return this->ffz;
+}
+
+const HomiesEmotes &TwitchIrcServer::getHomiesEmotes() const
+{
+    return this->homies;
 }
 
 }  // namespace chatterino

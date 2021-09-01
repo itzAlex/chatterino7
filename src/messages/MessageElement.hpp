@@ -53,10 +53,14 @@ enum class MessageElementFlag : int64_t {
     SeventvEmoteText = (1LL << 33),
     SeventvEmote = SeventvEmoteImage | SeventvEmoteText,
 
+    HomiesEmoteImage = (1LL << 43),
+    HomiesEmoteText = (1LL << 44),
+    HomiesEmote = HomiesEmoteImage | HomiesEmoteText,
+
     EmoteImages =
-        TwitchEmoteImage | BttvEmoteImage | FfzEmoteImage | SeventvEmoteImage,
+        TwitchEmoteImage | BttvEmoteImage | FfzEmoteImage | SeventvEmoteImage | HomiesEmoteImage,
     EmoteText =
-        TwitchEmoteText | BttvEmoteText | FfzEmoteText | SeventvEmoteText,
+        TwitchEmoteText | BttvEmoteText | FfzEmoteText | SeventvEmoteText | HomiesEmoteText,
 
     BitsStatic = (1LL << 11),
     BitsAnimated = (1LL << 12),
@@ -152,7 +156,7 @@ enum class MessageElementFlag : int64_t {
     // (1LL << 33) is used by SeventvEmoteText, it is next to SeventvEmoteImage
 
     Default = Timestamp | Badges | Username | BitsStatic | FfzEmoteImage |
-              BttvEmoteImage | SeventvEmoteImage | TwitchEmoteImage |
+              BttvEmoteImage | SeventvEmoteImage | HomiesEmoteImage | TwitchEmoteImage |
               BitsAmount | Text | AlwaysShow,
 };
 using MessageElementFlags = FlagsEnum<MessageElementFlag>;

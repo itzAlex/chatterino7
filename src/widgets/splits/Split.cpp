@@ -904,6 +904,7 @@ void Split::reloadChannelAndSubscriberEmotes()
         twitchChannel->refresh7TVChannelEmotes(true);
         twitchChannel->refreshBTTVChannelEmotes(true);
         twitchChannel->refreshFFZChannelEmotes(true);
+        twitchChannel->refreshHomiesChannelEmotes(true);
     }
 }
 

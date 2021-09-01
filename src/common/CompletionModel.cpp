@@ -139,6 +139,12 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
         addString(emote.first.string, TaggedString::Type::FFZChannelEmote);
     }
 
+    // Homies Global
+    for (auto &emote : *getApp()->twitch2->getHomiesEmotes().emotes())
+    {
+        addString(emote.first.string, TaggedString::Type::HOMIESGlobalEmote);
+    }
+
     // Emojis
     if (prefix.startsWith(":"))
     {
@@ -200,6 +206,12 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
     for (auto &emote : *tc->ffzEmotes())
     {
         addString(emote.first.string, TaggedString::Type::BTTVGlobalEmote);
+    }
+
+    // Homies Channel
+    for (auto &emote : *tc->homiesEmotes())
+    {
+        addString(emote.first.string, TaggedString::Type::HOMIESChannelEmote);
     }
 
     // Commands

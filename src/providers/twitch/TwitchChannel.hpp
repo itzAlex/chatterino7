@@ -31,6 +31,7 @@ class EmoteMap;
 
 class TwitchBadges;
 class SeventvEmotes;
+class HomiesEmotes;
 class FfzEmotes;
 class BttvEmotes;
 
@@ -88,15 +89,18 @@ public:
 
     // Emotes
     boost::optional<EmotePtr> seventvEmote(const EmoteName &name) const;
+    boost::optional<EmotePtr> homiesEmote(const EmoteName &name) const;
     boost::optional<EmotePtr> bttvEmote(const EmoteName &name) const;
     boost::optional<EmotePtr> ffzEmote(const EmoteName &name) const;
     std::shared_ptr<const EmoteMap> seventvEmotes() const;
+    std::shared_ptr<const EmoteMap> homiesEmotes() const;
     std::shared_ptr<const EmoteMap> bttvEmotes() const;
     std::shared_ptr<const EmoteMap> ffzEmotes() const;
 
     virtual void refresh7TVChannelEmotes(bool manualRefresh);
     virtual void refreshBTTVChannelEmotes(bool manualRefresh);
     virtual void refreshFFZChannelEmotes(bool manualRefresh);
+    virtual void refreshHomiesChannelEmotes(bool manualRefresh);
 
     // Badges
     boost::optional<EmotePtr> ffzCustomModBadge() const;
@@ -163,6 +167,7 @@ private:
 
 protected:
     Atomic<std::shared_ptr<const EmoteMap>> seventvEmotes_;
+    Atomic<std::shared_ptr<const EmoteMap>> homiesEmotes_;
     Atomic<std::shared_ptr<const EmoteMap>> bttvEmotes_;
     Atomic<std::shared_ptr<const EmoteMap>> ffzEmotes_;
     Atomic<boost::optional<EmotePtr>> ffzCustomModBadge_;

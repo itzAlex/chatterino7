@@ -121,6 +121,10 @@ namespace {
         {
             addPageLink("FFZ");
         }
+        else if (creatorFlags.has(MessageElementFlag::HomiesEmote))
+        {
+            addPageLink("Homies");
+        }
     }
 }  // namespace
 

@@ -231,6 +231,8 @@ void EmotePopup::loadChannel(ChannelPtr _channel)
               "BetterTTV", MessageElementFlag::BttvEmote);
     addEmotes(*globalChannel, *getApp()->twitch2->getFfzEmotes().emotes(),
               "FrankerFaceZ", MessageElementFlag::FfzEmote);
+    addEmotes(*globalChannel, *getApp()->twitch2->getHomiesEmotes().emotes(),
+              "Homies", MessageElementFlag::HomiesEmote);
 
     // twitch
     addEmoteSets(
@@ -244,6 +246,8 @@ void EmotePopup::loadChannel(ChannelPtr _channel)
               MessageElementFlag::BttvEmote);
     addEmotes(*channelChannel, *twitchChannel->ffzEmotes(), "FrankerFaceZ",
               MessageElementFlag::FfzEmote);
+    addEmotes(*channelChannel, *twitchChannel->homiesEmotes(), "Homies",
+              MessageElementFlag::HomiesEmote);
 
     this->globalEmotesView_->setChannel(globalChannel);
     this->subEmotesView_->setChannel(subChannel);

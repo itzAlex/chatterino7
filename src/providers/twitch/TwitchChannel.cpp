@@ -11,6 +11,7 @@
 #include "providers/bttv/BttvEmotes.hpp"
 #include "providers/bttv/LoadBttvChannelEmote.hpp"
 #include "providers/seventv/SeventvEmotes.hpp"
+#include "providers/itzalex/HomiesEmotes.hpp"
 #include "providers/twitch/IrcMessageHandler.hpp"
 #include "providers/twitch/PubsubClient.hpp"
 #include "providers/twitch/TwitchCommon.hpp"
@@ -156,6 +157,7 @@ TwitchChannel::TwitchChannel(const QString &name)
     , seventvEmotes_(std::make_shared<EmoteMap>())
     , bttvEmotes_(std::make_shared<EmoteMap>())
     , ffzEmotes_(std::make_shared<EmoteMap>())
+    , homiesEmotes_(std::make_shared<EmoteMap>())
     , mod_(false)
 {
     qCDebug(chatterinoTwitch) << "[TwitchChannel" << name << "] Opened";
@@ -181,6 +183,7 @@ TwitchChannel::TwitchChannel(const QString &name)
         this->refreshBadges();
         this->refreshCheerEmotes();
         this->refresh7TVChannelEmotes(false);
+        this->refreshHomiesChannelEmotes(false);
         this->refreshFFZChannelEmotes(false);
         this->refreshBTTVChannelEmotes(false);
     });
@@ -251,6 +254,18 @@ void TwitchChannel::refresh7TVChannelEmotes(bool manualRefresh)
                     std::make_shared<EmoteMap>(std::move(emoteMap)));
         },
         manualRefresh);
+}
+
+void TwitchChannel::refreshHomiesChannelEmotes(bool manualRefresh)
+{
+    HomiesEmotes::loadChannel(
+            weakOf<Channel>(this), this->roomId(),
+            [this, weak = weakOf<Channel>(this)](auto &&emoteMap) {
+                if (auto shared = weak.lock())
+                    this->homiesEmotes_.set(
+                            std::make_shared<EmoteMap>(std::move(emoteMap)));
+            },
+            manualRefresh);
 }
 
 void TwitchChannel::refreshBTTVChannelEmotes(bool manualRefresh)
@@ -543,6 +558,17 @@ boost::optional<EmotePtr> TwitchChannel::seventvEmote(
     return it->second;
 }
 
+boost::optional<EmotePtr> TwitchChannel::homiesEmote(
+        const EmoteName &name) const
+{
+    auto emotes = this->homiesEmotes_.get();
+    auto it = emotes->find(name);
+
+    if (it == emotes->end())
+        return boost::none;
+    return it->second;
+}
+
 boost::optional<EmotePtr> TwitchChannel::bttvEmote(const EmoteName &name) const
 {
     auto emotes = this->bttvEmotes_.get();
@@ -566,6 +592,11 @@ boost::optional<EmotePtr> TwitchChannel::ffzEmote(const EmoteName &name) const
 std::shared_ptr<const EmoteMap> TwitchChannel::seventvEmotes() const
 {
     return this->seventvEmotes_.get();
+}
+
+std::shared_ptr<const EmoteMap> TwitchChannel::homiesEmotes() const
+{
+    return this->homiesEmotes_.get();
 }
 
 std::shared_ptr<const EmoteMap> TwitchChannel::bttvEmotes() const
