@@ -225,14 +225,14 @@ void EmotePopup::loadChannel(ChannelPtr _channel)
     auto channelChannel = std::make_shared<Channel>("", Channel::Type::None);
 
     // global
+    addEmotes(*globalChannel, *getApp()->twitch2->getHomiesEmotes().emotes(),
+              "Homies", MessageElementFlag::HomiesEmote);
     addEmotes(*globalChannel, *getApp()->twitch2->getSeventvEmotes().emotes(),
               "7TV", MessageElementFlag::SeventvEmote);
     addEmotes(*globalChannel, *getApp()->twitch2->getBttvEmotes().emotes(),
               "BetterTTV", MessageElementFlag::BttvEmote);
     addEmotes(*globalChannel, *getApp()->twitch2->getFfzEmotes().emotes(),
               "FrankerFaceZ", MessageElementFlag::FfzEmote);
-    addEmotes(*globalChannel, *getApp()->twitch2->getHomiesEmotes().emotes(),
-              "Homies", MessageElementFlag::HomiesEmote);
 
     // twitch
     addEmoteSets(
@@ -240,14 +240,14 @@ void EmotePopup::loadChannel(ChannelPtr _channel)
             *globalChannel, *subChannel, _channel->getName());
 
     // channel
+    addEmotes(*channelChannel, *twitchChannel->homiesEmotes(), "Homies",
+              MessageElementFlag::HomiesEmote);
     addEmotes(*channelChannel, *twitchChannel->seventvEmotes(), "7TV",
               MessageElementFlag::SeventvEmote);
     addEmotes(*channelChannel, *twitchChannel->bttvEmotes(), "BetterTTV",
               MessageElementFlag::BttvEmote);
     addEmotes(*channelChannel, *twitchChannel->ffzEmotes(), "FrankerFaceZ",
               MessageElementFlag::FfzEmote);
-    addEmotes(*channelChannel, *twitchChannel->homiesEmotes(), "Homies",
-              MessageElementFlag::HomiesEmote);
 
     this->globalEmotesView_->setChannel(globalChannel);
     this->subEmotesView_->setChannel(subChannel);

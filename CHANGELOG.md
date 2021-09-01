@@ -4,6 +4,7 @@
 - Major: Added Homies emotes (Global & Channel emotes)
 - Major: Added the ability to exclude channels where a message should not be highlighted
 - Minor: Added `/massban` and `/massunban` commands to ban/unban a list of usernames
+- Minor: Changed channel/global emotes order to `Homies - 7TV - BetterTTV - FrankerFaceZ - Twitch`
 - Bugfix: The main window was not movable when the add channel dialog (accounts) was spawned
 
 ## Homies (#2)

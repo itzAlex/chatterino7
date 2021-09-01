@@ -17,7 +17,6 @@ namespace chatterino {
     namespace {
         const QString CHANNEL_HAS_NO_EMOTES(
                 "This channel has no Homies channel emotes.");
-        const QString emoteLinkFormat("https://itzalex.github.io/emotes/%1");
 
         Url getEmoteLink(const EmoteId &id, const QString &emoteScale)
         {
@@ -53,7 +52,6 @@ namespace chatterino {
                      Tooltip{QString("%1<br>%2 Homies Emote<br>By: %3")
                                      .arg(name.string, (isGlobal ? "Global" : "Channel"),
                                           author.string)},
-                     Url{emoteLinkFormat.arg(id.string)},
                  });
 
             auto result = CreateEmoteResult({id, name, emote});
