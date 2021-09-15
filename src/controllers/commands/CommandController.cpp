@@ -497,6 +497,290 @@ void CommandController::initialize(Settings &, Paths &paths)
         return "";
     });
 
+    this->registerCommand("/nuke", [this](const auto &words, auto channel) {
+        auto currentUser = getApp()->accounts->twitch.getCurrent();
+
+        if (currentUser->isAnon())
+        {
+            channel->addMessage(
+                    makeSystemMessage("You must be logged in to perform this action!"));
+            return "";
+        }
+
+        TwitchChannel *twitchChannel =
+                dynamic_cast<TwitchChannel *>(channel.get());
+
+        bool isModOrBroadcaster =
+                twitchChannel ? twitchChannel->hasModRights() : false;
+
+        if (!isModOrBroadcaster)
+        {
+            channel->addMessage(makeSystemMessage("You don't have permissions to execute this command in this channel!"));
+            return "";
+        }
+
+        if (words.size() < 3)
+        {
+            channel->addMessage(makeSystemMessage("Usage: /nuke my phrase [-r=<number><m|h>] [delete|ban|<number>[s|m|h|d|w]]"));
+            return "";
+        }
+
+        QString phrase = words.mid(1, words.size() - 2).join(" ");
+        QString action = words.at(words.size() - 1);
+        LimitedQueueSnapshot<MessagePtr> snapshot = channel->getMessageSnapshot();
+        QString seconds;
+        QString minutes;
+
+        if (words.at(words.size() - 2).startsWith("-r="))
+        {
+            QStringList persistance = words.at(words.size() - 2).split("-r=");
+            phrase = words.mid(1, words.size() - 3).join(" ");
+
+            if (persistance.size() == 2)
+            {
+                QString persistanceTime = persistance.at(1);
+
+                if (persistanceTime.endsWith("s"))
+                {
+                    seconds = persistanceTime.left(persistanceTime.lastIndexOf("s"));
+                }
+
+                else if (persistanceTime.endsWith("m"))
+                {
+                    minutes = persistanceTime.left(persistanceTime.lastIndexOf("m"));
+                }
+            }
+        }
+
+        static QRegularExpression timeoutRegex("(\\d+)([smhdw])");
+        auto timeoutMatch = timeoutRegex.match(action);
+
+        if (action != "ban" && action != "delete" && !timeoutMatch.hasMatch())
+        {
+            channel->addMessage(makeSystemMessage("Invalid action. Valid actions: ban, delete, <x>s, <x>m, <x>h, <x>d, <x>w"));
+            channel->addMessage(makeSystemMessage("Example: /nuke my phrase 10m"));
+            return "";
+        }
+
+        int nuked = 0;
+        int amount = 0;
+        QStringList usernames;
+
+        if (timeoutMatch.hasMatch())
+        {
+            constexpr int minute = 60;
+            constexpr int hour = 60 * minute;
+            constexpr int day = 24 * hour;
+            constexpr int week = 7 * day;
+
+            amount = timeoutMatch.captured(1).toInt();
+            QString unit = timeoutMatch.captured(2);
+
+            if (amount <= 0)
+            {
+                channel->addMessage(makeSystemMessage("Invalid timeout value. It has to be higher than 0."));
+                return "";
+            }
+
+            if (unit == "m")
+            {
+                amount *= minute;
+            }
+            else if (unit == "h")
+            {
+                amount *= hour;
+            }
+            else if (unit == "d")
+            {
+                amount *= day;
+            }
+            else if (unit == "w")
+            {
+                amount *= week;
+            }
+        }
+
+        for (size_t i = 0; i < snapshot.size(); ++i)
+        {
+            MessagePtr message = snapshot[i];
+
+            if (!message->loginName.isEmpty())
+            {
+                if (message->loginName == channel->getName() || message->isMod)
+                {
+                    continue;
+                }
+
+                if (message->messageText.contains(phrase, Qt::CaseInsensitive))
+                {
+                    if (action == "delete")
+                    {
+                        QTimer::singleShot((nuked + 1) * 1000, [channel, message]() {
+                            // channel->sendMessage("/delete " + message->id);
+                        });
+
+                        nuked++;
+                    }
+
+                    if (action == "ban")
+                    {
+                        if (usernames.indexOf(message->loginName) == -1)
+                        {
+                            QTimer::singleShot((nuked + 1) * 1000, [channel, message]() {
+                                // channel->sendMessage("/ban " + message->loginName);
+                            });
+
+                            usernames.append(message->loginName);
+                            nuked++;
+                        }
+                    }
+
+                    if (timeoutMatch.hasMatch())
+                    {
+                        if (usernames.indexOf(message->loginName) == -1)
+                        {
+                            QTimer::singleShot((nuked + 1) * 1000, [channel, message, amount]() {
+                                // channel->sendMessage(QString("/timeout %1 %2").arg(message->loginName).arg(amount));
+                            });
+
+                            usernames.append(message->loginName);
+                            nuked++;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!seconds.isEmpty())
+        {
+            if (seconds.toInt()) {
+
+                QTimer::singleShot(seconds.toInt() * 1000, [this]() {
+                    this->privateMessageReceivedConnection.disconnect();
+                });
+            } else {
+                channel->addMessage(makeSystemMessage("Ignoring persistence since the introduced value is invalid"));
+                return "";
+            }
+        }
+
+        else if (!minutes.isEmpty())
+        {
+            if (minutes.toInt()) {
+                QTimer::singleShot(minutes.toInt() * 60 * 1000, [this]() {
+                    this->privateMessageReceivedConnection.disconnect();
+                });
+            } else {
+                channel->addMessage(makeSystemMessage("Ignoring persistence since the introduced value is invalid"));
+                return "";
+            }
+        }
+
+        static QRegularExpression idRegex("(id=)(\\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12})");
+        static QRegularExpression modRegex("(mod=)(\\w{1})");
+        QString channelName = channel->getName();
+        stripChannelName(channelName);
+
+        this->privateMessageReceivedConnection = this->privateMessageReceivedSignal.connect(
+                [this, channelName, phrase, action, amount, timeoutMatch, &usernames, channel](Communi::IrcPrivateMessage &msg) {
+                    // QTimer *timer = new QTimer;
+                    // timer->setSingleShot(true);
+
+                    QString messageData = QString(msg.toData());
+                    auto modMatch = modRegex.match(messageData);
+
+                    if (msg.nick() == channelName || (modMatch.captured(2) == "1" ? true : false))
+                    {
+                        return "";
+                    }
+
+                    QString target = msg.target();
+                    stripChannelName(target);
+
+                    auto idMatch = idRegex.match(messageData);
+
+                    if (channelName == target)
+                    {
+                        QString message = msg.content();
+
+                        if (message.contains(phrase, Qt::CaseInsensitive))
+                        {
+                            QString id = idMatch.captured(2);
+                            QString sender = msg.nick();
+
+                            if (action == "ban")
+                            {
+                                if (usernames.indexOf(sender) == -1)
+                                {
+                                    channel->sendMessage("/ban " + sender);
+                                    usernames.append(sender);
+
+                                    /*
+                                    if (!timer->isActive())
+                                    {
+                                        // channel->sendMessage("/ban " + sender);
+                                        usernames.append(sender);
+                                        timer->start(1000);
+                                    } else
+                                    {
+                                        QTimer::singleShot(timer->remainingTime(), [channel, sender]() {
+                                            // channel->sendMessage("/ban " + sender);
+                                        });
+
+                                        usernames.append(sender);
+                                        timer->start(1000);
+                                    }
+                                    */
+                                }
+                            }
+
+                            if (action == "delete")
+                            {
+                                channel->sendMessage("/delete " + id);
+
+                                /*
+                                if (!timer->isActive())
+                                {
+                                    channel->sendMessage("/delete " + id);
+                                    timer->start(1000);
+                                } else
+                                {
+                                    QTimer::singleShot(timer->remainingTime(), [channel, id]() {
+                                        channel->sendMessage("/delete " + id);
+                                    });
+
+                                    timer->start(1000);
+                                }
+                                 */
+                            }
+
+                            if (timeoutMatch.hasMatch())
+                            {
+                                channel->sendMessage(QString("/timeout %1 %2").arg(sender).arg(amount));
+
+                                /*
+                                if (!timer->isActive())
+                                {
+                                    channel->sendMessage(QString("/timeout %1 %2").arg(sender).arg(amount));
+                                    timer->start(1000);
+                                } else
+                                {
+                                    QTimer::singleShot(timer->remainingTime(), [channel, sender, amount]() {
+                                        channel->sendMessage(QString("/timeout %1 %2").arg(sender).arg(amount));
+                                    });
+
+                                    usernames.append(sender);
+                                    timer->start(1000);
+                                }
+                                */
+                            }
+                        }
+                    }
+        });
+
+        return "";
+    });
+
     this->registerCommand("/follow", [](const auto &words, auto channel) {
         auto currentUser = getApp()->accounts->twitch.getCurrent();
 
@@ -1209,6 +1493,11 @@ QString CommandController::execCustomCommand(const QStringList &words,
 QStringList CommandController::getDefaultTwitchCommandList()
 {
     return this->commandAutoCompletions_;
+}
+
+void CommandController::newMessageReceived(Communi::IrcPrivateMessage &msg)
+{
+    this->privateMessageReceivedSignal.invoke(msg);
 }
 
 }  // namespace chatterino

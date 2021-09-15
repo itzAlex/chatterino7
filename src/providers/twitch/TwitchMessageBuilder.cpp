@@ -168,6 +168,8 @@ MessagePtr TwitchMessageBuilder::build()
 
     this->appendChannelName();
 
+    this->appendIsMod();
+
     if (this->tags.contains("rm-deleted"))
     {
         this->message().flags.set(MessageFlag::Disabled);
@@ -491,6 +493,23 @@ void TwitchMessageBuilder::addTextOrEmoji(const QString &string_)
     }
 
     this->emplace<TextElement>(string, MessageElementFlag::Text, textColor);
+}
+
+void TwitchMessageBuilder::appendIsMod()
+{
+    bool hasUserType = this->tags.contains("user-type");
+
+    if (hasUserType)
+    {
+        QString userType = this->tags.value("user-type").toString();
+
+        if (userType == "mod") {
+            this->message().isMod = true;
+            return;
+        }
+    }
+
+    this->message().isMod = false;
 }
 
 void TwitchMessageBuilder::parseMessageID()

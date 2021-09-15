@@ -25,6 +25,9 @@ class CommandController final : public Singleton
 public:
     SignalVector<Command> items_;
 
+    pajlada::Signals::Connection privateMessageReceivedConnection;
+    pajlada::Signals::Signal<Communi::IrcPrivateMessage &> privateMessageReceivedSignal;
+
     QString execCommand(const QString &text, std::shared_ptr<Channel> channel,
                         bool dryRun);
     QStringList getDefaultTwitchCommandList();
@@ -33,6 +36,8 @@ public:
     virtual void save() override;
 
     CommandModel *createModel(QObject *parent);
+
+    void newMessageReceived(Communi::IrcPrivateMessage &msg);
 
 private:
     void load(Paths &paths);

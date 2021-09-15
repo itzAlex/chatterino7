@@ -6,6 +6,8 @@
 #include "messages/LimitedQueueSnapshot.hpp"
 #include "messages/Message.hpp"
 #include "messages/MessageBuilder.hpp"
+#include "controllers/commands/CommandController.hpp"
+#include "Application.hpp"
 
 #include <QCoreApplication>
 
@@ -65,6 +67,7 @@ AbstractIrcServer::AbstractIrcServer()
     QObject::connect(this->readConnection_.get(),
                      &Communi::IrcConnection::privateMessageReceived, this,
                      [this](auto msg) {
+                         getApp()->commands->newMessageReceived(*msg);
                          this->privateMessageReceived(msg);
                      });
     QObject::connect(this->readConnection_.get(),

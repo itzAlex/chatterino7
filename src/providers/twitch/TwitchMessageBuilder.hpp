@@ -69,6 +69,7 @@ private:
     void parseUsernameColor() override;
     void parseUsername() override;
     void parseMessageID();
+    void appendIsMod();
     void parseRoomID();
     void appendUsername();
 
