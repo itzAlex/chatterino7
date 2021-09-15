@@ -7,6 +7,15 @@
 - Minor: Changed channel/global emotes order to `Homies - 7TV - BetterTTV - FrankerFaceZ - Twitch`
 - Bugfix: The main window was not movable when the add channel dialog (accounts) was spawned
 
+- Minor: Add `{channel.name}`, `{channel.id}`, `{stream.game}`, `{stream.title}`, `{my.id}`, `{my.name}` placeholders for commands (#3155)
+- Minor: Remove TwitchEmotes.com attribution and the open/copy options when right-clicking a Twitch Emote. (#2214, #3136)
+- Minor: Strip leading @ and trailing , from username in /user and /usercard commands. (#3143)
+- Minor: Display a system message when reloading subscription emotes to match BTTV/FFZ behavior (#3135)
+- Minor: Fixed `/streamlink` command not stripping leading @'s or #'s (#3215)
+- Minor: Strip leading @ and trailing , from username in `/popout` command. (#3217)
+- Minor: Added `flags.reward_message` filter variable (#3231)
+- Bugfix: Fixed a bug with usernames or emotes completing from the wrong position. (#3229)
+
 ## Homies (#2)
 
 - Major: Added the ability to select where a message should be highlighted
