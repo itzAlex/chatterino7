@@ -37,6 +37,10 @@ public:
 
     CommandModel *createModel(QObject *parent);
 
+    QString execCustomCommand(const QStringList &words, const Command &command,
+                              bool dryRun, ChannelPtr channel,
+                              std::map<QString, QString> context = {});
+
     void newMessageReceived(Communi::IrcPrivateMessage &msg);
 
 private:
@@ -61,9 +65,6 @@ private:
     // unique_ptr
     std::unique_ptr<pajlada::Settings::Setting<std::vector<Command>>>
         commandsSetting_;
-
-    QString execCustomCommand(const QStringList &words, const Command &command,
-                              bool dryRun);
 
     QStringList commandAutoCompletions_;
 };
