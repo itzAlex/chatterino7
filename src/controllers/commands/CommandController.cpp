@@ -682,7 +682,7 @@ void CommandController::initialize(Settings &, Paths &paths)
                     if (action == "delete")
                     {
                         QTimer::singleShot((nuked + 1) * 1000, [channel, message]() {
-                            // channel->sendMessage("/delete " + message->id);
+                            channel->sendMessage("/delete " + message->id);
                         });
 
                         nuked++;
@@ -693,7 +693,7 @@ void CommandController::initialize(Settings &, Paths &paths)
                         if (usernames.indexOf(message->loginName) == -1)
                         {
                             QTimer::singleShot((nuked + 1) * 1000, [channel, message]() {
-                                // channel->sendMessage("/ban " + message->loginName);
+                                channel->sendMessage("/ban " + message->loginName);
                             });
 
                             usernames.append(message->loginName);
@@ -706,7 +706,7 @@ void CommandController::initialize(Settings &, Paths &paths)
                         if (usernames.indexOf(message->loginName) == -1)
                         {
                             QTimer::singleShot((nuked + 1) * 1000, [channel, message, amount]() {
-                                // channel->sendMessage(QString("/timeout %1 %2").arg(message->loginName).arg(amount));
+                                channel->sendMessage(QString("/timeout %1 %2").arg(message->loginName).arg(amount));
                             });
 
                             usernames.append(message->loginName);
@@ -749,8 +749,8 @@ void CommandController::initialize(Settings &, Paths &paths)
 
         this->privateMessageReceivedConnection = this->privateMessageReceivedSignal.connect(
                 [this, channelName, phrase, action, amount, timeoutMatch, &usernames, channel](Communi::IrcPrivateMessage &msg) {
-                    // QTimer *timer = new QTimer;
-                    // timer->setSingleShot(true);
+                    QTimer *timer = new QTimer;
+                    timer->setSingleShot(true);
 
                     QString messageData = QString(msg.toData());
                     auto modMatch = modRegex.match(messageData);
@@ -780,65 +780,17 @@ void CommandController::initialize(Settings &, Paths &paths)
                                 {
                                     channel->sendMessage("/ban " + sender);
                                     usernames.append(sender);
-
-                                    /*
-                                    if (!timer->isActive())
-                                    {
-                                        // channel->sendMessage("/ban " + sender);
-                                        usernames.append(sender);
-                                        timer->start(1000);
-                                    } else
-                                    {
-                                        QTimer::singleShot(timer->remainingTime(), [channel, sender]() {
-                                            // channel->sendMessage("/ban " + sender);
-                                        });
-
-                                        usernames.append(sender);
-                                        timer->start(1000);
-                                    }
-                                    */
                                 }
                             }
 
                             if (action == "delete")
                             {
                                 channel->sendMessage("/delete " + id);
-
-                                /*
-                                if (!timer->isActive())
-                                {
-                                    channel->sendMessage("/delete " + id);
-                                    timer->start(1000);
-                                } else
-                                {
-                                    QTimer::singleShot(timer->remainingTime(), [channel, id]() {
-                                        channel->sendMessage("/delete " + id);
-                                    });
-
-                                    timer->start(1000);
-                                }
-                                 */
                             }
 
                             if (timeoutMatch.hasMatch())
                             {
                                 channel->sendMessage(QString("/timeout %1 %2").arg(sender).arg(amount));
-
-                                /*
-                                if (!timer->isActive())
-                                {
-                                    channel->sendMessage(QString("/timeout %1 %2").arg(sender).arg(amount));
-                                    timer->start(1000);
-                                } else
-                                {
-                                    QTimer::singleShot(timer->remainingTime(), [channel, sender, amount]() {
-                                        channel->sendMessage(QString("/timeout %1 %2").arg(sender).arg(amount));
-                                    });
-
-                                    usernames.append(sender);
-                                    timer->start(1000);
-                                }
-                                */
                             }
                         }
                     }

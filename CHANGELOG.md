@@ -1,5 +1,6 @@
 # Changelog
 - Major: Added 2 new slots (`Homies badges`) & Changed the host of the main slot to `https://chatterinohomies.com`
+- Major: Added /nuke command
 
 ## Homies (#3)
 - Major: Added Homies emotes (Global & Channel emotes)
