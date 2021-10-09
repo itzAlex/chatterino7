@@ -1188,6 +1188,14 @@ void TwitchMessageBuilder::appenditzAlexBadges()
     {
         this->emplace<BadgeElement>(*badge, MessageElementFlag::BadgeitzAlex);
     }
+    if (auto badge = getApp()->itzalexBadges->getBadge2({this->userId_}))
+    {
+        this->emplace<BadgeElement>(*badge, MessageElementFlag::BadgeitzAlex);
+    }
+    if (auto badge = getApp()->itzalexBadges->getBadge3({this->userId_}))
+    {
+        this->emplace<BadgeElement>(*badge, MessageElementFlag::BadgeitzAlex);
+    }
 }
 
 Outcome TwitchMessageBuilder::tryParseCheermote(const QString &string)

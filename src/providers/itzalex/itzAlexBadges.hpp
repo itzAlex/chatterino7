@@ -21,6 +21,8 @@ public:
     itzAlexBadges();
 
     boost::optional<EmotePtr> getBadge(const UserId &id);
+    boost::optional<EmotePtr> getBadge2(const UserId &id);
+    boost::optional<EmotePtr> getBadge3(const UserId &id);
 
 private:
     void loaditzAlexBadges();
@@ -28,7 +30,11 @@ private:
     std::shared_mutex mutex_;
 
     std::unordered_map<QString, int> badgeMap;
+    std::unordered_map<QString, int> badgeMap2;
+    std::unordered_map<QString, int> badgeMap3;
     std::vector<EmotePtr> emotes;
+    std::vector<EmotePtr> emotes2;
+    std::vector<EmotePtr> emotes3;
 };
 
 }  // namespace chatterino

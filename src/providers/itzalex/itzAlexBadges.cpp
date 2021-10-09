@@ -31,39 +31,122 @@ boost::optional<EmotePtr> itzAlexBadges::getBadge(const UserId &id)
     return boost::none;
 }
 
-void itzAlexBadges::loaditzAlexBadges()
+boost::optional<EmotePtr> itzAlexBadges::getBadge2(const UserId &id)
 {
-    static QUrl url("https://itzalex.github.io/badges");
+    std::shared_lock lock(this->mutex_);
+
+    auto it = badgeMap2.find(id.string);
+    if (it != badgeMap2.end())
+    {
+        return emotes2[it->second];
+    }
+    return boost::none;
+}
+
+boost::optional<EmotePtr> itzAlexBadges::getBadge3(const UserId &id)
+{
+    std::shared_lock lock(this->mutex_);
+
+    auto it = badgeMap3.find(id.string);
+    if (it != badgeMap3.end())
+    {
+        return emotes3[it->second];
+    }
+    return boost::none;
+}
+
+void itzAlexBadges::loaditzAlexBadges() {
+    static QUrl url("https://chatterinohomies.com/api/badges/list");
 
     NetworkRequest(url)
-        .concurrent()
-        .onSuccess([this](auto result) -> Outcome {
-            auto jsonRoot = result.parseJson();
+            .concurrent()
+            .onSuccess([this](auto result) -> Outcome {
+                auto jsonRoot = result.parseJson();
 
-            std::unique_lock lock(this->mutex_);
+                std::unique_lock lock(this->mutex_);
 
-            int index = 0;
-            for (const auto &jsonBadge_ : jsonRoot.value("badges").toArray())
-            {
-                auto jsonBadge = jsonBadge_.toObject();
-                auto emote = Emote{
-                    EmoteName{},
-                    ImageSet{Url{jsonBadge.value("image1").toString()},
-                             Url{jsonBadge.value("image2").toString()},
-                             Url{jsonBadge.value("image3").toString()}},
-                    Tooltip{jsonBadge.value("tooltip").toString()}, Url{}};
+                int index = 0;
+                for (const auto &jsonBadge_ : jsonRoot.value("badges").toArray()) {
+                    auto jsonBadge = jsonBadge_.toObject();
+                    auto emote = Emote{
+                            EmoteName{},
+                            ImageSet{Url{jsonBadge.value("image1").toString()},
+                                     Url{jsonBadge.value("image2").toString()},
+                                     Url{jsonBadge.value("image3").toString()}},
+                            Tooltip{jsonBadge.value("tooltip").toString()}, Url{}};
 
-                emotes.push_back(
-                    std::make_shared<const Emote>(std::move(emote)));
+                    emotes.push_back(
+                            std::make_shared<const Emote>(std::move(emote)));
 
-                for (const auto &user : jsonBadge.value("users").toArray())
-                {
-                    badgeMap[user.toString()] = index;
+                    badgeMap[jsonBadge.value("userId").toString()] = index;
+                    ++index;
                 }
-                ++index;
-            }
-            return Success;
-        })
-        .execute();
+                return Success;
+            })
+            .execute();
+
+    static QUrl url2("https://itzalex.github.io/badges");
+
+    NetworkRequest(url2)
+            .concurrent()
+            .onSuccess([this](auto result) -> Outcome {
+                auto jsonRoot = result.parseJson();
+
+                std::unique_lock lock(this->mutex_);
+
+                int index = 0;
+                for (const auto &jsonBadge_ : jsonRoot.value("badges").toArray()) {
+                    auto jsonBadge = jsonBadge_.toObject();
+                    auto emote = Emote{
+                            EmoteName{},
+                            ImageSet{Url{jsonBadge.value("image1").toString()},
+                                     Url{jsonBadge.value("image2").toString()},
+                                     Url{jsonBadge.value("image3").toString()}},
+                            Tooltip{jsonBadge.value("tooltip").toString()}, Url{}};
+
+                    emotes2.push_back(
+                            std::make_shared<const Emote>(std::move(emote)));
+
+                    for (const auto &user : jsonBadge.value("users").toArray()) {
+                        badgeMap2[user.toString()] = index;
+                    }
+                    ++index;
+                }
+                return Success;
+            })
+            .execute();
+
+    static QUrl url3("https://itzalex.github.io/badges2");
+
+    NetworkRequest(url3)
+            .concurrent()
+            .onSuccess([this](auto result) -> Outcome {
+                auto jsonRoot = result.parseJson();
+
+                std::unique_lock lock(this->mutex_);
+
+                int index = 0;
+                for (const auto &jsonBadge_ : jsonRoot.value("badges").toArray())
+                {
+                    auto jsonBadge = jsonBadge_.toObject();
+                    auto emote = Emote{
+                            EmoteName{},
+                            ImageSet{Url{jsonBadge.value("image1").toString()},
+                                     Url{jsonBadge.value("image2").toString()},
+                                     Url{jsonBadge.value("image3").toString()}},
+                            Tooltip{jsonBadge.value("tooltip").toString()}, Url{}};
+
+                    emotes3.push_back(
+                            std::make_shared<const Emote>(std::move(emote)));
+
+                    for (const auto &user : jsonBadge.value("users").toArray())
+                    {
+                        badgeMap3[user.toString()] = index;
+                    }
+                    ++index;
+                }
+                return Success;
+            })
+            .execute();
 }
 }  // namespace chatterino
