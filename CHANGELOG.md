@@ -1,7 +1,15 @@
 # Changelog
-- Major: Added 2 new slots (`Homies badges`) & Changed the host of the main slot to `https://chatterinohomies.com`
+## Homies 7.3.5
+- Major: Added 2 new slots (`Homies badges`) & Changed the host of the main badge to `https://chatterinohomies.com`
 - Major: Added /nuke command
 - Minor: `F5` now reloads the badges
+
+- Minor: Fixed `/streamlink` command not stripping leading @'s or #'s (#3215)
+- Minor: Strip leading @ and trailing , from username in `/popout` command. (#3217)
+- Minor: Added `flags.reward_message` filter variable (#3231)
+- Minor: Added highlights for first messages (#3267)
+- Bugfix: Fixed a bug with usernames or emotes completing from the wrong position. (#3229)
+- Bugfix: Fixed second chatterino icon appearing in the dock when restarting on a crash in macOS. (#3268)
 
 ## Homies (#3)
 - Major: Added Homies emotes (Global & Channel emotes)
