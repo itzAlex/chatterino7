@@ -19,14 +19,13 @@ class itzAlexBadges : public Singleton
 public:
     virtual void initialize(Settings &settings, Paths &paths) override;
     itzAlexBadges();
+    void loaditzAlexBadges();
 
     boost::optional<EmotePtr> getBadge(const UserId &id);
     boost::optional<EmotePtr> getBadge2(const UserId &id);
     boost::optional<EmotePtr> getBadge3(const UserId &id);
 
 private:
-    void loaditzAlexBadges();
-
     std::shared_mutex mutex_;
 
     std::unordered_map<QString, int> badgeMap;

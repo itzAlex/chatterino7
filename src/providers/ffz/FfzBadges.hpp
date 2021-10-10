@@ -23,12 +23,12 @@ class FfzBadges : public Singleton
 public:
     virtual void initialize(Settings &settings, Paths &paths) override;
     FfzBadges() = default;
+    void loadFfzBadges();
 
     boost::optional<EmotePtr> getBadge(const UserId &id);
     boost::optional<QColor> getBadgeColor(const UserId &id);
 
 private:
-    void loadFfzBadges();
 
     std::shared_mutex mutex_;
 

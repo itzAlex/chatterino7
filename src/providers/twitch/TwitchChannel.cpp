@@ -7,11 +7,16 @@
 #include "common/QLogging.hpp"
 #include "controllers/accounts/AccountController.hpp"
 #include "controllers/notifications/NotificationController.hpp"
+#include "boost/filesystem.hpp"
 #include "messages/Message.hpp"
 #include "providers/bttv/BttvEmotes.hpp"
 #include "providers/bttv/LoadBttvChannelEmote.hpp"
+#include "providers/seventv/SeventvBadges.hpp"
 #include "providers/seventv/SeventvEmotes.hpp"
+#include "providers/itzalex/itzAlexBadges.hpp"
 #include "providers/itzalex/HomiesEmotes.hpp"
+#include "providers/ffz/FfzBadges.hpp"
+#include "providers/chatterino/ChatterinoBadges.hpp"
 #include "providers/twitch/IrcMessageHandler.hpp"
 #include "providers/twitch/PubsubClient.hpp"
 #include "providers/twitch/TwitchCommon.hpp"
@@ -22,6 +27,7 @@
 #include "singletons/Settings.hpp"
 #include "singletons/Toasts.hpp"
 #include "singletons/WindowManager.hpp"
+#include "singletons/Paths.hpp"
 #include "util/FormatTime.hpp"
 #include "util/PostToThread.hpp"
 #include "util/QStringHash.hpp"
@@ -242,6 +248,15 @@ const QString &TwitchChannel::getLocalizedName() const
 void TwitchChannel::setLocalizedName(const QString &name)
 {
     this->nameOptions.localizedName = name;
+}
+
+void TwitchChannel::refreshBadgesProviders()
+{
+    getApp()->seventvBadges->loadSeventvBadges();
+    getApp()->ffzBadges->loadFfzBadges();
+    getApp()->chatterinoBadges->loadChatterinoBadges();
+    getApp()->itzalexBadges->loaditzAlexBadges();
+    this->addMessage(makeSystemMessage("Badges reloaded."));
 }
 
 void TwitchChannel::refresh7TVChannelEmotes(bool manualRefresh)

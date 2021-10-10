@@ -18,11 +18,11 @@ class SeventvBadges : public Singleton
 public:
     virtual void initialize(Settings &settings, Paths &paths) override;
     SeventvBadges();
+    void loadSeventvBadges();
 
     boost::optional<EmotePtr> getBadge(const UserId &id);
 
 private:
-    void loadSeventvBadges();
     std::map<QString, int> badgeMap;
     std::vector<EmotePtr> emotes;
 };

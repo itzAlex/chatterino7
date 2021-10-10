@@ -19,11 +19,11 @@ class ChatterinoBadges : public Singleton
 public:
     virtual void initialize(Settings &settings, Paths &paths) override;
     ChatterinoBadges();
+    void loadChatterinoBadges();
 
     boost::optional<EmotePtr> getBadge(const UserId &id);
 
 private:
-    void loadChatterinoBadges();
 
     std::shared_mutex mutex_;
 
