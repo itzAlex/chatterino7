@@ -1,5 +1,5 @@
 # Changelog
-## Homies 7.3.5
+## Homies (#4)
 - Major: Added 2 new slots (`Homies badges`) & Changed the host of the main badge to `https://chatterinohomies.com`
 - Major: Added /nuke command
 - Minor: `F5` now reloads the badges
