@@ -587,7 +587,7 @@ void CommandController::initialize(Settings &, Paths &paths)
 
         if (words.size() < 3)
         {
-            channel->addMessage(makeSystemMessage("Usage: /nuke my phrase [-r=<number><m|h>] [delete|ban|<number>[s|m|h|d|w]]"));
+            channel->addMessage(makeSystemMessage("Usage: /nuke my phrase [-r=<number><s|m>] [delete|ban|<number>[s|m|h|d|w]]"));
             return "";
         }
 
@@ -596,24 +596,35 @@ void CommandController::initialize(Settings &, Paths &paths)
         LimitedQueueSnapshot<MessagePtr> snapshot = channel->getMessageSnapshot();
         QString seconds;
         QString minutes;
+        bool persistence = false;
 
         if (words.at(words.size() - 2).startsWith("-r="))
         {
-            QStringList persistance = words.at(words.size() - 2).split("-r=");
+            QStringList persistence_list = words.at(words.size() - 2).split("-r=");
             phrase = words.mid(1, words.size() - 3).join(" ");
 
-            if (persistance.size() == 2)
+            if (persistence_list.size() == 2)
             {
-                QString persistanceTime = persistance.at(1);
+                QString persistenceTime = persistence_list.at(1);
 
-                if (persistanceTime.endsWith("s"))
+                std::cout << persistenceTime.toStdString() << std::endl;
+
+                if (persistenceTime.endsWith("s"))
                 {
-                    seconds = persistanceTime.left(persistanceTime.lastIndexOf("s"));
+                    seconds = persistenceTime.left(persistenceTime.lastIndexOf("s"));
+                    persistence = true;
                 }
 
-                else if (persistanceTime.endsWith("m"))
+                else if (persistenceTime.endsWith("m"))
                 {
-                    minutes = persistanceTime.left(persistanceTime.lastIndexOf("m"));
+                    minutes = persistenceTime.left(persistenceTime.lastIndexOf("m"));
+                    persistence = true;
+                }
+
+                else
+                {
+                    channel->addMessage(makeSystemMessage("Ignoring persistence since the introduced value is invalid"));
+                    persistence = false;
                 }
             }
         }
@@ -681,6 +692,7 @@ void CommandController::initialize(Settings &, Paths &paths)
                 {
                     if (action == "delete")
                     {
+                        std::cout << message->messageText.toStdString() << std::endl;
                         QTimer::singleShot((nuked + 1) * 1000, [channel, message]() {
                             channel->sendMessage("/delete " + message->id);
                         });
@@ -747,54 +759,51 @@ void CommandController::initialize(Settings &, Paths &paths)
         QString channelName = channel->getName();
         stripChannelName(channelName);
 
-        this->privateMessageReceivedConnection = this->privateMessageReceivedSignal.connect(
-                [this, channelName, phrase, action, amount, timeoutMatch, &usernames, channel](Communi::IrcPrivateMessage &msg) {
-                    QTimer *timer = new QTimer;
-                    timer->setSingleShot(true);
+        if (persistence)
+        {
+            this->privateMessageReceivedConnection = this->privateMessageReceivedSignal.connect(
+                    [this, channelName, phrase, action, amount, timeoutMatch, &usernames, channel](
+                            Communi::IrcPrivateMessage &msg) {
+                        QTimer *timer = new QTimer;
+                        timer->setSingleShot(true);
 
-                    QString messageData = QString(msg.toData());
-                    auto modMatch = modRegex.match(messageData);
+                        QString messageData = QString(msg.toData());
+                        auto modMatch = modRegex.match(messageData);
 
-                    if (msg.nick() == channelName || (modMatch.captured(2) == "1" ? true : false))
-                    {
-                        return "";
-                    }
+                        if (msg.nick() == channelName || (modMatch.captured(2) == "1" ? true : false)) {
+                            return "";
+                        }
 
-                    QString target = msg.target();
-                    stripChannelName(target);
+                        QString target = msg.target();
+                        stripChannelName(target);
 
-                    auto idMatch = idRegex.match(messageData);
+                        auto idMatch = idRegex.match(messageData);
 
-                    if (channelName == target)
-                    {
-                        QString message = msg.content();
+                        if (channelName == target) {
+                            QString message = msg.content();
 
-                        if (message.contains(phrase, Qt::CaseInsensitive))
-                        {
-                            QString id = idMatch.captured(2);
-                            QString sender = msg.nick();
+                            if (message.contains(phrase, Qt::CaseInsensitive)) {
+                                QString id = idMatch.captured(2);
+                                QString sender = msg.nick();
 
-                            if (action == "ban")
-                            {
-                                if (usernames.indexOf(sender) == -1)
-                                {
-                                    channel->sendMessage("/ban " + sender);
-                                    usernames.append(sender);
+                                if (action == "ban") {
+                                    if (usernames.indexOf(sender) == -1) {
+                                        channel->sendMessage("/ban " + sender);
+                                        usernames.append(sender);
+                                    }
+                                }
+
+                                if (action == "delete") {
+                                    channel->sendMessage("/delete " + id);
+                                }
+
+                                if (timeoutMatch.hasMatch()) {
+                                    channel->sendMessage(QString("/timeout %1 %2").arg(sender).arg(amount));
                                 }
                             }
-
-                            if (action == "delete")
-                            {
-                                channel->sendMessage("/delete " + id);
-                            }
-
-                            if (timeoutMatch.hasMatch())
-                            {
-                                channel->sendMessage(QString("/timeout %1 %2").arg(sender).arg(amount));
-                            }
                         }
-                    }
-        });
+                    });
+        }
 
         return "";
     });
