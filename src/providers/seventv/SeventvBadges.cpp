@@ -35,6 +35,9 @@ boost::optional<EmotePtr> SeventvBadges::getBadge(const UserId &id)
 
 void SeventvBadges::loadSeventvBadges()
 {
+    badgeMap.clear();
+    emotes.clear();
+
     static QUrl url("https://api.7tv.app/v2/badges");
 
     static QUrlQuery urlQuery;

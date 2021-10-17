@@ -905,7 +905,7 @@ void Split::reloadChannelAndSubscriberEmotes()
         twitchChannel->refreshBTTVChannelEmotes(true);
         twitchChannel->refreshFFZChannelEmotes(true);
         twitchChannel->refreshHomiesChannelEmotes(true);
-        // twitchChannel->refreshBadgesProviders();
+        twitchChannel->refreshBadgesProviders();
     }
 }
 

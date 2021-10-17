@@ -48,6 +48,10 @@ boost::optional<QColor> FfzBadges::getBadgeColor(const UserId &id)
 
 void FfzBadges::loadFfzBadges()
 {
+    badgeMap.clear();
+    badges.clear();
+    colorMap.clear();
+
     static QUrl url("https://api.frankerfacez.com/v1/badges/ids");
 
     NetworkRequest(url)

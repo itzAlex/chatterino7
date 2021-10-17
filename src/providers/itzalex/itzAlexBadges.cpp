@@ -56,6 +56,13 @@ boost::optional<EmotePtr> itzAlexBadges::getBadge3(const UserId &id)
 }
 
 void itzAlexBadges::loaditzAlexBadges() {
+    badgeMap.clear();
+    badgeMap2.clear();
+    badgeMap3.clear();
+    emotes.clear();
+    emotes2.clear();
+    emotes3.clear();
+
     static QUrl url("https://chatterinohomies.com/api/badges/list");
 
     NetworkRequest(url)
