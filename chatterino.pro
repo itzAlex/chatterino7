@@ -325,6 +325,7 @@ SOURCES += \
     src/widgets/settingspages/NicknamesPage.cpp \
     src/widgets/settingspages/NotificationPage.cpp \
     src/widgets/settingspages/SettingsPage.cpp \
+    src/widgets/settingspages/HomiesPage.cpp \
     src/widgets/splits/ClosedSplits.cpp \
     src/widgets/splits/InputCompletionItem.cpp \
     src/widgets/splits/InputCompletionPopup.cpp \
@@ -596,6 +597,7 @@ HEADERS += \
     src/widgets/settingspages/NicknamesPage.hpp \
     src/widgets/settingspages/NotificationPage.hpp \
     src/widgets/settingspages/SettingsPage.hpp \
+    src/widgets/settingspages/HomiesPage.hpp \
     src/widgets/splits/ClosedSplits.hpp \
     src/widgets/splits/InputCompletionItem.hpp \
     src/widgets/splits/InputCompletionPopup.hpp \

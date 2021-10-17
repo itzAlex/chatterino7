@@ -101,6 +101,8 @@ public:
     IntSetting tabDirection = {"/appearance/tabDirection",
                                NotebookTabDirection::Horizontal};
 
+    BoolSetting grayOutRecents = {"/appearance/messages/grayOutRecents", true};
+
     //    BoolSetting collapseLongMessages =
     //    {"/appearance/messages/collapseLongMessages", false};
     IntSetting collpseMessagesMinLines = {

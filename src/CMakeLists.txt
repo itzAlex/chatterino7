@@ -449,6 +449,8 @@ set(SOURCE_FILES
         widgets/settingspages/NotificationPage.hpp
         widgets/settingspages/SettingsPage.cpp
         widgets/settingspages/SettingsPage.hpp
+        widgets/settingspages/HomiesEmotes.cpp
+        widgets/settingspages/HomiesEmotes.hpp
 
         widgets/splits/ClosedSplits.cpp
         widgets/splits/ClosedSplits.hpp
