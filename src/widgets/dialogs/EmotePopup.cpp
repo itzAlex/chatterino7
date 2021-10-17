@@ -225,8 +225,11 @@ void EmotePopup::loadChannel(ChannelPtr _channel)
     auto channelChannel = std::make_shared<Channel>("", Channel::Type::None);
 
     // global
-    addEmotes(*globalChannel, *getApp()->twitch2->getHomiesEmotes().emotes(),
-              "Homies", MessageElementFlag::HomiesEmote);
+    if (getSettings()->enableHomiesGlobalEmotes)
+    {
+        addEmotes(*globalChannel, *getApp()->twitch2->getHomiesEmotes().emotes(),
+                  "Homies", MessageElementFlag::HomiesEmote);
+    }
     addEmotes(*globalChannel, *getApp()->twitch2->getSeventvEmotes().emotes(),
               "7TV", MessageElementFlag::SeventvEmote);
     addEmotes(*globalChannel, *getApp()->twitch2->getBttvEmotes().emotes(),

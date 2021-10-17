@@ -1038,7 +1038,7 @@ Outcome TwitchMessageBuilder::tryAppendEmote(const EmoteName &name)
             flags.set(MessageElementFlag::ZeroWidthEmote);
         }
     }
-    else if ((emote = globalHomiesEmotes.emote(name)))
+    else if (getSettings()->enableHomiesGlobalEmotes && (emote = globalHomiesEmotes.emote(name)))
     {
         flags = MessageElementFlag::HomiesEmote;
     }

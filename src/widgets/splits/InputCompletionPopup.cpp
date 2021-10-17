@@ -10,6 +10,7 @@
 #include "providers/twitch/TwitchChannel.hpp"
 #include "providers/twitch/TwitchIrcServer.hpp"
 #include "singletons/Emotes.hpp"
+#include "singletons/Settings.hpp"
 #include "util/LayoutCreator.hpp"
 #include "widgets/listview/GenericListView.hpp"
 #include "widgets/splits/InputCompletionItem.hpp"
@@ -118,8 +119,9 @@ void InputCompletionPopup::updateEmotes(const QString &text, ChannelPtr channel)
             addEmotes(emotes, *bttvG, text, "Global BetterTTV");
         if (auto ffzG = getApp()->twitch2->getFfzEmotes().emotes())
             addEmotes(emotes, *ffzG, text, "Global FrankerFaceZ");
-        if (auto homiesG = getApp()->twitch2->getHomiesEmotes().emotes())
-            addEmotes(emotes, *homiesG, text, "Global Homies");
+        if (getSettings()->enableHomiesGlobalEmotes)
+            if (auto homiesG = getApp()->twitch2->getHomiesEmotes().emotes())
+                addEmotes(emotes, *homiesG, text, "Global Homies");
 
         addEmojis(emotes, getApp()->emotes->emojis.emojis, text);
     }

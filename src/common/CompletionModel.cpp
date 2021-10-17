@@ -140,9 +140,11 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
     }
 
     // Homies Global
-    for (auto &emote : *getApp()->twitch2->getHomiesEmotes().emotes())
+    if (getSettings()->enableHomiesGlobalEmotes)
     {
-        addString(emote.first.string, TaggedString::Type::HOMIESGlobalEmote);
+        for (auto &emote : *getApp()->twitch2->getHomiesEmotes().emotes()) {
+            addString(emote.first.string, TaggedString::Type::HOMIESGlobalEmote);
+        }
     }
 
     // Emojis
