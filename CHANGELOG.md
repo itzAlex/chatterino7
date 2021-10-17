@@ -8,6 +8,7 @@
 - Minor: Strip leading @ and trailing , from username in `/popout` command. (#3217)
 - Minor: Added `flags.reward_message` filter variable (#3231)
 - Minor: Added highlights for first messages (#3267)
+- Minor: Ignore out of bounds check for tiling wms (#3270)
 - Bugfix: Fixed a bug with usernames or emotes completing from the wrong position. (#3229)
 - Bugfix: Fixed second chatterino icon appearing in the dock when restarting on a crash in macOS. (#3268)
 
