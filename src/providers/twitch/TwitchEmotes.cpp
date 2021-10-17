@@ -39,8 +39,12 @@ QString TwitchEmotes::cleanUpEmoteCode(const QString &dirtyEmoteCode)
 // id is used for lookup
 // emoteName is used for giving a name to the emote in case it doesn't exist
 EmotePtr TwitchEmotes::getOrCreateEmote(const EmoteId &id,
-                                        const EmoteName &name_)
+                                        const EmoteName &name_,
+                                        QString channelName)
 {
+    const QString emoteLinkFormat("https://twitch.tv/%1");
+    const QString emoteLinkFormatGlobal("https://twitchemotes.com/global/emotes/%1");
+
     auto name = TwitchEmotes::cleanUpEmoteCode(name_.string);
 
     // search in cache or create new emote
@@ -56,7 +60,9 @@ EmotePtr TwitchEmotes::getOrCreateEmote(const EmoteId &id,
                 Image::fromUrl(getEmoteLink(id, "2.0"), 0.5),
                 Image::fromUrl(getEmoteLink(id, "3.0"), 0.25),
             },
-            Tooltip{name.toHtmlEscaped() + "<br>Twitch Emote"},
+            Tooltip{name.toHtmlEscaped() + "<br>Twitch Emote" +
+                (channelName.isEmpty() ? "" : QString("<br>Channel: %1").arg(channelName))},
+            Url{(channelName.isEmpty() ? QString(emoteLinkFormatGlobal.arg(id.string)) : QString(emoteLinkFormat.arg(channelName)))},
         });
     }
 

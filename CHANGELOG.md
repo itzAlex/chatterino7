@@ -2,6 +2,7 @@
 ## Homies (#5)
 - Minor: `F5` now reloads the badges
 - Minor: Homies global emotes can now be enabled/disabled
+- Minor: Added channel name & link to Twitch emotes popup
 
 - Minor: Ignore out of bounds check for tiling wms (#3270)
 
