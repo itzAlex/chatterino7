@@ -204,7 +204,7 @@ void HighlightModel::customRowSetData(const std::vector<QStandardItem *> &row,
                 }
                 else if (rowIndex == 4)
                 {
-                    getSettings()->enableFirstMessageHighlight .setValue(
+                    getSettings()->enableFirstMessageHighlight.setValue(
                         value.toBool());
                 }
             }
