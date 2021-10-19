@@ -5,6 +5,7 @@
 - Minor: Added channel name & link to Twitch emotes popup
 - Minor: Added option to gray-out historical messages (Credits to Dankerino)
 - Minor: Added update checker
+- Bugfix: Fixed `First messages` highlight configuration not being saved
 
 - Minor: Ignore out of bounds check for tiling wms (#3270)
 

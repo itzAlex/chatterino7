@@ -105,7 +105,7 @@ HighlightingPage::HighlightingPage()
                                        ->selectionModel()
                                        ->currentIndex()
                                        .row() -
-                                   4;
+                                   5;
 
                     auto selectUsernameWidget =
                         new SelectChannelWidget(selected);
@@ -119,7 +119,7 @@ HighlightingPage::HighlightingPage()
                                            ->selectionModel()
                                            ->currentIndex()
                                            .row() -
-                                   4;
+                                   5;
 
                     auto excludeChannelWidget =
                             new ExcludeChannelWidget(selected);
@@ -380,7 +380,7 @@ void HighlightingPage::tableCellClicked(const QModelIndex &clicked,
     {
         case HighlightTab::Messages:
         case HighlightTab::Users: {
-            if (clicked.row() >= 4)
+            if (clicked.row() >= 5)
             {
                 view->enableSelectChannelButton();
                 view->enableExcludeChannelButton();

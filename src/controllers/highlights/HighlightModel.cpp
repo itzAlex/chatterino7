@@ -202,6 +202,11 @@ void HighlightModel::customRowSetData(const std::vector<QStandardItem *> &row,
                     getSettings()->enableRedeemedHighlight.setValue(
                         value.toBool());
                 }
+                else if (rowIndex == 4)
+                {
+                    getSettings()->enableFirstMessageHighlight .setValue(
+                        value.toBool());
+                }
             }
         }
         break;
@@ -298,6 +303,11 @@ void HighlightModel::customRowSetData(const std::vector<QStandardItem *> &row,
                 else if (rowIndex == 3)
                 {
                     getSettings()->redeemedHighlightSoundUrl.setValue(
+                        value.toString());
+                }
+                else if (rowIndex == 4)
+                {
+                    getSettings()->firstMessageHighlightSoundUrl.setValue(
                         value.toString());
                 }
             }
