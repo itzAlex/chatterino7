@@ -1833,11 +1833,12 @@ void ChannelView::handleMouseClick(QMouseEvent *event,
             if (link.type == Link::UserInfo)
             {
                 const bool commaMention = getSettings()->mentionUsersWithComma;
+                const bool atMention = getSettings()->mentionUsersWithAt;
                 const bool isFirstWord =
                     split && split->getInput().isEditFirstWord();
                 auto userMention =
-                    formatUserMention(link.value, isFirstWord, commaMention);
-                insertText("@" + userMention + " ");
+                    formatUserMention(link.value, isFirstWord, commaMention, atMention);
+                insertText(userMention + " ");
             }
             else if (link.type == Link::UserWhisper)
             {

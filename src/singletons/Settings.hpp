@@ -156,7 +156,7 @@ public:
     /// Behaviour
     BoolSetting allowDuplicateMessages = {"/behaviour/allowDuplicateMessages",
                                           true};
-    BoolSetting mentionUsersWithAt = {"/behaviour/mentionUsersWithAt", false};
+    BoolSetting mentionUsersWithAt = {"/behaviour/mentionUsersWithAt", true};
     BoolSetting showJoins = {"/behaviour/showJoins", false};
     BoolSetting showParts = {"/behaviour/showParts", false};
     FloatSetting mouseScrollMultiplier = {"/behaviour/mouseScrollMultiplier",

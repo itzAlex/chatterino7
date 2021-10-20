@@ -575,8 +575,9 @@ void SplitInput::insertCompletionText(const QString &input_)
         {
             const auto userMention =
                 formatUserMention(input_, edit.isFirstWord(),
-                                  getSettings()->mentionUsersWithComma);
-            input = "@" + userMention + " ";
+                                  getSettings()->mentionUsersWithComma,
+                                  getSettings()->mentionUsersWithAt);
+            input = userMention + " ";
             done = true;
         }
 

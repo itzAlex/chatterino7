@@ -4,6 +4,7 @@
 - Minor: Homies global emotes can now be enabled/disabled
 - Minor: Added option to gray-out historical messages (Credits to Dankerino)
 - Minor: Added update checker
+- Minor: Added an option to add/remove the at sign when you mention someone
 - Bugfix: Fixed `First messages` highlight configuration not being saved
 
 - Minor: Ignore out of bounds check for tiling wms (#3270)

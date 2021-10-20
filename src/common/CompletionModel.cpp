@@ -175,8 +175,9 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
         for (const auto &name : chatters)
         {
             addString(
-                "@" + formatUserMention(name, isFirstWord,
-                                        getSettings()->mentionUsersWithComma),
+                formatUserMention(name, isFirstWord,
+                                    getSettings()->mentionUsersWithComma,
+                                    getSettings()->mentionUsersWithAt),
                 TaggedString::Type::Username);
         }
     }
@@ -187,7 +188,8 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
         for (const auto &name : chatters)
         {
             addString(formatUserMention(name, isFirstWord,
-                                        getSettings()->mentionUsersWithComma),
+                                        getSettings()->mentionUsersWithComma,
+                                        false),
                       TaggedString::Type::Username);
         }
     }
