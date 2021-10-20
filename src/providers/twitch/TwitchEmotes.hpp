@@ -39,7 +39,7 @@ public:
     static QString cleanUpEmoteCode(const QString &dirtyEmoteCode);
     TwitchEmotes();
 
-    EmotePtr getOrCreateEmote(const EmoteId &id, const EmoteName &name, QString channelName = "");
+    EmotePtr getOrCreateEmote(const EmoteId &id, const EmoteName &name);
 
 private:
     Url getEmoteLink(const EmoteId &id, const QString &emoteScale);

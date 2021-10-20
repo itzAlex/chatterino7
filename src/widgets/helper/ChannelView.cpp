@@ -125,10 +125,6 @@ namespace {
         {
             addPageLink("Homies");
         }
-        else if (creatorFlags.has(MessageElementFlag::TwitchEmote))
-        {
-            addPageLink("Twitch");
-        }
     }
 }  // namespace
 

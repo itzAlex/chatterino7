@@ -350,7 +350,7 @@ void TwitchAccount::loadUserstateEmotes(std::function<void()> callback)
                         emoteSet->emotes.push_back(TwitchEmote{id, code});
 
                         auto emote =
-                            getApp()->emotes->twitch.getOrCreateEmote(id, code, emoteSet->text);
+                            getApp()->emotes->twitch.getOrCreateEmote(id, code);
 
                         // Follower emotes can be only used in their origin channel
                         if (ivrEmote.emoteType == "FOLLOWER")
