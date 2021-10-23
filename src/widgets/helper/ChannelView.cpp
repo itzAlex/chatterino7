@@ -1930,6 +1930,10 @@ void ChannelView::addContextMenuItems(
         menu->addAction("Copy selection", [this] {
             crossPlatformCopy(this->getSelectedText());
         });
+        menu->addAction("Search in Google", [this] {
+            QDesktopServices::openUrl(QUrl("https://www.google.com/search?q=" +
+                this->getSelectedText().trimmed()));
+        });
     }
 
     menu->addAction("Copy message", [layout] {

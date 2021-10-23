@@ -1,4 +1,7 @@
 # Changelog
+## Homies (#6)
+- Minor: Added `Search in Google` option when text is selected
+
 ## Homies (#5)
 - Minor: `F5` now reloads the badges
 - Minor: Homies global emotes can now be enabled/disabled
