@@ -1,6 +1,22 @@
 # Changelog
 ## Homies (#6)
 - Minor: Added `Search in Google` option when text is selected
+  
+- Minor: Added new search predicate to filter for messages matching a regex (#3282)
+- Minor: Subcategories in settings are now searchable. (#3157)
+- Minor: Highlight usernames in /mods and /vips messages (#3187)
+- Minor: Added chatter count to viewer list popout (#3261)
+- Minor: Added `flags.first_message` filter variable (#3292)
+- Minor: Removed duplicate setting for toggling `Channel Point Redeemed Message` highlights (#3296)
+- Minor: Clean up chat messages of special line characters prior to sending. (#3312)
+- Bugfix: Fixed a bug that caused zero-width emotes to be misaligned when the "Remove spaces between emotes" setting is on. (#3249)
+- Bugfix: Fixed the "Change channel" popup showing a wrong window title (#3273)
+- Bugfix: Fixed built-in Chatterino commands not working in whispers and mentions special channels (#3288)
+- Bugfix: Fixed `QCharRef with an index pointing outside the valid range of a QString` warning that was emitted on every Tab press. (#3234)
+- Bugfix: Fixed being unable to disable `First Message` highlights (#3293)
+- Bugfix: Fixed `First Message` custom sound not persisting through restart. (#3303)
+- Bugfix: Fixed `First Message` scrollbar highlights not being disabled. (#3325)
+- Dev: Add GitHub action to test builds without precompiled headers enabled. (#3327)
 
 ## Homies (#5)
 - Minor: `F5` now reloads the badges
