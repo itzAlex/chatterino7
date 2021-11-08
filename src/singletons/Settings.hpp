@@ -202,8 +202,8 @@ public:
     BoolSetting removeSpacesBetweenEmotes = {
         "/emotes/removeSpacesBetweenEmotes", false};
 
-    BoolSetting enableHomiesGlobalEmotes = {
-        "/emotes/enableHomiesGlobalEmotes", true};
+    BoolSetting enableHomiesGlobalEmotes = {"/emotes/enableHomiesGlobalEmotes",
+                                            true};
 
     /// Links
     BoolSetting linksDoubleClickOnly = {"/links/doubleClickToOpen", false};

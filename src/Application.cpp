@@ -89,14 +89,13 @@ void Application::initialize(Settings &settings, Paths &paths)
         getSettings()->currentVersion.getValue() != "" &&
         getSettings()->currentVersion.getValue() != CHATTERINO_VERSION)
     {
-        auto box = new QMessageBox(QMessageBox::Information, "Chatterino Homies",
-                                   "Show changelog?",
+        auto box = new QMessageBox(QMessageBox::Information,
+                                   "Chatterino Homies", "Show changelog?",
                                    QMessageBox::Yes | QMessageBox::No);
         box->setAttribute(Qt::WA_DeleteOnClose);
         if (box->exec() == QMessageBox::Yes)
         {
-            QDesktopServices::openUrl(
-                QUrl("https://chatterinohomies.com"));
+            QDesktopServices::openUrl(QUrl("https://chatterinohomies.com"));
         }
     }
 

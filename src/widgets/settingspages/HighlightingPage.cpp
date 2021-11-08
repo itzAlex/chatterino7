@@ -116,13 +116,13 @@ HighlightingPage::HighlightingPage()
 
                 view->excludeChannelPressed.connect([this, view] {
                     int selected = view->getTableView()
-                                           ->selectionModel()
-                                           ->currentIndex()
-                                           .row() -
+                                       ->selectionModel()
+                                       ->currentIndex()
+                                       .row() -
                                    5;
 
                     auto excludeChannelWidget =
-                            new ExcludeChannelWidget(selected);
+                        new ExcludeChannelWidget(selected);
 
                     excludeChannelWidget->show();
                     excludeChannelWidget->raise();

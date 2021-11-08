@@ -177,7 +177,8 @@ void WindowManager::updateWordTypeMask()
     flags.set(settings->showBadgesSubscription ? MEF::BadgeSubscription
                                                : MEF::None);
     flags.set(settings->showBadgesVanity ? MEF::BadgeVanity : MEF::None);
-    flags.set(settings->showBadgesChatterino ? MEF::BadgeChatterino : MEF::None);
+    flags.set(settings->showBadgesChatterino ? MEF::BadgeChatterino
+                                             : MEF::None);
     flags.set(settings->showBadgesSeventv ? MEF::BadgeSeventv : MEF::None);
     flags.set(settings->showBadgesFfz ? MEF::BadgeFfz : MEF::None);
     flags.set(settings->showBadgesitzAlex ? MEF::BadgeitzAlex : MEF::None);

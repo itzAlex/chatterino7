@@ -29,7 +29,6 @@ public:
     boost::optional<QColor> getBadgeColor(const UserId &id);
 
 private:
-
     std::shared_mutex mutex_;
 
     std::unordered_map<QString, int> badgeMap;

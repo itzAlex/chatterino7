@@ -24,7 +24,6 @@ public:
     boost::optional<EmotePtr> getBadge(const UserId &id);
 
 private:
-
     std::shared_mutex mutex_;
 
     std::unordered_map<QString, int> badgeMap;

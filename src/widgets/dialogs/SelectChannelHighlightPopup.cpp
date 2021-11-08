@@ -187,11 +187,11 @@ SelectChannelWidget::SelectChannelWidget(int selected, QWidget *parent)
 }
 
 ExcludeChannelWidget::ExcludeChannelWidget(int selected, QWidget *parent)
-        : QDialog(parent)
+    : QDialog(parent)
 {
 #ifdef USEWINSDK
     ::SetWindowPos(HWND(this->winId()), HWND_TOPMOST, 0, 0, 0, 0,
-               SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+                   SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
 #endif
 
     // Highlight
@@ -205,8 +205,8 @@ ExcludeChannelWidget::ExcludeChannelWidget(int selected, QWidget *parent)
     this->setLayout(&this->ui_.mainLayout);
     this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     this->setWindowFlags(
-            (this->windowFlags() & ~(Qt::WindowContextHelpButtonHint)) |
-            Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+        (this->windowFlags() & ~(Qt::WindowContextHelpButtonHint)) |
+        Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
     this->setWindowFlag(Qt::WindowStaysOnTopHint, true);
 
     // Add & Remove buttons
@@ -261,14 +261,14 @@ ExcludeChannelWidget::ExcludeChannelWidget(int selected, QWidget *parent)
 
     // OK and Cancel buttons & Checkbox
     auto buttonBox =
-            new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
+        new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
     buttonBox->setCenterButtons(true);
     this->ui_.mainLayout.addWidget(buttonBox);
 
     for (std::string channel : row.getExcludedChannels())
     {
         QStandardItem *item =
-                new QStandardItem(QString::fromStdString(channel));
+            new QStandardItem(QString::fromStdString(channel));
         this->ui_.model_->appendRow(item);
     }
 
@@ -279,18 +279,18 @@ ExcludeChannelWidget::ExcludeChannelWidget(int selected, QWidget *parent)
         for (int row = 0; row < this->ui_.model_->rowCount(); row++)
         {
             ExcludedChannels.push_back(this->ui_.model_->index(row, 0)
-                                       .data()
-                                       .toString()
-                                       .toStdString());
+                                           .data()
+                                           .toString()
+                                           .toStdString());
         }
 
         getSettings()->highlightedMessages.insert(
-                HighlightPhrase{row.getPattern(), row.showInMentions(),
-                                row.hasAlert(), row.hasSound(), row.isRegex(),
-                                row.isCaseSensitive(), row.getSoundUrl().toString(),
-                                row.getColor(), row.isGlobalHighlight(), row.getChannels(),
-                                ExcludedChannels},
-                selected);
+            HighlightPhrase{row.getPattern(), row.showInMentions(),
+                            row.hasAlert(), row.hasSound(), row.isRegex(),
+                            row.isCaseSensitive(), row.getSoundUrl().toString(),
+                            row.getColor(), row.isGlobalHighlight(),
+                            row.getChannels(), ExcludedChannels},
+            selected);
 
         getSettings()->highlightedMessages.removeAt(selected + 1);
 

@@ -227,8 +227,9 @@ void EmotePopup::loadChannel(ChannelPtr _channel)
     // global
     if (getSettings()->enableHomiesGlobalEmotes)
     {
-        addEmotes(*globalChannel, *getApp()->twitch2->getHomiesEmotes().emotes(),
-                  "Homies", MessageElementFlag::HomiesEmote);
+        addEmotes(*globalChannel,
+                  *getApp()->twitch2->getHomiesEmotes().emotes(), "Homies",
+                  MessageElementFlag::HomiesEmote);
     }
     addEmotes(*globalChannel, *getApp()->twitch2->getSeventvEmotes().emotes(),
               "7TV", MessageElementFlag::SeventvEmote);
@@ -239,8 +240,8 @@ void EmotePopup::loadChannel(ChannelPtr _channel)
 
     // twitch
     addEmoteSets(
-            getApp()->accounts->twitch.getCurrent()->accessEmotes()->emoteSets,
-            *globalChannel, *subChannel, _channel->getName());
+        getApp()->accounts->twitch.getCurrent()->accessEmotes()->emoteSets,
+        *globalChannel, *subChannel, _channel->getName());
 
     // channel
     addEmotes(*channelChannel, *twitchChannel->homiesEmotes(), "Homies",

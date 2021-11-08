@@ -15,9 +15,9 @@ public:
     void refreshButtons();
     void AnimatedSave();
 
-    QPushButton* clearFieldsButton;
-    QPushButton* accountsSettingsButton;
-    QComboBox* combo;
+    QPushButton *clearFieldsButton;
+    QPushButton *accountsSettingsButton;
+    QComboBox *combo;
     QLabel *label;
 
     QLineEdit followHashInput;

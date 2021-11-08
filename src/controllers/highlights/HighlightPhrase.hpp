@@ -115,10 +115,9 @@ namespace pajlada {
 namespace {
     chatterino::HighlightPhrase constructError()
     {
-        return chatterino::HighlightPhrase(QString(), false, false, false,
-                                           false, false, QString(), QColor(),
-                                           true, std::vector<std::string>(),
-                                           std::vector<std::string>());
+        return chatterino::HighlightPhrase(
+            QString(), false, false, false, false, false, QString(), QColor(),
+            true, std::vector<std::string>(), std::vector<std::string>());
     }
 }  // namespace
 

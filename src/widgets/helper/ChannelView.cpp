@@ -1836,8 +1836,8 @@ void ChannelView::handleMouseClick(QMouseEvent *event,
                 const bool atMention = getSettings()->mentionUsersWithAt;
                 const bool isFirstWord =
                     split && split->getInput().isEditFirstWord();
-                auto userMention =
-                    formatUserMention(link.value, isFirstWord, commaMention, atMention);
+                auto userMention = formatUserMention(link.value, isFirstWord,
+                                                     commaMention, atMention);
                 insertText(userMention + " ");
             }
             else if (link.type == Link::UserWhisper)
@@ -1932,7 +1932,7 @@ void ChannelView::addContextMenuItems(
         });
         menu->addAction("Search in Google", [this] {
             QDesktopServices::openUrl(QUrl("https://www.google.com/search?q=" +
-                this->getSelectedText().trimmed()));
+                                           this->getSelectedText().trimmed()));
         });
     }
 

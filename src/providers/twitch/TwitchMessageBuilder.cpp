@@ -7,8 +7,8 @@
 #include "messages/Message.hpp"
 #include "providers/chatterino/ChatterinoBadges.hpp"
 #include "providers/ffz/FfzBadges.hpp"
-#include "providers/seventv/SeventvBadges.hpp"
 #include "providers/itzalex/itzAlexBadges.hpp"
+#include "providers/seventv/SeventvBadges.hpp"
 #include "providers/twitch/TwitchBadges.hpp"
 #include "providers/twitch/TwitchChannel.hpp"
 #include "providers/twitch/TwitchIrcServer.hpp"
@@ -509,7 +509,8 @@ void TwitchMessageBuilder::appendIsMod()
     {
         QString userType = this->tags.value("user-type").toString();
 
-        if (userType == "mod") {
+        if (userType == "mod")
+        {
             this->message().isMod = true;
             return;
         }
@@ -1038,7 +1039,8 @@ Outcome TwitchMessageBuilder::tryAppendEmote(const EmoteName &name)
             flags.set(MessageElementFlag::ZeroWidthEmote);
         }
     }
-    else if (getSettings()->enableHomiesGlobalEmotes && (emote = globalHomiesEmotes.emote(name)))
+    else if (getSettings()->enableHomiesGlobalEmotes &&
+             (emote = globalHomiesEmotes.emote(name)))
     {
         flags = MessageElementFlag::HomiesEmote;
     }

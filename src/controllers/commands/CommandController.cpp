@@ -474,26 +474,29 @@ void CommandController::initialize(Settings &, Paths &paths)
 
         if (currentUser->isAnon())
         {
-            channel->addMessage(
-                    makeSystemMessage("You must be logged in to perform this action!"));
+            channel->addMessage(makeSystemMessage(
+                "You must be logged in to perform this action!"));
             return "";
         }
 
         TwitchChannel *twitchChannel =
-                dynamic_cast<TwitchChannel *>(channel.get());
+            dynamic_cast<TwitchChannel *>(channel.get());
 
         bool isModOrBroadcaster =
-                twitchChannel ? twitchChannel->hasModRights() : false;
+            twitchChannel ? twitchChannel->hasModRights() : false;
 
         if (!isModOrBroadcaster)
         {
-            channel->addMessage(makeSystemMessage("You don't have permissions to execute this command in this channel!"));
+            channel->addMessage(
+                makeSystemMessage("You don't have permissions to execute this "
+                                  "command in this channel!"));
             return "";
         }
 
         if (words.size() < 2)
         {
-            channel->addMessage(makeSystemMessage("Usage: /massban [username1] [username2] ..."));
+            channel->addMessage(makeSystemMessage(
+                "Usage: /massban [username1] [username2] ..."));
             return "";
         }
 
@@ -521,26 +524,29 @@ void CommandController::initialize(Settings &, Paths &paths)
 
         if (currentUser->isAnon())
         {
-            channel->addMessage(
-                    makeSystemMessage("You must be logged in to perform this action!"));
+            channel->addMessage(makeSystemMessage(
+                "You must be logged in to perform this action!"));
             return "";
         }
 
         TwitchChannel *twitchChannel =
-                dynamic_cast<TwitchChannel *>(channel.get());
+            dynamic_cast<TwitchChannel *>(channel.get());
 
         bool isModOrBroadcaster =
-                twitchChannel ? twitchChannel->hasModRights() : false;
+            twitchChannel ? twitchChannel->hasModRights() : false;
 
         if (!isModOrBroadcaster)
         {
-            channel->addMessage(makeSystemMessage("You don't have permissions to execute this command in this channel!"));
+            channel->addMessage(
+                makeSystemMessage("You don't have permissions to execute this "
+                                  "command in this channel!"));
             return "";
         }
 
         if (words.size() < 2)
         {
-            channel->addMessage(makeSystemMessage("Usage: /massunban [username1] [username2] ..."));
+            channel->addMessage(makeSystemMessage(
+                "Usage: /massunban [username1] [username2] ..."));
             return "";
         }
 
@@ -568,39 +574,45 @@ void CommandController::initialize(Settings &, Paths &paths)
 
         if (currentUser->isAnon())
         {
-            channel->addMessage(
-                    makeSystemMessage("You must be logged in to perform this action!"));
+            channel->addMessage(makeSystemMessage(
+                "You must be logged in to perform this action!"));
             return "";
         }
 
         TwitchChannel *twitchChannel =
-                dynamic_cast<TwitchChannel *>(channel.get());
+            dynamic_cast<TwitchChannel *>(channel.get());
 
         bool isModOrBroadcaster =
-                twitchChannel ? twitchChannel->hasModRights() : false;
+            twitchChannel ? twitchChannel->hasModRights() : false;
 
         if (!isModOrBroadcaster)
         {
-            channel->addMessage(makeSystemMessage("You don't have permissions to execute this command in this channel!"));
+            channel->addMessage(
+                makeSystemMessage("You don't have permissions to execute this "
+                                  "command in this channel!"));
             return "";
         }
 
         if (words.size() < 3)
         {
-            channel->addMessage(makeSystemMessage("Usage: /nuke my phrase [-r=<number><s|m>] [delete|ban|<number>[s|m|h|d|w]]"));
+            channel->addMessage(
+                makeSystemMessage("Usage: /nuke my phrase [-r=<number><s|m>] "
+                                  "[delete|ban|<number>[s|m|h|d|w]]"));
             return "";
         }
 
         QString phrase = words.mid(1, words.size() - 2).join(" ");
         QString action = words.at(words.size() - 1);
-        LimitedQueueSnapshot<MessagePtr> snapshot = channel->getMessageSnapshot();
+        LimitedQueueSnapshot<MessagePtr> snapshot =
+            channel->getMessageSnapshot();
         QString seconds;
         QString minutes;
         bool persistence = false;
 
         if (words.at(words.size() - 2).startsWith("-r="))
         {
-            QStringList persistence_list = words.at(words.size() - 2).split("-r=");
+            QStringList persistence_list =
+                words.at(words.size() - 2).split("-r=");
             phrase = words.mid(1, words.size() - 3).join(" ");
 
             if (persistence_list.size() == 2)
@@ -611,19 +623,23 @@ void CommandController::initialize(Settings &, Paths &paths)
 
                 if (persistenceTime.endsWith("s"))
                 {
-                    seconds = persistenceTime.left(persistenceTime.lastIndexOf("s"));
+                    seconds =
+                        persistenceTime.left(persistenceTime.lastIndexOf("s"));
                     persistence = true;
                 }
 
                 else if (persistenceTime.endsWith("m"))
                 {
-                    minutes = persistenceTime.left(persistenceTime.lastIndexOf("m"));
+                    minutes =
+                        persistenceTime.left(persistenceTime.lastIndexOf("m"));
                     persistence = true;
                 }
 
                 else
                 {
-                    channel->addMessage(makeSystemMessage("Ignoring persistence since the introduced value is invalid"));
+                    channel->addMessage(
+                        makeSystemMessage("Ignoring persistence since the "
+                                          "introduced value is invalid"));
                     persistence = false;
                 }
             }
@@ -634,8 +650,11 @@ void CommandController::initialize(Settings &, Paths &paths)
 
         if (action != "ban" && action != "delete" && !timeoutMatch.hasMatch())
         {
-            channel->addMessage(makeSystemMessage("Invalid action. Valid actions: ban, delete, <x>s, <x>m, <x>h, <x>d, <x>w"));
-            channel->addMessage(makeSystemMessage("Example: /nuke my phrase 10m"));
+            channel->addMessage(
+                makeSystemMessage("Invalid action. Valid actions: ban, delete, "
+                                  "<x>s, <x>m, <x>h, <x>d, <x>w"));
+            channel->addMessage(
+                makeSystemMessage("Example: /nuke my phrase 10m"));
             return "";
         }
 
@@ -655,7 +674,8 @@ void CommandController::initialize(Settings &, Paths &paths)
 
             if (amount <= 0)
             {
-                channel->addMessage(makeSystemMessage("Invalid timeout value. It has to be higher than 0."));
+                channel->addMessage(makeSystemMessage(
+                    "Invalid timeout value. It has to be higher than 0."));
                 return "";
             }
 
@@ -692,10 +712,12 @@ void CommandController::initialize(Settings &, Paths &paths)
                 {
                     if (action == "delete")
                     {
-                        std::cout << message->messageText.toStdString() << std::endl;
-                        QTimer::singleShot((nuked + 1) * 1000, [channel, message]() {
-                            channel->sendMessage("/delete " + message->id);
-                        });
+                        std::cout << message->messageText.toStdString()
+                                  << std::endl;
+                        QTimer::singleShot(
+                            (nuked + 1) * 1000, [channel, message]() {
+                                channel->sendMessage("/delete " + message->id);
+                            });
 
                         nuked++;
                     }
@@ -704,9 +726,11 @@ void CommandController::initialize(Settings &, Paths &paths)
                     {
                         if (usernames.indexOf(message->loginName) == -1)
                         {
-                            QTimer::singleShot((nuked + 1) * 1000, [channel, message]() {
-                                channel->sendMessage("/ban " + message->loginName);
-                            });
+                            QTimer::singleShot(
+                                (nuked + 1) * 1000, [channel, message]() {
+                                    channel->sendMessage("/ban " +
+                                                         message->loginName);
+                                });
 
                             usernames.append(message->loginName);
                             nuked++;
@@ -717,9 +741,14 @@ void CommandController::initialize(Settings &, Paths &paths)
                     {
                         if (usernames.indexOf(message->loginName) == -1)
                         {
-                            QTimer::singleShot((nuked + 1) * 1000, [channel, message, amount]() {
-                                channel->sendMessage(QString("/timeout %1 %2").arg(message->loginName).arg(amount));
-                            });
+                            QTimer::singleShot(
+                                (nuked + 1) * 1000,
+                                [channel, message, amount]() {
+                                    channel->sendMessage(
+                                        QString("/timeout %1 %2")
+                                            .arg(message->loginName)
+                                            .arg(amount));
+                                });
 
                             usernames.append(message->loginName);
                             nuked++;
@@ -731,46 +760,59 @@ void CommandController::initialize(Settings &, Paths &paths)
 
         if (!seconds.isEmpty())
         {
-            if (seconds.toInt()) {
-
+            if (seconds.toInt())
+            {
                 QTimer::singleShot(seconds.toInt() * 1000, [this]() {
                     this->privateMessageReceivedConnection.disconnect();
                 });
-            } else {
-                channel->addMessage(makeSystemMessage("Ignoring persistence since the introduced value is invalid"));
+            }
+            else
+            {
+                channel->addMessage(
+                    makeSystemMessage("Ignoring persistence since the "
+                                      "introduced value is invalid"));
                 return "";
             }
         }
 
         else if (!minutes.isEmpty())
         {
-            if (minutes.toInt()) {
+            if (minutes.toInt())
+            {
                 QTimer::singleShot(minutes.toInt() * 60 * 1000, [this]() {
                     this->privateMessageReceivedConnection.disconnect();
                 });
-            } else {
-                channel->addMessage(makeSystemMessage("Ignoring persistence since the introduced value is invalid"));
+            }
+            else
+            {
+                channel->addMessage(
+                    makeSystemMessage("Ignoring persistence since the "
+                                      "introduced value is invalid"));
                 return "";
             }
         }
 
-        static QRegularExpression idRegex("(id=)(\\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12})");
+        static QRegularExpression idRegex(
+            "(id=)(\\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12})");
         static QRegularExpression modRegex("(mod=)(\\w{1})");
         QString channelName = channel->getName();
         stripChannelName(channelName);
 
         if (persistence)
         {
-            this->privateMessageReceivedConnection = this->privateMessageReceivedSignal.connect(
-                    [this, channelName, phrase, action, amount, timeoutMatch, &usernames, channel](
-                            Communi::IrcPrivateMessage &msg) {
+            this->privateMessageReceivedConnection =
+                this->privateMessageReceivedSignal.connect(
+                    [this, channelName, phrase, action, amount, timeoutMatch,
+                     &usernames, channel](Communi::IrcPrivateMessage &msg) {
                         QTimer *timer = new QTimer;
                         timer->setSingleShot(true);
 
                         QString messageData = QString(msg.toData());
                         auto modMatch = modRegex.match(messageData);
 
-                        if (msg.nick() == channelName || (modMatch.captured(2) == "1" ? true : false)) {
+                        if (msg.nick() == channelName ||
+                            (modMatch.captured(2) == "1" ? true : false))
+                        {
                             return "";
                         }
 
@@ -779,29 +821,40 @@ void CommandController::initialize(Settings &, Paths &paths)
 
                         auto idMatch = idRegex.match(messageData);
 
-                        if (channelName == target) {
+                        if (channelName == target)
+                        {
                             QString message = msg.content();
 
-                            if (message.contains(phrase, Qt::CaseInsensitive)) {
+                            if (message.contains(phrase, Qt::CaseInsensitive))
+                            {
                                 QString id = idMatch.captured(2);
                                 QString sender = msg.nick();
 
-                                if (action == "ban") {
-                                    if (usernames.indexOf(sender) == -1) {
+                                if (action == "ban")
+                                {
+                                    if (usernames.indexOf(sender) == -1)
+                                    {
                                         channel->sendMessage("/ban " + sender);
                                         usernames.append(sender);
                                     }
                                 }
 
-                                if (action == "delete") {
+                                if (action == "delete")
+                                {
                                     channel->sendMessage("/delete " + id);
                                 }
 
-                                if (timeoutMatch.hasMatch()) {
-                                    channel->sendMessage(QString("/timeout %1 %2").arg(sender).arg(amount));
+                                if (timeoutMatch.hasMatch())
+                                {
+                                    channel->sendMessage(
+                                        QString("/timeout %1 %2")
+                                            .arg(sender)
+                                            .arg(amount));
                                 }
                             }
                         }
+
+                        return "";
                     });
         }
 

@@ -1,13 +1,13 @@
 #include "AbstractIrcServer.hpp"
 
+#include "Application.hpp"
 #include "common/Channel.hpp"
 #include "common/Common.hpp"
 #include "common/QLogging.hpp"
+#include "controllers/commands/CommandController.hpp"
 #include "messages/LimitedQueueSnapshot.hpp"
 #include "messages/Message.hpp"
 #include "messages/MessageBuilder.hpp"
-#include "controllers/commands/CommandController.hpp"
-#include "Application.hpp"
 
 #include <QCoreApplication>
 

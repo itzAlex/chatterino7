@@ -142,8 +142,10 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
     // Homies Global
     if (getSettings()->enableHomiesGlobalEmotes)
     {
-        for (auto &emote : *getApp()->twitch2->getHomiesEmotes().emotes()) {
-            addString(emote.first.string, TaggedString::Type::HOMIESGlobalEmote);
+        for (auto &emote : *getApp()->twitch2->getHomiesEmotes().emotes())
+        {
+            addString(emote.first.string,
+                      TaggedString::Type::HOMIESGlobalEmote);
         }
     }
 
@@ -174,11 +176,10 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
 
         for (const auto &name : chatters)
         {
-            addString(
-                formatUserMention(name, isFirstWord,
-                                    getSettings()->mentionUsersWithComma,
-                                    getSettings()->mentionUsersWithAt),
-                TaggedString::Type::Username);
+            addString(formatUserMention(name, isFirstWord,
+                                        getSettings()->mentionUsersWithComma,
+                                        getSettings()->mentionUsersWithAt),
+                      TaggedString::Type::Username);
         }
     }
     else if (!getSettings()->userCompletionOnlyWithAt)
@@ -187,10 +188,10 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
 
         for (const auto &name : chatters)
         {
-            addString(formatUserMention(name, isFirstWord,
-                                        getSettings()->mentionUsersWithComma,
-                                        false),
-                      TaggedString::Type::Username);
+            addString(
+                formatUserMention(name, isFirstWord,
+                                  getSettings()->mentionUsersWithComma, false),
+                TaggedString::Type::Username);
         }
     }
 

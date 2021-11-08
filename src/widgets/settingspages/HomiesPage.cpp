@@ -49,11 +49,12 @@ void HomiesPage::initLayout(GeneralPageView &layout)
     layout.addCheckbox("Gray-out historical messages", s.grayOutRecents);
 
     layout.addTitle("Behaviour");
-    layout.addCheckbox("Mention users with an at sign (@User)", s.mentionUsersWithAt);
+    layout.addCheckbox("Mention users with an at sign (@User)",
+                       s.mentionUsersWithAt);
 
     layout.addStretch();
     auto inv = new BaseWidget(this);
     layout.addWidget(inv);
 }
 
-} // namespace chatterino
+}  // namespace chatterino

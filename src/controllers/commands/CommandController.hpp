@@ -26,7 +26,8 @@ public:
     SignalVector<Command> items_;
 
     pajlada::Signals::Connection privateMessageReceivedConnection;
-    pajlada::Signals::Signal<Communi::IrcPrivateMessage &> privateMessageReceivedSignal;
+    pajlada::Signals::Signal<Communi::IrcPrivateMessage &>
+        privateMessageReceivedSignal;
 
     QString execCommand(const QString &text, std::shared_ptr<Channel> channel,
                         bool dryRun);
