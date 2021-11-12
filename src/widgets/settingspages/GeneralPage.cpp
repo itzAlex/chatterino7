@@ -507,7 +507,7 @@ void GeneralPage::initLayout(GeneralPageView &layout)
             getSettings()->cachePath = "";
         }));
         box->addWidget(layout.makeButton("Clear cache", []() {
-            boost::filesystem::remove_all(
+            std::filesystem::remove_all(
                 (getPaths()->cacheDirectory()).toStdString());
             qApp->quit();
             QProcess::startDetached(qApp->arguments()[0], qApp->arguments());
