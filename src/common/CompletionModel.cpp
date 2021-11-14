@@ -72,13 +72,11 @@ int CompletionModel::rowCount(const QModelIndex &) const
     return this->items_.size();
 }
 
-void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
-{
-    std::lock_guard<std::mutex> guard(this->itemsMutex_);
+void CompletionModel::refresh(const QString &prefix, bool isFirstWord) {
+    std::lock_guard <std::mutex> guard(this->itemsMutex_);
     this->items_.clear();
 
-    if (prefix.length() < 2 || !this->channel_.isTwitchChannel())
-    {
+    if (prefix.length() < 2 || !this->channel_.isTwitchChannel()) {
         return;
     }
 
@@ -86,35 +84,28 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
     auto tc = dynamic_cast<TwitchChannel *>(&this->channel_);
 
     std::function<void(const QString &str, TaggedString::Type type)> addString;
-    if (getSettings()->prefixOnlyEmoteCompletion)
-    {
+    if (getSettings()->prefixOnlyEmoteCompletion) {
         addString = [=](const QString &str, TaggedString::Type type) {
             if (str.startsWith(prefix, Qt::CaseInsensitive))
                 this->items_.emplace(str + " ", type);
         };
-    }
-    else
-    {
+    } else {
         addString = [=](const QString &str, TaggedString::Type type) {
             if (str.contains(prefix, Qt::CaseInsensitive))
                 this->items_.emplace(str + " ", type);
         };
     }
 
-    if (auto account = getApp()->accounts->twitch.getCurrent())
-    {
+    if (auto account = getApp()->accounts->twitch.getCurrent()) {
         // Twitch Emotes available globally
-        for (const auto &emote : account->accessEmotes()->emotes)
-        {
+        for (const auto &emote : account->accessEmotes()->emotes) {
             addString(emote.first.string, TaggedString::TwitchGlobalEmote);
         }
 
         // Twitch Emotes available locally
         auto localEmoteData = account->accessLocalEmotes();
-        if (tc && localEmoteData->find(tc->roomId()) != localEmoteData->end())
-        {
-            for (const auto &emote : localEmoteData->at(tc->roomId()))
-            {
+        if (tc && localEmoteData->find(tc->roomId()) != localEmoteData->end()) {
+            for (const auto &emote : localEmoteData->at(tc->roomId())) {
                 addString(emote.first.string,
                           TaggedString::Type::TwitchLocalEmote);
             }
@@ -122,25 +113,31 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
     }
 
     // 7TV Global
-    for (auto &emote : *getApp()->twitch2->getSeventvEmotes().emotes())
+    if (getSettings()->enable7TVCompletion)
     {
-        addString(emote.first.string, TaggedString::Type::SEVENTVGlobalEmote);
+        for (auto &emote : *getApp()->twitch2->getSeventvEmotes().emotes()) {
+            addString(emote.first.string, TaggedString::Type::SEVENTVGlobalEmote);
+        }
     }
 
     // Bttv Global
-    for (auto &emote : *getApp()->twitch2->getBttvEmotes().emotes())
+    if (getSettings()->enableBTTVCompletion)
     {
-        addString(emote.first.string, TaggedString::Type::BTTVChannelEmote);
+        for (auto &emote : *getApp()->twitch2->getBttvEmotes().emotes()) {
+            addString(emote.first.string, TaggedString::Type::BTTVChannelEmote);
+        }
     }
 
     // Ffz Global
-    for (auto &emote : *getApp()->twitch2->getFfzEmotes().emotes())
+    if (getSettings()->enableFFZCompletion)
     {
-        addString(emote.first.string, TaggedString::Type::FFZChannelEmote);
+        for (auto &emote : *getApp()->twitch2->getFfzEmotes().emotes()) {
+            addString(emote.first.string, TaggedString::Type::FFZChannelEmote);
+        }
     }
 
     // Homies Global
-    if (getSettings()->enableHomiesGlobalEmotes)
+    if (getSettings()->enableHomiesGlobalEmotes && getSettings()->enableHomiesCompletion)
     {
         for (auto &emote : *getApp()->twitch2->getHomiesEmotes().emotes())
         {

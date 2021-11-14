@@ -182,6 +182,14 @@ public:
         "/behaviour/autocompletion/emoteCompletionWithColon", true};
     BoolSetting showUsernameCompletionMenu = {
         "/behaviour/autocompletion/showUsernameCompletionMenu", true};
+    BoolSetting enableHomiesCompletion = {
+        "/behaviour/autocompletion/enableHomiesCompletion", true};
+    BoolSetting enableFFZCompletion = {
+            "/behaviour/autocompletion/enableFFZCompletion", true};
+    BoolSetting enableBTTVCompletion = {
+            "/behaviour/autocompletion/enableBTTVCompletion", true};
+    BoolSetting enable7TVCompletion = {
+            "/behaviour/autocompletion/enable7TVCompletion", true};
 
     FloatSetting pauseOnHoverDuration = {"/behaviour/pauseOnHoverDuration", 0};
     EnumSetting<Qt::KeyboardModifier> pauseChatModifier = {

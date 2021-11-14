@@ -50,6 +50,14 @@ void HomiesPage::initLayout(GeneralPageView &layout)
     layout.addCheckbox("Gray-out historical messages", s.grayOutRecents);
 
     layout.addTitle("Behaviour");
+    layout.addCheckbox("Enable Homies global emotes auto-completation",
+                       s.enableHomiesCompletion);
+    layout.addCheckbox("Enable 7TV global emotes auto-completation",
+                       s.enable7TVCompletion);
+    layout.addCheckbox("Enable BTTV global emotes auto-completation",
+                       s.enableBTTVCompletion);
+    layout.addCheckbox("Enable FFZ global emotes auto-completation",
+                       s.enableFFZCompletion);
     layout.addCheckbox("Mention users with an at sign (@User)",
                        s.mentionUsersWithAt);
     layout.addCheckbox("Automatically join separated links (http<s>:/ / → http<s>://)",
