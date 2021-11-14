@@ -231,12 +231,24 @@ void EmotePopup::loadChannel(ChannelPtr _channel)
                   *getApp()->twitch2->getHomiesEmotes().emotes(), "Homies",
                   MessageElementFlag::HomiesEmote);
     }
-    addEmotes(*globalChannel, *getApp()->twitch2->getSeventvEmotes().emotes(),
-              "7TV", MessageElementFlag::SeventvEmote);
-    addEmotes(*globalChannel, *getApp()->twitch2->getBttvEmotes().emotes(),
-              "BetterTTV", MessageElementFlag::BttvEmote);
-    addEmotes(*globalChannel, *getApp()->twitch2->getFfzEmotes().emotes(),
-              "FrankerFaceZ", MessageElementFlag::FfzEmote);
+
+    if (getSettings()->enable7TVGlobalEmotes)
+    {
+        addEmotes(*globalChannel, *getApp()->twitch2->getSeventvEmotes().emotes(),
+                  "7TV", MessageElementFlag::SeventvEmote);
+    }
+
+    if (getSettings()->enableBTTVGlobalEmotes)
+    {
+        addEmotes(*globalChannel, *getApp()->twitch2->getBttvEmotes().emotes(),
+                  "BetterTTV", MessageElementFlag::BttvEmote);
+    }
+
+    if (getSettings()->enableFFZGlobalEmotes)
+    {
+        addEmotes(*globalChannel, *getApp()->twitch2->getFfzEmotes().emotes(),
+                  "FrankerFaceZ", MessageElementFlag::FfzEmote);
+    }
 
     // twitch
     addEmoteSets(

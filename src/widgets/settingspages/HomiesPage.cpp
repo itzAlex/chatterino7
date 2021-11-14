@@ -46,6 +46,12 @@ void HomiesPage::initLayout(GeneralPageView &layout)
     layout.addTitle("Emotes");
     layout.addCheckbox("Enable Homies global emotes (requires restart)",
                        s.enableHomiesGlobalEmotes);
+    layout.addCheckbox("Enable 7TV global emotes (requires restart)",
+                       s.enable7TVGlobalEmotes);
+    layout.addCheckbox("Enable BTTV global emotes (requires restart)",
+                       s.enableBTTVGlobalEmotes);
+    layout.addCheckbox("Enable FFZ global emotes (requires restart)",
+                       s.enableFFZGlobalEmotes);
     layout.addTitle("Apperance");
     layout.addCheckbox("Gray-out historical messages", s.grayOutRecents);
 

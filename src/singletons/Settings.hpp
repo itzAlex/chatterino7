@@ -218,6 +218,12 @@ public:
 
     BoolSetting enableHomiesGlobalEmotes = {"/emotes/enableHomiesGlobalEmotes",
                                             true};
+    BoolSetting enable7TVGlobalEmotes = {"/emotes/enable7TVGlobalEmotes",
+                                            true};
+    BoolSetting enableFFZGlobalEmotes = {"/emotes/enableFFZGlobalEmotes",
+                                            true};
+    BoolSetting enableBTTVGlobalEmotes = {"/emotes/enableBTTVGlobalEmotes",
+                                            true};
 
     /// Links
     BoolSetting linksDoubleClickOnly = {"/links/doubleClickToOpen", false};

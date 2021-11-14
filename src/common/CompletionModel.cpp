@@ -113,7 +113,7 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord) {
     }
 
     // 7TV Global
-    if (getSettings()->enable7TVCompletion)
+    if (getSettings()->enable7TVGlobalEmotes && getSettings()->enable7TVCompletion)
     {
         for (auto &emote : *getApp()->twitch2->getSeventvEmotes().emotes()) {
             addString(emote.first.string, TaggedString::Type::SEVENTVGlobalEmote);
@@ -121,7 +121,7 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord) {
     }
 
     // Bttv Global
-    if (getSettings()->enableBTTVCompletion)
+    if (getSettings()->enableBTTVGlobalEmotes && getSettings()->enableBTTVCompletion)
     {
         for (auto &emote : *getApp()->twitch2->getBttvEmotes().emotes()) {
             addString(emote.first.string, TaggedString::Type::BTTVChannelEmote);
@@ -129,7 +129,7 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord) {
     }
 
     // Ffz Global
-    if (getSettings()->enableFFZCompletion)
+    if (getSettings()->enableFFZGlobalEmotes && getSettings()->enableFFZCompletion)
     {
         for (auto &emote : *getApp()->twitch2->getFfzEmotes().emotes()) {
             addString(emote.first.string, TaggedString::Type::FFZChannelEmote);
