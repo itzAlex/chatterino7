@@ -1,13 +1,13 @@
 #pragma once
 
+#include <QMap>
+#include <pajlada/settings.hpp>
 #include "common/ChatterinoSetting.hpp"
 #include "common/SignalVector.hpp"
 #include "common/Singleton.hpp"
 #include "controllers/commands/Command.hpp"
+#include "messages/MessageBuilder.hpp"
 #include "providers/twitch/TwitchChannel.hpp"
-
-#include <QMap>
-#include <pajlada/settings.hpp>
 
 #include <memory>
 #include <mutex>
