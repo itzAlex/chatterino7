@@ -5,7 +5,7 @@
 #include <QLabel>
 #include <QProcess>
 #include <QScrollArea>
-
+#include <filesystem>
 #include "Application.hpp"
 #include "boost/filesystem.hpp"
 #include "common/Version.hpp"
@@ -507,7 +507,7 @@ void GeneralPage::initLayout(GeneralPageView &layout)
             getSettings()->cachePath = "";
         }));
         box->addWidget(layout.makeButton("Clear cache", []() {
-            std::filesystem::remove_all(
+            boost::filesystem::remove_all(
                 (getPaths()->cacheDirectory()).toStdString());
             qApp->quit();
             QProcess::startDetached(qApp->arguments()[0], qApp->arguments());

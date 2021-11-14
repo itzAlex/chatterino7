@@ -1,5 +1,6 @@
 #include "CommandController.hpp"
 
+#include <filesystem>
 #include "Application.hpp"
 #include "boost/filesystem.hpp"
 #include "common/SignalVector.hpp"
@@ -1104,7 +1105,7 @@ void CommandController::initialize(Settings &, Paths &paths)
         });
 
     this->registerCommand("/reset", [](const auto & /*words*/, auto channel) {
-        std::filesystem::remove_all(
+        boost::filesystem::remove_all(
             (getPaths()->cacheDirectory()).toStdString());
         qApp->quit();
         QProcess::startDetached(qApp->arguments()[0], qApp->arguments());
