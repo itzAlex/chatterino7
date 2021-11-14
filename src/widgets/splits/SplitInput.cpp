@@ -204,6 +204,9 @@ void SplitInput::openEmotePopup()
 
 void SplitInput::installKeyPressedEvent()
 {
+    static QRegularExpression validDomainRegex(
+            "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]");
+
     auto app = getApp();
 
     this->ui_.textEdit->keyPressed.connect([this, app](QKeyEvent *event) {
@@ -229,6 +232,18 @@ void SplitInput::installKeyPressedEvent()
 
             message = message.replace('\n', ' ');
             QString sendMessage = app->commands->execCommand(message, c, false);
+
+            if (getSettings()->separateLinks && getSettings()->isSeparatedLinksChannel(this->split_->getChannel()->getName()))
+            {
+                auto validDomainMatch = validDomainRegex.match(sendMessage);
+
+                if (validDomainMatch.hasMatch()) {
+                    if (sendMessage.contains("https://", Qt::CaseInsensitive))
+                        sendMessage = sendMessage.replace("https://", "https:/ /");
+                    if (sendMessage.contains("http://", Qt::CaseInsensitive))
+                        sendMessage = sendMessage.replace("http://", "http:/ /");
+                }
+            }
 
             c->sendMessage(sendMessage);
             // don't add duplicate messages and empty message to message history

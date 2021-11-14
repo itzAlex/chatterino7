@@ -215,9 +215,28 @@ std::vector<MessagePtr> IrcMessageHandler::parseMessage(
 std::vector<MessagePtr> IrcMessageHandler::parsePrivMessage(
     Channel *channel, Communi::IrcPrivateMessage *message)
 {
+    QString messageContent = "";
+
+    if (getSettings()->joinSeparatedLinks)
+    {
+        static QRegularExpression separatedLinkRegex("https?:\\/\\s\\/\\S+");
+        static QRegularExpression validDomainRegex(
+                "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]");
+        auto separatedLinkMatch = separatedLinkRegex.match(message->content());
+
+        if (separatedLinkMatch.hasMatch()) {
+            QString separatedLink = separatedLinkMatch.captured(0).simplified().remove(" ");
+
+            auto validDomainMatch = validDomainRegex.match(separatedLink);
+            if (validDomainMatch.hasMatch()) {
+                messageContent = message->content().replace(separatedLinkMatch.captured(0), separatedLink);
+            }
+        }
+    }
+
     std::vector<MessagePtr> builtMessages;
     MessageParseArgs args;
-    TwitchMessageBuilder builder(channel, message, args, message->content(),
+    TwitchMessageBuilder builder(channel, message, args, messageContent.isEmpty() ? message->content() : messageContent,
                                  message->isAction());
     if (!builder.isIgnored())
     {
@@ -230,7 +249,26 @@ std::vector<MessagePtr> IrcMessageHandler::parsePrivMessage(
 void IrcMessageHandler::handlePrivMessage(Communi::IrcPrivateMessage *message,
                                           TwitchIrcServer &server)
 {
-    this->addMessage(message, message->target(), message->content(), server,
+    QString messageContent = "";
+
+    if (getSettings()->joinSeparatedLinks)
+    {
+        static QRegularExpression separatedLinkRegex("https?:\\/\\s\\/\\S+");
+        static QRegularExpression validDomainRegex(
+                "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]");
+        auto separatedLinkMatch = separatedLinkRegex.match(message->content());
+
+        if (separatedLinkMatch.hasMatch()) {
+            QString separatedLink = separatedLinkMatch.captured(0).simplified().remove(" ");
+
+            auto validDomainMatch = validDomainRegex.match(separatedLink);
+            if (validDomainMatch.hasMatch()) {
+                messageContent = message->content().replace(separatedLinkMatch.captured(0), separatedLink);
+            }
+        }
+    }
+
+    this->addMessage(message, message->target(), messageContent.isEmpty() ? message->content() : messageContent, server,
                      false, message->isAction());
 }
 

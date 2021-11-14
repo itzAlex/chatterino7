@@ -25,6 +25,7 @@ ConcurrentSettings::ConcurrentSettings()
     , filterRecords(*new SignalVector<FilterRecordPtr>())
     , nicknames(*new SignalVector<Nickname>())
     , moderationActions(*new SignalVector<ModerationAction>)
+    , separateLinksChannels(*new SignalVector<QString>)
 {
     persist(this->highlightedMessages, "/highlighting/highlights");
     persist(this->blacklistedUsers, "/highlighting/blacklist");
@@ -34,6 +35,7 @@ ConcurrentSettings::ConcurrentSettings()
     persist(this->mutedChannels, "/pings/muted");
     persist(this->filterRecords, "/filtering/filters");
     persist(this->nicknames, "/nicknames");
+    persist(this->separateLinksChannels, "/separateLinksChannels");
     // tagged users?
     persist(this->moderationActions, "/moderation/actions");
 }
@@ -62,6 +64,30 @@ bool ConcurrentSettings::isBlacklistedUser(const QString &username)
     }
 
     return false;
+}
+
+bool ConcurrentSettings::isSeparatedLinksChannel(const QString &channelName)
+{
+    auto items = this->separateLinksChannels.readOnly();
+
+    for (const auto &channel : *items)
+    {
+        if (channelName.toLower() == channel.toLower())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void ConcurrentSettings::addSeparatedLinkChannel(const QString &channelName)
+{
+    separateLinksChannels.append(channelName);
+}
+
+void ConcurrentSettings::clearSeparatedLinkChannels()
+{
+    separateLinksChannels.clear();
 }
 
 bool ConcurrentSettings::isMutedChannel(const QString &channelName)
