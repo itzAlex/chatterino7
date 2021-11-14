@@ -59,8 +59,7 @@ find_package(Sanitizers)
 # Find boost on the system
 find_package(Boost COMPONENTS filesystem system REQUIRED) 
 # Link boost filesystem 
-link_libraries(Boost::filesystem)
-
+link_libraries(Boost::filesystem Boost::system)
 # Find OpenSSL on the system
 find_package(OpenSSL REQUIRED)
 
