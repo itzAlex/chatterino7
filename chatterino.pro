@@ -288,6 +288,7 @@ SOURCES += \
     src/widgets/dialogs/UserInfoPopup.cpp \
     src/widgets/dialogs/WelcomeDialog.cpp \
     src/widgets/dialogs/SelectChannelHighlightPopup.cpp \
+    src/widgets/dialogs/SelectChannelSeparateLinksDialog.cpp \
     src/widgets/FramelessEmbedWindow.cpp \
     src/widgets/helper/Button.cpp \
     src/widgets/helper/ChannelView.cpp \
@@ -558,6 +559,7 @@ HEADERS += \
     src/widgets/dialogs/UserInfoPopup.hpp \
     src/widgets/dialogs/WelcomeDialog.hpp \
     src/widgets/dialogs/SelectChannelHighlightPopup.hpp \
+    src/widgets/dialogs/SelectChannelSeparateLinksDialog.hpp \
     src/widgets/FramelessEmbedWindow.hpp \
     src/widgets/helper/Button.hpp \
     src/widgets/helper/ChannelView.hpp \

@@ -5,7 +5,6 @@
 #endif
 
 #include "Application.hpp"
-#include "controllers/commands/CommandController.hpp"
 #include "singletons/Settings.hpp"
 
 #include <QFontMetrics>

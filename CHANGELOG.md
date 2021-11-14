@@ -1,5 +1,6 @@
 # Changelog
 ## Homies (#6)
+- Major: Added an option to separate and join URLs in selected channels
 - Minor: Added `Search in Google` option when text is selected
   
 - Minor: Added new search predicate to filter for messages matching a regex (#3282)

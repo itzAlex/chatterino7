@@ -40,11 +40,15 @@ public:
     SignalVector<FilterRecordPtr> &filterRecords;
     SignalVector<Nickname> &nicknames;
     SignalVector<ModerationAction> &moderationActions;
+    SignalVector<QString> &separateLinksChannels;
 
     bool isHighlightedUser(const QString &username);
     bool isBlacklistedUser(const QString &username);
     bool isMutedChannel(const QString &channelName);
     bool toggleMutedChannel(const QString &channelName);
+    bool isSeparatedLinksChannel(const QString &channelName);
+    void addSeparatedLinkChannel(const QString &channelName);
+    void clearSeparatedLinkChannels();
 
 private:
     void mute(const QString &channelName);
@@ -185,6 +189,8 @@ public:
     BoolSetting autorun = {"/behaviour/autorun", false};
     BoolSetting mentionUsersWithComma = {"/behaviour/mentionUsersWithComma",
                                          true};
+    BoolSetting joinSeparatedLinks = {"/behaviour/joinSeparatedLinks", false};
+    BoolSetting separateLinks = {"/behaviour/separateLinks", false};
 
     /// Commands
     BoolSetting allowCommandsAtEnd = {"/commands/allowCommandsAtEnd", false};

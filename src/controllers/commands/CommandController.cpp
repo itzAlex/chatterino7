@@ -619,8 +619,6 @@ void CommandController::initialize(Settings &, Paths &paths)
             {
                 QString persistenceTime = persistence_list.at(1);
 
-                std::cout << persistenceTime.toStdString() << std::endl;
-
                 if (persistenceTime.endsWith("s"))
                 {
                     seconds =

@@ -9,6 +9,7 @@
 #include "widgets/BaseWindow.hpp"
 #include "widgets/helper/Line.hpp"
 #include "widgets/settingspages/GeneralPageView.hpp"
+#include "widgets/dialogs/SelectChannelSeparateLinksDialog.hpp"
 
 #include <QDesktopServices>
 #include <QFileDialog>
@@ -51,6 +52,32 @@ void HomiesPage::initLayout(GeneralPageView &layout)
     layout.addTitle("Behaviour");
     layout.addCheckbox("Mention users with an at sign (@User)",
                        s.mentionUsersWithAt);
+    layout.addCheckbox("Automatically join separated links (http<s>:/ / → http<s>://)",
+                       s.joinSeparatedLinks);
+
+    layout.addCheckbox("Automatically separate links (http<s>:// → http<s>:/ /)",
+                       s.separateLinks);
+
+    QPushButton *selectChannelsSeparateLinksButton = new QPushButton();
+    {
+        selectChannelsSeparateLinksButton->setText("Select channels");
+        selectChannelsSeparateLinksButton->adjustSize();
+    }
+
+    s.separateLinks.connect(
+            [selectChannelsSeparateLinksButton](const bool &value, auto) {
+                if (value == 1) selectChannelsSeparateLinksButton->setEnabled(true);
+                else selectChannelsSeparateLinksButton->setEnabled(false);
+    });
+
+    connect(selectChannelsSeparateLinksButton, &QPushButton::clicked, [=]() {
+        auto selectChannelsSeparateLinksWidget = new SelectChannelSeparateLinksDialog();
+
+        selectChannelsSeparateLinksWidget->show();
+        selectChannelsSeparateLinksWidget->raise();
+    });
+
+    layout.addWidget(selectChannelsSeparateLinksButton);
 
     layout.addStretch();
     auto inv = new BaseWidget(this);
