@@ -233,7 +233,7 @@ void SplitInput::installKeyPressedEvent()
             message = message.replace('\n', ' ');
             QString sendMessage = app->commands->execCommand(message, c, false);
 
-            if (getSettings()->isSeparatedLinksChannel(this->split_->getChannel()->getName()))
+            if (getSettings()->separateLinks && getSettings()->isSeparatedLinksChannel(this->split_->getChannel()->getName()))
             {
                 auto validDomainMatch = validDomainRegex.match(sendMessage);
 
