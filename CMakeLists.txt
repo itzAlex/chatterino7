@@ -58,9 +58,12 @@ endif ()
 find_package(Sanitizers)
 
 # Find boost on the system
-find_package(Boost COMPONENTS filesystem system REQUIRED) 
+find_package(Boost REQUIRED COMPONENTS filesystem system) 
 # Link boost filesystem 
-link_libraries(Boost::filesystem Boost::system)
+if(Boost_FOUND)
+    add_executable(progname file1.cxx file2.cxx) 
+    target_link_libraries(progname Boost::filesystem Boost::regex)
+endif()
 # Find OpenSSL on the system
 find_package(OpenSSL REQUIRED)
 
