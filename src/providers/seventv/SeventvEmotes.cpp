@@ -131,6 +131,127 @@ boost::optional<EmotePtr> SeventvEmotes::emote(const EmoteName &name) const
     return it->second;
 }
 
+void SeventvEmotes::addEmote(QString emoteID, TwitchChannel *channel)
+{
+    QJsonObject payload1, variables1;
+
+    QString query1 = R"(
+        query GetUser($id: String!) {
+            user(id: $id) {
+                id
+            }
+    })";
+
+    QString SevenTV_TOKEN =
+        pajlada::Settings::Setting<QString>::get("/SevenTVToken");
+
+    SevenTV_TOKEN = SevenTV_TOKEN.replace("Bearer ", "");
+
+    if (SevenTV_TOKEN.isEmpty())
+    {
+        channel->addMessage(makeSystemMessage(
+            "To add an emote you must first add your 7TV token!"));
+
+        return;
+    }
+
+    QString channelID = channel->roomId();
+
+    variables1.insert("id", channelID);
+
+    payload1.insert("query", query1.replace(whitespaceRegex, " "));
+    payload1.insert("variables", variables1);
+
+    NetworkRequest(apiUrlGQL, NetworkRequestType::Post)
+        .timeout(20000)
+        .header("Content-Type", "application/json")
+        .header("Authorization", "Bearer " + SevenTV_TOKEN)
+        .payload(QJsonDocument(payload1).toJson(QJsonDocument::Compact))
+        .onSuccess([=](NetworkResult result) -> Outcome {
+            QString userID = result.parseJson()
+                                 .value("data")
+                                 .toObject()
+                                 .value("user")
+                                 .toObject()
+                                 .value("id")
+                                 .toString();
+
+            QJsonObject payload2, variables2;
+
+            QString query2 = R"(
+                    mutation AddChannelEmote($login: String!, $em: String!) {
+                        addChannelEmote(channel_id: $login, emote_id: $em) {
+                            emote_ids
+                     }
+                })";
+
+            variables2.insert("login", userID);
+            variables2.insert("em", emoteID);
+
+            payload2.insert("query", query2.replace(whitespaceRegex, " "));
+            payload2.insert("variables", variables2);
+
+            NetworkRequest(apiUrlGQL, NetworkRequestType::Post)
+                .timeout(20000)
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + SevenTV_TOKEN)
+                .payload(QJsonDocument(payload2).toJson(QJsonDocument::Compact))
+                .onSuccess([=](NetworkResult result) -> Outcome {
+                    channel->addMessage(
+                        makeSystemMessage("7TV emote added successfully!"));
+
+                    return Success;
+                })
+                .onError([=](NetworkResult result) {
+                    QString error = result.parseJson()
+                                        .value("errors")
+                                        .toArray()
+                                        .first()
+                                        .toObject()
+                                        .value("message")
+                                        .toString();
+
+                    if (error.startsWith("Channel Emote Slots Limit Reached"))
+                    {
+                        channel->addMessage(
+                            makeSystemMessage("This channel has already used "
+                                              "all of 7TV's emotes slots!"));
+                    }
+
+                    else if (error.startsWith("Unknown Channel"))
+                    {
+                        channel->addMessage(makeSystemMessage(
+                            "This channel is unknown to 7TV"));
+                    }
+
+                    else if (error.startsWith("Unknown Emote"))
+                    {
+                        channel->addMessage(makeSystemMessage(
+                            "There is no emote with this identifier in 7TV!"));
+                    }
+
+                    else if (error.startsWith("Insufficient Privilege"))
+                    {
+                        channel->addMessage(makeSystemMessage(
+                            "You do not have permission to modify 7TV emotes "
+                            "in this channel!"));
+                    }
+
+                    else
+                    {
+                        channel->addMessage(makeSystemMessage(
+                            "The 7TV token you have entered is invalid!"));
+                    }
+
+                    return true;
+                })
+                .execute();
+
+            return Success;
+        })
+        .execute();
+}
+
 void SeventvEmotes::loadEmotes()
 {
     qCDebug(chatterinoSeventv) << "Loading 7TV Emotes";
@@ -221,7 +342,7 @@ void SeventvEmotes::loadChannel(std::weak_ptr<Channel> channel,
     payload.insert("query", query.replace(whitespaceRegex, " "));
     payload.insert("variables", variables);
 
-    qDebug() << QJsonDocument(payload).toJson(QJsonDocument::Compact);
+    // qDebug() << QJsonDocument(payload).toJson(QJsonDocument::Compact);
 
     NetworkRequest(apiUrlGQL, NetworkRequestType::Post)
         .timeout(20000)

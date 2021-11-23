@@ -374,6 +374,8 @@ set(SOURCE_FILES
         widgets/dialogs/SelectChannelHighlightPopup.hpp
         widgets/dialogs/SelectChannelSeparateLinksDialog.cpp
         widgets/dialogs/SelectChannelSeparateLinksDialog.hpp
+        widgets/dialogs/TokenDialog.cpp
+        widgets/dialogs/TokenDialog.hpp
         widgets/dialogs/switcher/NewTabItem.cpp
         widgets/dialogs/switcher/NewTabItem.hpp
         widgets/dialogs/switcher/QuickSwitcherModel.cpp

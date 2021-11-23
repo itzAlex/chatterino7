@@ -205,7 +205,8 @@ void SplitInput::openEmotePopup()
 void SplitInput::installKeyPressedEvent()
 {
     static QRegularExpression validDomainRegex(
-            "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]");
+        "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-"
+        "z0-9]");
 
     auto app = getApp();
 
@@ -233,15 +234,20 @@ void SplitInput::installKeyPressedEvent()
             message = message.replace('\n', ' ');
             QString sendMessage = app->commands->execCommand(message, c, false);
 
-            if (getSettings()->separateLinks && getSettings()->isSeparatedLinksChannel(this->split_->getChannel()->getName()))
+            if (getSettings()->separateLinks &&
+                getSettings()->isSeparatedLinksChannel(
+                    this->split_->getChannel()->getName()))
             {
                 auto validDomainMatch = validDomainRegex.match(sendMessage);
 
-                if (validDomainMatch.hasMatch()) {
+                if (validDomainMatch.hasMatch())
+                {
                     if (sendMessage.contains("https://", Qt::CaseInsensitive))
-                        sendMessage = sendMessage.replace("https://", "https:/ /");
+                        sendMessage =
+                            sendMessage.replace("https://", "https:/ /");
                     if (sendMessage.contains("http://", Qt::CaseInsensitive))
-                        sendMessage = sendMessage.replace("http://", "http:/ /");
+                        sendMessage =
+                            sendMessage.replace("http://", "http:/ /");
                 }
             }
 

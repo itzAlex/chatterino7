@@ -1031,7 +1031,8 @@ Outcome TwitchMessageBuilder::tryAppendEmote(const EmoteName &name)
     {
         flags = MessageElementFlag::HomiesEmote;
     }
-    else if (getSettings()->enable7TVGlobalEmotes && (emote = globalSeventvEmotes.emote(name)))
+    else if (getSettings()->enable7TVGlobalEmotes &&
+             (emote = globalSeventvEmotes.emote(name)))
     {
         flags = MessageElementFlag::SeventvEmote;
         if (emote.value()->zeroWidth)
@@ -1044,11 +1045,13 @@ Outcome TwitchMessageBuilder::tryAppendEmote(const EmoteName &name)
     {
         flags = MessageElementFlag::HomiesEmote;
     }
-    else if (getSettings()->enableFFZGlobalEmotes && (emote = globalFfzEmotes.emote(name)))
+    else if (getSettings()->enableFFZGlobalEmotes &&
+             (emote = globalFfzEmotes.emote(name)))
     {
         flags = MessageElementFlag::FfzEmote;
     }
-    else if (getSettings()->enableBTTVGlobalEmotes && (emote = globalBttvEmotes.emote(name)))
+    else if (getSettings()->enableBTTVGlobalEmotes &&
+             (emote = globalBttvEmotes.emote(name)))
     {
         flags = MessageElementFlag::BttvEmote;
 

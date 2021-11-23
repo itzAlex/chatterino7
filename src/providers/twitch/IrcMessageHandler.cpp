@@ -221,23 +221,30 @@ std::vector<MessagePtr> IrcMessageHandler::parsePrivMessage(
     {
         static QRegularExpression separatedLinkRegex("https?:\\/\\s\\/\\S+");
         static QRegularExpression validDomainRegex(
-                "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]");
+            "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,"
+            "61}[a-z0-9]");
         auto separatedLinkMatch = separatedLinkRegex.match(message->content());
 
-        if (separatedLinkMatch.hasMatch()) {
-            QString separatedLink = separatedLinkMatch.captured(0).simplified().remove(" ");
+        if (separatedLinkMatch.hasMatch())
+        {
+            QString separatedLink =
+                separatedLinkMatch.captured(0).simplified().remove(" ");
 
             auto validDomainMatch = validDomainRegex.match(separatedLink);
-            if (validDomainMatch.hasMatch()) {
-                messageContent = message->content().replace(separatedLinkMatch.captured(0), separatedLink);
+            if (validDomainMatch.hasMatch())
+            {
+                messageContent = message->content().replace(
+                    separatedLinkMatch.captured(0), separatedLink);
             }
         }
     }
 
     std::vector<MessagePtr> builtMessages;
     MessageParseArgs args;
-    TwitchMessageBuilder builder(channel, message, args, messageContent.isEmpty() ? message->content() : messageContent,
-                                 message->isAction());
+    TwitchMessageBuilder builder(
+        channel, message, args,
+        messageContent.isEmpty() ? message->content() : messageContent,
+        message->isAction());
     if (!builder.isIgnored())
     {
         builtMessages.emplace_back(builder.build());
@@ -255,21 +262,28 @@ void IrcMessageHandler::handlePrivMessage(Communi::IrcPrivateMessage *message,
     {
         static QRegularExpression separatedLinkRegex("https?:\\/\\s\\/\\S+");
         static QRegularExpression validDomainRegex(
-                "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]");
+            "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,"
+            "61}[a-z0-9]");
         auto separatedLinkMatch = separatedLinkRegex.match(message->content());
 
-        if (separatedLinkMatch.hasMatch()) {
-            QString separatedLink = separatedLinkMatch.captured(0).simplified().remove(" ");
+        if (separatedLinkMatch.hasMatch())
+        {
+            QString separatedLink =
+                separatedLinkMatch.captured(0).simplified().remove(" ");
 
             auto validDomainMatch = validDomainRegex.match(separatedLink);
-            if (validDomainMatch.hasMatch()) {
-                messageContent = message->content().replace(separatedLinkMatch.captured(0), separatedLink);
+            if (validDomainMatch.hasMatch())
+            {
+                messageContent = message->content().replace(
+                    separatedLinkMatch.captured(0), separatedLink);
             }
         }
     }
 
-    this->addMessage(message, message->target(), messageContent.isEmpty() ? message->content() : messageContent, server,
-                     false, message->isAction());
+    this->addMessage(
+        message, message->target(),
+        messageContent.isEmpty() ? message->content() : messageContent, server,
+        false, message->isAction());
 }
 
 void IrcMessageHandler::addMessage(Communi::IrcMessage *_message,

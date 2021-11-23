@@ -28,6 +28,7 @@
 #include "messages/layouts/MessageLayout.hpp"
 #include "messages/layouts/MessageLayoutElement.hpp"
 #include "providers/LinkResolver.hpp"
+#include "providers/seventv/SeventvEmotes.hpp"
 #include "providers/twitch/TwitchChannel.hpp"
 #include "providers/twitch/TwitchIrcServer.hpp"
 #include "singletons/Resources.hpp"
@@ -1904,7 +1905,22 @@ void ChannelView::addContextMenuItems(
     // Link copy
     if (hoveredElement->getLink().type == Link::Url)
     {
+        static QRegularExpression SevenTVEmoteLink(
+            "7tv\\.app\\/emotes\\/(\\w{24})");
+
         QString url = hoveredElement->getLink().value;
+        auto SevenTVEmoteLinkMatch = SevenTVEmoteLink.match(url);
+
+        if (SevenTVEmoteLinkMatch.hasMatch())
+        {
+            QString emoteID = SevenTVEmoteLinkMatch.captured(1);
+
+            menu->addAction("Add 7TV Emote", [=] {
+                TwitchChannel *twitchChannel = dynamic_cast<TwitchChannel *>(
+                    this->underlyingChannel_.get());
+                SeventvEmotes::addEmote(emoteID, twitchChannel);
+            });
+        }
 
         // open link
         menu->addAction("Open link", [url] {

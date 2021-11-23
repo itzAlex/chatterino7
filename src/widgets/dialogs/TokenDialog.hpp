@@ -13,17 +13,14 @@ class QStandardItemModel;
 class QString;
 
 namespace chatterino {
-class SelectChannelSeparateLinksDialog : public QDialog
+class TokenDialog : public QDialog
 {
 public:
-    SelectChannelSeparateLinksDialog(QWidget *parent = 0);
+    TokenDialog(int provider, QWidget *parent = 0);
 
 private:
     struct {
         QVBoxLayout mainLayout;
-        QHBoxLayout *buttons_;
-        QStandardItemModel *model_;
-        QTableView *tableView_;
     } ui_;
 };
 }  // namespace chatterino

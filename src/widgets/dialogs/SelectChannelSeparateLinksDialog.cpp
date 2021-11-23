@@ -17,7 +17,8 @@
 
 namespace chatterino {
 
-SelectChannelSeparateLinksDialog::SelectChannelSeparateLinksDialog(QWidget *parent)
+SelectChannelSeparateLinksDialog::SelectChannelSeparateLinksDialog(
+    QWidget *parent)
     : QDialog(parent)
 {
 #ifdef USEWINSDK
@@ -33,8 +34,8 @@ SelectChannelSeparateLinksDialog::SelectChannelSeparateLinksDialog(QWidget *pare
     this->setLayout(&this->ui_.mainLayout);
     this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     this->setWindowFlags(
-            (this->windowFlags() & ~(Qt::WindowContextHelpButtonHint)) |
-            Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
+        (this->windowFlags() & ~(Qt::WindowContextHelpButtonHint)) |
+        Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint);
     this->setWindowFlag(Qt::WindowStaysOnTopHint, true);
 
     // Add & Remove buttons
@@ -92,18 +93,16 @@ SelectChannelSeparateLinksDialog::SelectChannelSeparateLinksDialog(QWidget *pare
 
     // OK and Cancel buttons & Checkbox
     auto buttonBox =
-            new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
+        new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
     buttonBox->setCenterButtons(true);
     this->ui_.mainLayout.addWidget(buttonBox);
 
     // Add previous elements from config
     for (QString channel : getSettings()->separateLinksChannels)
     {
-        QStandardItem *item =
-                new QStandardItem(channel);
+        QStandardItem *item = new QStandardItem(channel);
         this->ui_.model_->appendRow(item);
     }
-
 
     // Signals
     QObject::connect(buttonBox, &QDialogButtonBox::accepted, [=]() {
@@ -111,9 +110,8 @@ SelectChannelSeparateLinksDialog::SelectChannelSeparateLinksDialog(QWidget *pare
 
         for (int row = 0; row < this->ui_.model_->rowCount(); row++)
         {
-            getSettings()->addSeparatedLinkChannel(this->ui_.model_->index(row, 0)
-                                       .data()
-                                       .toString());
+            getSettings()->addSeparatedLinkChannel(
+                this->ui_.model_->index(row, 0).data().toString());
         }
 
         this->accept();
@@ -125,4 +123,4 @@ SelectChannelSeparateLinksDialog::SelectChannelSeparateLinksDialog(QWidget *pare
         this->close();
     });
 }
-}
+}  // namespace chatterino

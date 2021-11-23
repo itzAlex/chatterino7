@@ -218,8 +218,10 @@ void loadUncached(const std::shared_ptr<NetworkData> &data)
                                         QString(data->payload_));
                     }
                     // TODO: Should this always be run on the GUI thread?
-                    postToThread([data, code = status.toInt()] {
-                        data->onError_(NetworkResult({}, code));
+                    postToThread([reply, data, code = status.toInt()] {
+                        QByteArray bytes = reply->readAll();
+
+                        data->onError_(NetworkResult(bytes, code));
                     });
                 }
 

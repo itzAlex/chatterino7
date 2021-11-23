@@ -79,8 +79,10 @@ void InputCompletionPopup::updateEmotes(const QString &text, ChannelPtr channel)
     std::vector<_Emote> emotes;
     auto tc = dynamic_cast<TwitchChannel *>(channel.get());
     // returns true also for special Twitch channels (/live, /mentions, /whispers, etc.)
-    if (channel->isTwitchChannel()) {
-        if (auto user = getApp()->accounts->twitch.getCurrent()) {
+    if (channel->isTwitchChannel())
+    {
+        if (auto user = getApp()->accounts->twitch.getCurrent())
+        {
             // Twitch Emotes available globally
             auto emoteData = user->accessEmotes();
             addEmotes(emotes, emoteData->emotes, text, "Twitch Emote");
@@ -88,15 +90,18 @@ void InputCompletionPopup::updateEmotes(const QString &text, ChannelPtr channel)
             // Twitch Emotes available locally
             auto localEmoteData = user->accessLocalEmotes();
             if (tc &&
-                localEmoteData->find(tc->roomId()) != localEmoteData->end()) {
-                if (auto localEmotes = &localEmoteData->at(tc->roomId())) {
+                localEmoteData->find(tc->roomId()) != localEmoteData->end())
+            {
+                if (auto localEmotes = &localEmoteData->at(tc->roomId()))
+                {
                     addEmotes(emotes, *localEmotes, text,
                               "Local Twitch Emotes");
                 }
             }
         }
 
-        if (tc) {
+        if (tc)
+        {
             if (auto seventv = tc->seventvEmotes())
                 addEmotes(emotes, *seventv, text, "Channel 7TV");
             // TODO extract "Channel BetterTTV" text into a #define.
@@ -108,22 +113,26 @@ void InputCompletionPopup::updateEmotes(const QString &text, ChannelPtr channel)
                 addEmotes(emotes, *homies, text, "Channel Homies");
         }
 
-        if (getSettings()->enable7TVGlobalEmotes && getSettings()->enable7TVCompletion)
+        if (getSettings()->enable7TVGlobalEmotes &&
+            getSettings()->enable7TVCompletion)
         {
             if (auto seventvG = getApp()->twitch2->getSeventvEmotes().emotes())
                 addEmotes(emotes, *seventvG, text, "Global 7TV");
         }
-        if (getSettings()->enableBTTVGlobalEmotes && getSettings()->enableBTTVCompletion)
+        if (getSettings()->enableBTTVGlobalEmotes &&
+            getSettings()->enableBTTVCompletion)
         {
             if (auto bttvG = getApp()->twitch2->getBttvEmotes().emotes())
                 addEmotes(emotes, *bttvG, text, "Global BetterTTV");
         }
-        if (getSettings()->enableFFZGlobalEmotes && getSettings()->enableFFZCompletion)
+        if (getSettings()->enableFFZGlobalEmotes &&
+            getSettings()->enableFFZCompletion)
         {
             if (auto ffzG = getApp()->twitch2->getFfzEmotes().emotes())
                 addEmotes(emotes, *ffzG, text, "Global FrankerFaceZ");
         }
-        if (getSettings()->enableHomiesGlobalEmotes && getSettings()->enableHomiesCompletion)
+        if (getSettings()->enableHomiesGlobalEmotes &&
+            getSettings()->enableHomiesCompletion)
             if (auto homiesG = getApp()->twitch2->getHomiesEmotes().emotes())
                 addEmotes(emotes, *homiesG, text, "Global Homies");
 
