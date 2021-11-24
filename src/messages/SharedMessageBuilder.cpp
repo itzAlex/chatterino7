@@ -289,6 +289,7 @@ void SharedMessageBuilder::parseHighlights()
             continue;
         }
 
+        this->messageHighlight = true;
         std::vector<std::string> channels = highlight.getChannels();
         std::vector<std::string> ExcludedChannels =
             highlight.getExcludedChannels();
@@ -485,19 +486,16 @@ void SharedMessageBuilder::triggerHighlights()
         return;
     }
 
-    if (this->highlightEnabled_)
+    if (!this->messageHighlight || (this->messageHighlight && this->highlightEnabled_))
     {
         bool hasFocus = (QApplication::focusWidget() != nullptr);
         bool resolveFocus =
-            !hasFocus || getSettings()->highlightAlwaysPlaySound;
+                !hasFocus || getSettings()->highlightAlwaysPlaySound;
 
-        if (this->highlightSound_ && resolveFocus)
-        {
-            if (auto player = getPlayer())
-            {
+        if (this->highlightSound_ && resolveFocus) {
+            if (auto player = getPlayer()) {
                 // update the media player url if necessary
-                if (currentPlayerUrl != this->highlightSoundUrl_)
-                {
+                if (currentPlayerUrl != this->highlightSoundUrl_) {
                     player->setMedia(this->highlightSoundUrl_);
 
                     currentPlayerUrl = this->highlightSoundUrl_;
@@ -507,8 +505,7 @@ void SharedMessageBuilder::triggerHighlights()
             }
         }
 
-        if (this->highlightAlert_)
-        {
+        if (this->highlightAlert_) {
             getApp()->windows->sendAlert();
         }
     }
