@@ -28,6 +28,7 @@
 #include "messages/layouts/MessageLayout.hpp"
 #include "messages/layouts/MessageLayoutElement.hpp"
 #include "providers/LinkResolver.hpp"
+#include "providers/bttv/BttvEmotes.hpp"
 #include "providers/seventv/SeventvEmotes.hpp"
 #include "providers/twitch/TwitchChannel.hpp"
 #include "providers/twitch/TwitchIrcServer.hpp"
@@ -1905,10 +1906,12 @@ void ChannelView::addContextMenuItems(
     // Link copy
     if (hoveredElement->getLink().type == Link::Url)
     {
+        QString url = hoveredElement->getLink().value;
+
+        // 7TV Add emote button
         static QRegularExpression SevenTVEmoteLink(
             "7tv\\.app\\/emotes\\/(\\w{24})");
 
-        QString url = hoveredElement->getLink().value;
         auto SevenTVEmoteLinkMatch = SevenTVEmoteLink.match(url);
 
         if (SevenTVEmoteLinkMatch.hasMatch())
@@ -1919,6 +1922,22 @@ void ChannelView::addContextMenuItems(
                 TwitchChannel *twitchChannel = dynamic_cast<TwitchChannel *>(
                     this->underlyingChannel_.get());
                 SeventvEmotes::addEmote(emoteID, twitchChannel);
+            });
+        }
+
+        // BTTV Add emote button
+        static QRegularExpression BTTVEmoteLink(
+            "betterttv\\.com\\/emotes\\/(\\w{24})");
+
+        auto BTTVEmoteLinkMatch = BTTVEmoteLink.match(url);
+
+        if (BTTVEmoteLinkMatch.hasMatch())
+        {
+            QString emoteID = BTTVEmoteLinkMatch.captured(1);
+            menu->addAction("Add BTTV Emote", [=] {
+                TwitchChannel *twitchChannel = dynamic_cast<TwitchChannel *>(
+                    this->underlyingChannel_.get());
+                BttvEmotes::addEmote(emoteID, twitchChannel);
             });
         }
 

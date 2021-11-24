@@ -1,6 +1,7 @@
 # Changelog
 ## Homies (#6)
 - Major: Added a button to add emotes from 7TV
+- Major: Added a button to add emotes from BTTV
 - Major: Added an option to separate and join URLs in selected channels
 - Minor: Added `Search in Google` option when text is selected
 - Minor: Added options to disable autocomplete for all global emotes providers

@@ -57,19 +57,6 @@ void HomiesPage::initLayout(GeneralPageView &layout)
         SevenTVTokenWidget->raise();
     });
 
-    QPushButton *FFZTokenButton = new QPushButton();
-    {
-        FFZTokenButton->setText("FFZ Authentication Token");
-        FFZTokenButton->adjustSize();
-    }
-
-    connect(FFZTokenButton, &QPushButton::clicked, [=]() {
-        auto FFZTokenWidget = new TokenDialog(1);
-
-        FFZTokenWidget->show();
-        FFZTokenWidget->raise();
-    });
-
     QPushButton *BTTVTokenButton = new QPushButton();
     {
         BTTVTokenButton->setText("BetterTTV Authentication Token");
@@ -77,7 +64,7 @@ void HomiesPage::initLayout(GeneralPageView &layout)
     }
 
     connect(BTTVTokenButton, &QPushButton::clicked, [=]() {
-        auto BTTVTokenWidget = new TokenDialog(2);
+        auto BTTVTokenWidget = new TokenDialog(1);
 
         BTTVTokenWidget->show();
         BTTVTokenWidget->raise();
@@ -86,7 +73,6 @@ void HomiesPage::initLayout(GeneralPageView &layout)
     layout.addTitle("Providers tokens");
 
     layout.addWidget(sevenTVTokenButton);
-    layout.addWidget(FFZTokenButton);
     layout.addWidget(BTTVTokenButton);
 
     layout.addTitle("Emotes");

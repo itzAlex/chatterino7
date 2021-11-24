@@ -215,7 +215,7 @@ void SeventvEmotes::addEmote(QString emoteID, TwitchChannel *channel)
                     {
                         channel->addMessage(
                             makeSystemMessage("This channel has already used "
-                                              "all of 7TV's emotes slots!"));
+                                              "all 7TV emotes slots!"));
                     }
 
                     else if (error.startsWith("Unknown Channel"))
@@ -242,8 +242,6 @@ void SeventvEmotes::addEmote(QString emoteID, TwitchChannel *channel)
                         channel->addMessage(makeSystemMessage(
                             "The 7TV token you have entered is invalid!"));
                     }
-
-                    return true;
                 })
                 .execute();
 

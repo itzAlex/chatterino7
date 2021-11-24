@@ -32,8 +32,6 @@ TokenDialog::TokenDialog(int provider, QWidget *parent)
     if (provider == 0)
         this->setWindowTitle("7TV Token");
     if (provider == 1)
-        this->setWindowTitle("FFZ Token");
-    if (provider == 2)
         this->setWindowTitle("BetterTTV Token");
     this->setLayout(&this->ui_.mainLayout);
     this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -63,8 +61,6 @@ TokenDialog::TokenDialog(int provider, QWidget *parent)
         if (provider == 0)
             path = "/SevenTVToken";
         if (provider == 1)
-            path = "/FFZToken";
-        if (provider == 2)
             path = "/BTTVToken";
 
         pajlada::Settings::Setting<QString>::set(path, token);
