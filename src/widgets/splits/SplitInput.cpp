@@ -242,9 +242,6 @@ void SplitInput::addShortcuts()
                      << "Invalid cursorToStart select argument (0)!";
                  return "Invalid cursorToStart select argument (0)!";
              }
-    static QRegularExpression validDomainRegex(
-        "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-"
-        "z0-9]");
 
     auto app = getApp();
 
@@ -300,11 +297,32 @@ void SplitInput::addShortcuts()
              if (c == nullptr)
                  return "";
 
+             static QRegularExpression validDomainRegex(
+                     "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-"
+                     "z0-9]");
+
              QString message = ui_.textEdit->toPlainText();
 
              message = message.replace('\n', ' ');
              QString sendMessage =
                  getApp()->commands->execCommand(message, c, false);
+
+             if (getSettings()->separateLinks &&
+                 getSettings()->isSeparatedLinksChannel(
+                         this->split_->getChannel()->getName()))
+             {
+                 auto validDomainMatch = validDomainRegex.match(sendMessage);
+
+                 if (validDomainMatch.hasMatch())
+                 {
+                     if (sendMessage.contains("https://", Qt::CaseInsensitive))
+                         sendMessage =
+                                 sendMessage.replace("https://", "https:/ /");
+                     if (sendMessage.contains("http://", Qt::CaseInsensitive))
+                         sendMessage =
+                                 sendMessage.replace("http://", "http:/ /");
+                 }
+             }
 
              c->sendMessage(sendMessage);
              // don't add duplicate messages and empty message to message history
@@ -319,31 +337,6 @@ void SplitInput::addShortcuts()
              {
                  shouldClearInput = false;
              }
-            if (getSettings()->separateLinks &&
-                getSettings()->isSeparatedLinksChannel(
-                    this->split_->getChannel()->getName()))
-            {
-                auto validDomainMatch = validDomainRegex.match(sendMessage);
-
-                if (validDomainMatch.hasMatch())
-                {
-                    if (sendMessage.contains("https://", Qt::CaseInsensitive))
-                        sendMessage =
-                            sendMessage.replace("https://", "https:/ /");
-                    if (sendMessage.contains("http://", Qt::CaseInsensitive))
-                        sendMessage =
-                            sendMessage.replace("http://", "http:/ /");
-                }
-            }
-
-            c->sendMessage(sendMessage);
-            // don't add duplicate messages and empty message to message history
-            if ((this->prevMsg_.isEmpty() ||
-                 !this->prevMsg_.endsWith(message)) &&
-                !message.trimmed().isEmpty())
-            {
-                this->prevMsg_.append(message);
-            }
 
              if (shouldClearInput)
              {
@@ -513,6 +506,9 @@ bool SplitInput::eventFilter(QObject *obj, QEvent *event)
 
 void SplitInput::installKeyPressedEvent()
 {
+    static QRegularExpression validDomainRegex(
+            "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]");
+
     this->ui_.textEdit->keyPressed.disconnectAll();
     this->ui_.textEdit->keyPressed.connect([this](QKeyEvent *event) {
         if (auto popup = this->inputCompletionPopup_.get())
