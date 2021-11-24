@@ -859,10 +859,17 @@ void IrcMessageHandler::handleNoticeMessage(Communi::IrcNoticeMessage *message)
         }
 
         QString tags = message->tags().value("msg-id").toString();
-        if (tags == "bad_delete_message_error" || tags == "usage_delete")
+        if (tags == "usage_delete")
         {
             channel->addMessage(makeSystemMessage(
-                "Usage: /delete <msg-id>. Can't take more than one argument"));
+                "Usage: /delete <msg-id> - Deletes the specified message. "
+                "Can't take more than one argument."));
+        }
+        else if (tags == "bad_delete_message_error")
+        {
+            channel->addMessage(makeSystemMessage(
+                "There was a problem deleting the message. "
+                "It might be from another channel or too old to delete."));
         }
         else if (tags == "host_on" || tags == "host_target_went_offline")
         {
@@ -884,6 +891,34 @@ void IrcMessageHandler::handleNoticeMessage(Communi::IrcNoticeMessage *message)
             MessageBuilder builder;
             TwitchMessageBuilder::hostingSystemMessage(channelName, &builder,
                                                        hostOn);
+            channel->addMessage(builder.release());
+        }
+        else if (tags == "room_mods" || tags == "vips_success")
+        {
+            // /mods and /vips
+            // room_mods: The moderators of this channel are: ampzyh, antichriststollen, apa420, ...
+            // vips_success: The VIPs of this channel are: 8008, aiden, botfactory, ...
+
+            QString noticeText = msg->messageText;
+            if (tags == "vips_success")
+            {
+                // this one has a trailing period, need to get rid of it.
+                noticeText.chop(1);
+            }
+
+            QStringList msgParts = noticeText.split(':');
+            MessageBuilder builder;
+
+            auto tc = dynamic_cast<TwitchChannel *>(channel.get());
+            assert(tc != nullptr &&
+                   "IrcMessageHandler::handleNoticeMessage. Twitch specific "
+                   "functionality called in non twitch channel");
+
+            auto users = msgParts.at(1)
+                             .mid(1)  // there is a space before the first user
+                             .split(", ");
+            TwitchMessageBuilder::listOfUsersSystemMessage(msgParts.at(0),
+                                                           users, tc, &builder);
             channel->addMessage(builder.release());
         }
         else if (tags == "room_mods" || tags == "vips_success")

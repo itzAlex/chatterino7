@@ -67,6 +67,9 @@ public:
     static void modsOrVipsSystemMessage(QString prefix, QStringList users,
                                         TwitchChannel *channel,
                                         MessageBuilder *builder);
+    static void listOfUsersSystemMessage(QString prefix, QStringList users,
+                                         Channel *channel,
+                                         MessageBuilder *builder);
 
 private:
     void parseUsernameColor() override;
