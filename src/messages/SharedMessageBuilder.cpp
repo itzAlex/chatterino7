@@ -389,6 +389,11 @@ void SharedMessageBuilder::parseHighlights()
                 this->highlightAlert_ = true;
             }
 
+            if (highlight.showInMentions())
+            {
+                this->message().flags.set(MessageFlag::ShowInMentions);
+            }
+
             // Only set highlightSound_ if it hasn't been set by badge
             // highlights already.
             if (highlight.hasSound() && !this->highlightSound_)
@@ -486,16 +491,20 @@ void SharedMessageBuilder::triggerHighlights()
         return;
     }
 
-    if (!this->messageHighlight || (this->messageHighlight && this->highlightEnabled_))
+    if (!this->messageHighlight ||
+        (this->messageHighlight && this->highlightEnabled_))
     {
         bool hasFocus = (QApplication::focusWidget() != nullptr);
         bool resolveFocus =
-                !hasFocus || getSettings()->highlightAlwaysPlaySound;
+            !hasFocus || getSettings()->highlightAlwaysPlaySound;
 
-        if (this->highlightSound_ && resolveFocus) {
-            if (auto player = getPlayer()) {
+        if (this->highlightSound_ && resolveFocus)
+        {
+            if (auto player = getPlayer())
+            {
                 // update the media player url if necessary
-                if (currentPlayerUrl != this->highlightSoundUrl_) {
+                if (currentPlayerUrl != this->highlightSoundUrl_)
+                {
                     player->setMedia(this->highlightSoundUrl_);
 
                     currentPlayerUrl = this->highlightSoundUrl_;
@@ -505,7 +514,8 @@ void SharedMessageBuilder::triggerHighlights()
             }
         }
 
-        if (this->highlightAlert_) {
+        if (this->highlightAlert_)
+        {
             getApp()->windows->sendAlert();
         }
     }

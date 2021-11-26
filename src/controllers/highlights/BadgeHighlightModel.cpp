@@ -9,7 +9,7 @@ namespace chatterino {
 
 // commandmodel
 BadgeHighlightModel::BadgeHighlightModel(QObject *parent)
-    : SignalVectorModel<HighlightBadge>(5, parent)
+    : SignalVectorModel<HighlightBadge>(6, parent)
 {
 }
 
@@ -27,6 +27,7 @@ HighlightBadge BadgeHighlightModel::getItemFromRow(
 
     return HighlightBadge{
         original.badgeName(),
+        row[Column::ShowInMentions]->data(Qt::CheckStateRole).toBool(),
         row[Column::Badge]->data(Qt::DisplayRole).toString(),
         row[Column::FlashTaskbar]->data(Qt::CheckStateRole).toBool(),
         row[Column::PlaySound]->data(Qt::CheckStateRole).toBool(),
@@ -42,6 +43,7 @@ void BadgeHighlightModel::getRowFromItem(const HighlightBadge &item,
     using Column = BadgeHighlightModel::Column;
 
     setStringItem(row[Column::Badge], item.displayName(), false, true);
+    setBoolItem(row[Column::ShowInMentions], item.showInMentions());
     setBoolItem(row[Column::FlashTaskbar], item.hasAlert());
     setBoolItem(row[Column::PlaySound], item.hasSound());
     setFilePathItem(row[Column::SoundPath], item.getSoundUrl());

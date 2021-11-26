@@ -199,8 +199,8 @@ HighlightingPage::HighlightingPage()
                                         ->initialized(
                                             &getSettings()->highlightedBadges))
                                 .getElement();
-                view->setTitles({"Name", "Flash\ntaskbar", "Play\nsound",
-                                 "Custom\nsound", "Color"});
+                view->setTitles({"Name", "Show in\nMentions", "Flash\ntaskbar",
+                                 "Play\nsound", "Custom\nsound", "Color"});
                 view->getTableView()->horizontalHeader()->setSectionResizeMode(
                     QHeaderView::Fixed);
                 view->getTableView()->horizontalHeader()->setSectionResizeMode(
@@ -225,10 +225,11 @@ HighlightingPage::HighlightingPage()
                         {
                             return;
                         }
-                        getSettings()->highlightedBadges.append(HighlightBadge{
-                            s->badgeName(), s->displayName(), false, false, "",
-                            *ColorProvider::instance().color(
-                                ColorType::SelfHighlight)});
+                        getSettings()->highlightedBadges.append(
+                            HighlightBadge{s->badgeName(), true,
+                                           s->displayName(), false, false, "",
+                                           *ColorProvider::instance().color(
+                                               ColorType::SelfHighlight)});
                     }
                 });
 

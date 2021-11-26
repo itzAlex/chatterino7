@@ -243,7 +243,7 @@ void SplitInput::addShortcuts()
                  return "Invalid cursorToStart select argument (0)!";
              }
 
-    auto app = getApp();
+             auto app = getApp();
 
              cursor.movePosition(place,
                                  select ? QTextCursor::MoveMode::KeepAnchor
@@ -298,8 +298,9 @@ void SplitInput::addShortcuts()
                  return "";
 
              static QRegularExpression validDomainRegex(
-                     "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-"
-                     "z0-9]");
+                 "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]"
+                 "{0,61}[a-"
+                 "z0-9]");
 
              QString message = ui_.textEdit->toPlainText();
 
@@ -309,7 +310,7 @@ void SplitInput::addShortcuts()
 
              if (getSettings()->separateLinks &&
                  getSettings()->isSeparatedLinksChannel(
-                         this->split_->getChannel()->getName()))
+                     this->split_->getChannel()->getName()))
              {
                  auto validDomainMatch = validDomainRegex.match(sendMessage);
 
@@ -317,10 +318,10 @@ void SplitInput::addShortcuts()
                  {
                      if (sendMessage.contains("https://", Qt::CaseInsensitive))
                          sendMessage =
-                                 sendMessage.replace("https://", "https:/ /");
+                             sendMessage.replace("https://", "https:/ /");
                      if (sendMessage.contains("http://", Qt::CaseInsensitive))
                          sendMessage =
-                                 sendMessage.replace("http://", "http:/ /");
+                             sendMessage.replace("http://", "http:/ /");
                  }
              }
 
@@ -507,7 +508,8 @@ bool SplitInput::eventFilter(QObject *obj, QEvent *event)
 void SplitInput::installKeyPressedEvent()
 {
     static QRegularExpression validDomainRegex(
-            "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]");
+        "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-"
+        "z0-9]");
 
     this->ui_.textEdit->keyPressed.disconnectAll();
     this->ui_.textEdit->keyPressed.connect([this](QKeyEvent *event) {

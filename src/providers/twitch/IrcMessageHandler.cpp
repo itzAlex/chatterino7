@@ -264,7 +264,8 @@ void IrcMessageHandler::handlePrivMessage(Communi::IrcPrivateMessage *message,
         static QRegularExpression validDomainRegex(
             "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,"
             "61}[a-z0-9]");
-        auto separatedLinkMatch = separatedLinkRegex.match(message->content().replace("  ", " "));
+        auto separatedLinkMatch =
+            separatedLinkRegex.match(message->content().replace("  ", " "));
 
         if (separatedLinkMatch.hasMatch())
         {

@@ -14,16 +14,17 @@ class HighlightBadge
 public:
     bool operator==(const HighlightBadge &other) const;
 
-    HighlightBadge(const QString &badgeName, const QString &displayName,
-                   bool hasAlert, bool hasSound, const QString &soundUrl,
-                   QColor color);
+    HighlightBadge(const QString &badgeName, bool showInMentions,
+                   const QString &displayName, bool hasAlert, bool hasSound,
+                   const QString &soundUrl, QColor color);
 
-    HighlightBadge(const QString &badgeName, const QString &displayName,
-                   bool hasAlert, bool hasSound, const QString &soundUrl,
-                   std::shared_ptr<QColor> color);
+    HighlightBadge(const QString &badgeName, bool showInMentions,
+                   const QString &displayName, bool hasAlert, bool hasSound,
+                   const QString &soundUrl, std::shared_ptr<QColor> color);
 
     const QString &badgeName() const;
     const QString &displayName() const;
+    bool showInMentions() const;
     bool hasAlert() const;
     bool hasSound() const;
     bool isMatch(const Badge &badge) const;
@@ -52,6 +53,7 @@ private:
     bool compare(const QString &id, const Badge &badge) const;
 
     QString badgeName_;
+    bool showInMentions_;
     QString displayName_;
     bool hasAlert_;
     bool hasSound_;
@@ -72,8 +74,8 @@ struct Serialize<chatterino::HighlightBadge> {
                                 rapidjson::Document::AllocatorType &a)
     {
         rapidjson::Value ret(rapidjson::kObjectType);
-
         chatterino::rj::set(ret, "name", value.badgeName(), a);
+        chatterino::rj::set(ret, "showInMentions", value.showInMentions(), a);
         chatterino::rj::set(ret, "displayName", value.displayName(), a);
         chatterino::rj::set(ret, "alert", value.hasAlert(), a);
         chatterino::rj::set(ret, "sound", value.hasSound(), a);
@@ -93,11 +95,12 @@ struct Deserialize<chatterino::HighlightBadge> {
         if (!value.IsObject())
         {
             PAJLADA_REPORT_ERROR(error);
-            return chatterino::HighlightBadge(QString(), QString(), false,
+            return chatterino::HighlightBadge(QString(), true, QString(), false,
                                               false, "", QColor());
         }
 
         QString _name;
+        bool _showInMentions = true;
         QString _displayName;
         bool _hasAlert = true;
         bool _hasSound = false;
@@ -105,6 +108,7 @@ struct Deserialize<chatterino::HighlightBadge> {
         QString encodedColor;
 
         chatterino::rj::getSafe(value, "name", _name);
+        chatterino::rj::getSafe(value, "showInMentions", _showInMentions);
         chatterino::rj::getSafe(value, "displayName", _displayName);
         chatterino::rj::getSafe(value, "alert", _hasAlert);
         chatterino::rj::getSafe(value, "sound", _hasSound);
@@ -115,8 +119,9 @@ struct Deserialize<chatterino::HighlightBadge> {
         if (!_color.isValid())
             _color = chatterino::HighlightBadge::FALLBACK_HIGHLIGHT_COLOR;
 
-        return chatterino::HighlightBadge(_name, _displayName, _hasAlert,
-                                          _hasSound, _soundUrl, _color);
+        return chatterino::HighlightBadge(_name, _showInMentions, _displayName,
+                                          _hasAlert, _hasSound, _soundUrl,
+                                          _color);
     }
 };
 

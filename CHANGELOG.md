@@ -6,6 +6,7 @@
 - Minor: Added `Search in Google` option when text is selected
 - Minor: Added options to disable autocomplete for all global emotes providers
 - Minor: Added options to disable all global emotes providers
+- Minor: Added `Show in mentions` option to badge highlights
 - Bugfix: Fixed user & badge highlights not sounding (#6)
 
 - Major: Added customizable shortcuts. (#2340)
