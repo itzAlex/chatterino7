@@ -47,6 +47,8 @@ namespace {
         auto name = EmoteName{jsonEmote.toObject().value("name").toString()};
         auto author =
             EmoteAuthor{jsonEmote.toObject().value("author").toString()};
+        bool zeroWidth = jsonEmote.toObject().value("zerowidth").toBool();
+
         auto emote = Emote({
             name,
             ImageSet{Image::fromUrl(getEmoteLink(id, "1x"), 1),
@@ -56,6 +58,7 @@ namespace {
                         .arg(name.string, (isGlobal ? "Global" : "Channel"),
                              author.string)},
             Url{emoteLinkFormat.arg(id.string)},
+            zeroWidth
         });
 
         auto result = CreateEmoteResult({id, name, emote});
@@ -120,7 +123,7 @@ void HomiesEmotes::loadEmotes()
 {
     qCDebug(chatterinoHomies) << "Loading Homies Emotes";
 
-    NetworkRequest(apiUrlGQL)
+    NetworkRequest(apiUrl)
         .onSuccess([this](NetworkResult result) -> Outcome {
             QJsonArray parsedEmotes = result.parseJson()
                                           .value("data")
@@ -148,7 +151,7 @@ void HomiesEmotes::loadChannel(std::weak_ptr<Channel> channel,
     qCDebug(chatterinoHomies)
         << "Reloading Homies Channel Emotes" << channelId << manualRefresh;
 
-    NetworkRequest(apiUrlGQL)
+    NetworkRequest(apiUrl)
         .onSuccess([callback = std::move(callback), channel, channelId,
                     manualRefresh](NetworkResult result) -> Outcome {
             QJsonObject parsedEmotes = result.parseJson()

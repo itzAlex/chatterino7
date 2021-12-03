@@ -18,6 +18,7 @@
 #include "providers/ffz/FfzEmotes.hpp"
 #include "providers/irc/Irc2.hpp"
 #include "providers/itzalex/itzAlexBadges.hpp"
+#include "providers/itzalex/HomiesEmotes.hpp"
 #include "providers/seventv/SeventvBadges.hpp"
 #include "providers/seventv/SeventvEmotes.hpp"
 #include "providers/twitch/PubsubClient.hpp"

@@ -14,7 +14,7 @@ class EmoteMap;
 
 class HomiesEmotes final
 {
-    static constexpr const char *apiUrlGQL = "https://itzalex.github.io/emotes";
+    static constexpr const char *apiUrl = "https://itzalex.github.io/emotes";
 
 public:
     HomiesEmotes();

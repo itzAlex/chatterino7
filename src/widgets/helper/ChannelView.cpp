@@ -30,6 +30,7 @@
 #include "providers/LinkResolver.hpp"
 #include "providers/bttv/BttvEmotes.hpp"
 #include "providers/seventv/SeventvEmotes.hpp"
+#include "providers/itzalex/HomiesEmotes.hpp"
 #include "providers/twitch/TwitchChannel.hpp"
 #include "providers/twitch/TwitchIrcServer.hpp"
 #include "singletons/Resources.hpp"

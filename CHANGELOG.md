@@ -1,5 +1,6 @@
 # Changelog
 ## Homies (#6)
+- Major: Added zero-width emotes (Homies)
 - Major: Added a button to add emotes from 7TV
 - Major: Added a button to add emotes from BTTV
 - Major: Added an option to separate and join URLs in selected channels

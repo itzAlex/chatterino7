@@ -53,8 +53,8 @@ enum class MessageElementFlag : int64_t {
     SeventvEmoteText = (1LL << 33),
     SeventvEmote = SeventvEmoteImage | SeventvEmoteText,
 
-    HomiesEmoteImage = (1LL << 43),
-    HomiesEmoteText = (1LL << 44),
+    HomiesEmoteImage = (1LL << 34),
+    HomiesEmoteText = (1LL << 35),
     HomiesEmote = HomiesEmoteImage | HomiesEmoteText,
 
     EmoteImages = TwitchEmoteImage | BttvEmoteImage | FfzEmoteImage |
@@ -149,8 +149,8 @@ enum class MessageElementFlag : int64_t {
     OriginalLink = (1LL << 30),
 
     // ZeroWidthEmotes are emotes that are supposed to overlay over any pre-existing emotes
-    // e.g. BTTV's SoSnowy during christmas season or zerowidth 7TV emotes
-    ZeroWidthEmote = (1LL << 31),
+    // e.g. BTTV's SoSnowy during christmas season or zerowidth 7TV/Homies emotes
+    ZeroWidthEmote = (1LL << 36),
 
     // (1LL << 32) is used by SeventvEmoteImage, it is next to FfzEmote
     // (1LL << 33) is used by SeventvEmoteText, it is next to SeventvEmoteImage
