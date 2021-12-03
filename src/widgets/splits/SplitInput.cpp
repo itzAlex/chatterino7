@@ -481,7 +481,7 @@ void SplitInput::addShortcuts()
     };
 
     this->shortcuts_ = getApp()->hotkeys->shortcutsForCategory(
-        HotkeyCategory::SplitInput, actions, this);
+        HotkeyCategory::SplitInput, actions, this->parentWidget());
 }
 
 bool SplitInput::eventFilter(QObject *obj, QEvent *event)
