@@ -108,7 +108,7 @@ HighlightingPage::HighlightingPage()
                                    5;
 
                     auto selectUsernameWidget =
-                        new SelectChannelWidget(selected);
+                        new SelectChannelWidget(selected, "messages");
 
                     selectUsernameWidget->show();
                     selectUsernameWidget->raise();
@@ -122,7 +122,7 @@ HighlightingPage::HighlightingPage()
                                    5;
 
                     auto excludeChannelWidget =
-                        new ExcludeChannelWidget(selected);
+                        new ExcludeChannelWidget(selected, "messages");
 
                     excludeChannelWidget->show();
                     excludeChannelWidget->raise();
@@ -149,6 +149,10 @@ HighlightingPage::HighlightingPage()
                                 ->initialized(&getSettings()->highlightedUsers))
                         .getElement();
 
+                view->addSelectChannelHighlight();
+                view->addExcludeChannelHighlight();
+                view->enableSelectChannelButton();
+                view->enableExcludeChannelButton();
                 view->addRegexHelpLink();
                 view->getTableView()->horizontalHeader()->hideSection(
                     HighlightModel::Column::UseRegex);
@@ -177,6 +181,34 @@ HighlightingPage::HighlightingPage()
                         "highlighted user", true, true, false, false, false, "",
                         *ColorProvider::instance().color(
                             ColorType::SelfHighlight)});
+                });
+
+                view->selectChannelPressed.connect([this, view] {
+                    int selected = view->getTableView()
+                                       ->selectionModel()
+                                       ->currentIndex()
+                                       .row();
+
+                    qDebug() << selected;
+
+                    auto selectUsernameWidget =
+                        new SelectChannelWidget(selected, "users");
+
+                    selectUsernameWidget->show();
+                    selectUsernameWidget->raise();
+                });
+
+                view->excludeChannelPressed.connect([this, view] {
+                    int selected = view->getTableView()
+                                       ->selectionModel()
+                                       ->currentIndex()
+                                       .row();
+
+                    auto excludeChannelWidget =
+                        new ExcludeChannelWidget(selected, "users");
+
+                    excludeChannelWidget->show();
+                    excludeChannelWidget->raise();
                 });
 
                 QObject::connect(view->getTableView(), &QTableView::clicked,
@@ -380,7 +412,6 @@ void HighlightingPage::tableCellClicked(const QModelIndex &clicked,
     switch (tab)
     {
         case HighlightTab::Messages:
-        case HighlightTab::Users: {
             if (clicked.row() >= 5)
             {
                 view->enableSelectChannelButton();
@@ -391,6 +422,7 @@ void HighlightingPage::tableCellClicked(const QModelIndex &clicked,
                 view->disableSelectChannelButton();
                 view->disableExcludeChannelButton();
             }
+        case HighlightTab::Users: {
             using Column = HighlightModel::Column;
             bool restrictColorRow =
                 (tab == HighlightTab::Messages &&

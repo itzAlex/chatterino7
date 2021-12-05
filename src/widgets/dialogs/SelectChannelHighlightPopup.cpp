@@ -17,7 +17,21 @@
 
 namespace chatterino {
 
-SelectChannelWidget::SelectChannelWidget(int selected, QWidget *parent)
+HighlightPhrase getRow(QString type, int selected)
+{
+    if (type == "messages")
+    {
+        return getSettings()->highlightedMessages[selected];
+    }
+
+    else if (type == "users")
+    {
+        return getSettings()->highlightedUsers[selected];
+    }
+}
+
+SelectChannelWidget::SelectChannelWidget(int selected, QString type,
+                                         QWidget *parent)
     : QDialog(parent)
 {
 #ifdef USEWINSDK
@@ -26,7 +40,7 @@ SelectChannelWidget::SelectChannelWidget(int selected, QWidget *parent)
 #endif
 
     // Highlight
-    HighlightPhrase &row = getSettings()->highlightedMessages[selected];
+    HighlightPhrase row = getRow(type, selected);
 
     // Layout properties
     this->setModal(true);
@@ -147,14 +161,31 @@ SelectChannelWidget::SelectChannelWidget(int selected, QWidget *parent)
                                    .toStdString());
         }
 
-        getSettings()->highlightedMessages.insert(
-            HighlightPhrase{row.getPattern(), row.showInMentions(),
-                            row.hasAlert(), row.hasSound(), row.isRegex(),
-                            row.isCaseSensitive(), row.getSoundUrl().toString(),
-                            row.getColor(), checkbox->isChecked(), channels},
-            selected);
+        if (type == "messages")
+        {
+            getSettings()->highlightedMessages.insert(
+                HighlightPhrase{row.getPattern(), row.showInMentions(),
+                                row.hasAlert(), row.hasSound(), row.isRegex(),
+                                row.isCaseSensitive(),
+                                row.getSoundUrl().toString(), row.getColor(),
+                                checkbox->isChecked(), channels},
+                selected);
 
-        getSettings()->highlightedMessages.removeAt(selected + 1);
+            getSettings()->highlightedMessages.removeAt(selected + 1);
+        }
+
+        if (type == "users")
+        {
+            getSettings()->highlightedUsers.insert(
+                HighlightPhrase{row.getPattern(), row.showInMentions(),
+                                row.hasAlert(), row.hasSound(), row.isRegex(),
+                                row.isCaseSensitive(),
+                                row.getSoundUrl().toString(), row.getColor(),
+                                checkbox->isChecked(), channels},
+                selected);
+
+            getSettings()->highlightedUsers.removeAt(selected + 1);
+        }
 
         this->accept();
         this->close();
@@ -185,7 +216,8 @@ SelectChannelWidget::SelectChannelWidget(int selected, QWidget *parent)
     });
 }
 
-ExcludeChannelWidget::ExcludeChannelWidget(int selected, QWidget *parent)
+ExcludeChannelWidget::ExcludeChannelWidget(int selected, QString type,
+                                           QWidget *parent)
     : QDialog(parent)
 {
 #ifdef USEWINSDK
@@ -194,7 +226,7 @@ ExcludeChannelWidget::ExcludeChannelWidget(int selected, QWidget *parent)
 #endif
 
     // Highlight
-    HighlightPhrase &row = getSettings()->highlightedMessages[selected];
+    HighlightPhrase row = getRow(type, selected);
 
     // Layout properties
     this->setModal(true);
@@ -283,15 +315,33 @@ ExcludeChannelWidget::ExcludeChannelWidget(int selected, QWidget *parent)
                                            .toStdString());
         }
 
-        getSettings()->highlightedMessages.insert(
-            HighlightPhrase{row.getPattern(), row.showInMentions(),
-                            row.hasAlert(), row.hasSound(), row.isRegex(),
-                            row.isCaseSensitive(), row.getSoundUrl().toString(),
-                            row.getColor(), row.isGlobalHighlight(),
-                            row.getChannels(), ExcludedChannels},
-            selected);
+        if (type == "messages")
+        {
+            getSettings()->highlightedMessages.insert(
+                HighlightPhrase{row.getPattern(), row.showInMentions(),
+                                row.hasAlert(), row.hasSound(), row.isRegex(),
+                                row.isCaseSensitive(),
+                                row.getSoundUrl().toString(), row.getColor(),
+                                row.isGlobalHighlight(), row.getChannels(),
+                                ExcludedChannels},
+                selected);
 
-        getSettings()->highlightedMessages.removeAt(selected + 1);
+            getSettings()->highlightedMessages.removeAt(selected + 1);
+        }
+
+        if (type == "users")
+        {
+            getSettings()->highlightedUsers.insert(
+                HighlightPhrase{row.getPattern(), row.showInMentions(),
+                                row.hasAlert(), row.hasSound(), row.isRegex(),
+                                row.isCaseSensitive(),
+                                row.getSoundUrl().toString(), row.getColor(),
+                                row.isGlobalHighlight(), row.getChannels(),
+                                ExcludedChannels},
+                selected);
+
+            getSettings()->highlightedUsers.removeAt(selected + 1);
+        }
 
         this->accept();
         this->close();

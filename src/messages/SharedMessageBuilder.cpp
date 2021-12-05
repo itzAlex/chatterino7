@@ -214,6 +214,35 @@ void SharedMessageBuilder::parseHighlights()
         {
             continue;
         }
+
+        this->messageHighlight = true;
+        std::vector<std::string> channels = userHighlight.getChannels();
+        std::vector<std::string> ExcludedChannels =
+            userHighlight.getExcludedChannels();
+        std::string currentChannel = this->channel->getName().toStdString();
+
+        const auto it =
+            std::find_if(std::begin(channels), std::end(channels),
+                         [&currentChannel](const auto &str) {
+                             return boost::iequals(currentChannel, str);
+                         });
+
+        const auto it2 = std::find_if(
+            std::begin(ExcludedChannels), std::end(ExcludedChannels),
+            [&currentChannel](const auto &str) {
+                return boost::iequals(currentChannel, str);
+            });
+
+        if ((userHighlight.isGlobalHighlight() || it != std::end(channels)) &&
+            it2 == std::end(ExcludedChannels))
+        {
+            this->highlightEnabled_ = true;
+        }
+        else
+        {
+            continue;
+        }
+
         qCDebug(chatterinoMessage)
             << "Highlight because user" << this->ircMessage->nick()
             << "sent a message";

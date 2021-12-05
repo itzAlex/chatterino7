@@ -49,17 +49,15 @@ namespace {
             EmoteAuthor{jsonEmote.toObject().value("author").toString()};
         bool zeroWidth = jsonEmote.toObject().value("zerowidth").toBool();
 
-        auto emote = Emote({
-            name,
-            ImageSet{Image::fromUrl(getEmoteLink(id, "1x"), 1),
-                     Image::fromUrl(getEmoteLink(id, "2x"), 0.66),
-                     Image::fromUrl(getEmoteLink(id, "3x"), 0.33)},
-            Tooltip{QString("%1<br>%2 Homies Emote<br>By: %3")
-                        .arg(name.string, (isGlobal ? "Global" : "Channel"),
-                             author.string)},
-            Url{emoteLinkFormat.arg(id.string)},
-            zeroWidth
-        });
+        auto emote = Emote(
+            {name,
+             ImageSet{Image::fromUrl(getEmoteLink(id, "1x"), 1),
+                      Image::fromUrl(getEmoteLink(id, "2x"), 0.66),
+                      Image::fromUrl(getEmoteLink(id, "3x"), 0.33)},
+             Tooltip{QString("%1<br>%2 Homies Emote<br>By: %3")
+                         .arg(name.string, (isGlobal ? "Global" : "Channel"),
+                              author.string)},
+             Url{emoteLinkFormat.arg(id.string)}, zeroWidth});
 
         auto result = CreateEmoteResult({id, name, emote});
         return result;
