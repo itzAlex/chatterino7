@@ -88,6 +88,10 @@ void HomiesPage::initLayout(GeneralPageView &layout)
     layout.addCheckbox("Gray-out historical messages", s.grayOutRecents);
 
     layout.addTitle("Behaviour");
+    layout.addDropdown("Search Engine",
+                       {"Google", "Bing", "DuckDuckGo", "Qwant", "Startpage",
+                        "Yahoo", "Yandex", "Ecosia", "Baidu", "Ask", "Aol"},
+                       s.searchEngine);
     layout.addCheckbox("Enable Homies global emotes auto-completation",
                        s.enableHomiesCompletion);
     layout.addCheckbox("Enable 7TV global emotes auto-completation",

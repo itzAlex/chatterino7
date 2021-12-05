@@ -166,6 +166,7 @@ public:
     FloatSetting mouseScrollMultiplier = {"/behaviour/mouseScrollMultiplier",
                                           1.0};
     BoolSetting autoCloseUserPopup = {"/behaviour/autoCloseUserPopup", true};
+    QStringSetting searchEngine = {"/behaviour/searchEngine", "Google"};
     // BoolSetting twitchSeperateWriteConnection =
     // {"/behaviour/twitchSeperateWriteConnection", false};
 

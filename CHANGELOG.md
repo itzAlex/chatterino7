@@ -4,7 +4,7 @@
 - Major: Added a button to add emotes from 7TV
 - Major: Added a button to add emotes from BTTV
 - Major: Added an option to separate and join URLs in selected channels
-- Minor: Added `Search in Google` option when text is selected
+- Minor: Added `Search in <search_engine>` option when text is selected
 - Minor: Added options to disable autocomplete for all global emotes providers
 - Minor: Added options to disable all global emotes providers
 - Minor: Added `Show in mentions` option to badge highlights
