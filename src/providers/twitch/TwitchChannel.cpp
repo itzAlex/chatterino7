@@ -250,9 +250,6 @@ void TwitchChannel::setLocalizedName(const QString &name)
 
 void TwitchChannel::refreshBadgesProviders()
 {
-    getApp()->seventvBadges->loadSeventvBadges();
-    getApp()->ffzBadges->loadFfzBadges();
-    getApp()->chatterinoBadges->loadChatterinoBadges();
     getApp()->itzalexBadges->loaditzAlexBadges();
     this->addMessage(makeSystemMessage("Badges reloaded."));
 }
