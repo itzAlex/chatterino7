@@ -39,6 +39,8 @@ namespace {
         {"Moderator", "moderator"},
         {"Verified", "partner"},
         {"VIP", "vip"},
+        {"Founder", "founder"},
+        {"Subscriber", "subscriber"},
         {"Predicted Blue", "predictions/blue-1,predictions/blue-2"},
         {"Predicted Pink", "predictions/pink-2,predictions/pink-1"},
     };
@@ -151,8 +153,8 @@ HighlightingPage::HighlightingPage()
 
                 view->addSelectChannelHighlight();
                 view->addExcludeChannelHighlight();
-                view->enableSelectChannelButton();
-                view->enableExcludeChannelButton();
+                view->disableSelectChannelButton();
+                view->disableExcludeChannelButton();
                 view->addRegexHelpLink();
                 view->getTableView()->horizontalHeader()->hideSection(
                     HighlightModel::Column::UseRegex);
@@ -423,6 +425,9 @@ void HighlightingPage::tableCellClicked(const QModelIndex &clicked,
                 view->disableExcludeChannelButton();
             }
         case HighlightTab::Users: {
+            view->enableSelectChannelButton();
+            view->enableExcludeChannelButton();
+
             using Column = HighlightModel::Column;
             bool restrictColorRow =
                 (tab == HighlightTab::Messages &&

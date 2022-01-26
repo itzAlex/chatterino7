@@ -281,9 +281,16 @@ void IrcMessageHandler::handlePrivMessage(Communi::IrcPrivateMessage *message,
         }
     }
 
+    // This is to make sure that combined emoji go through properly, see
+    // https://github.com/Chatterino/chatterino2/issues/3384 and
+    // https://mm2pl.github.io/emoji_rfc.pdf for more details
+    // Constants used here are defined in TwitchChannel.hpp
+
+    messageContent.replace(COMBINED_FIXER, ZERO_WIDTH_JOINER);
+
     this->addMessage(
         message, message->target(),
-        messageContent.isEmpty() ? message->content() : messageContent, server,
+        messageContent.isEmpty() ? message->content().replace(COMBINED_FIXER, ZERO_WIDTH_JOINER) : messageContent, server,
         false, message->isAction());
 }
 
@@ -613,8 +620,10 @@ void IrcMessageHandler::handleWhisperMessage(Communi::IrcMessage *message)
 
     auto c = getApp()->twitch.server->whispersChannel.get();
 
-    TwitchMessageBuilder builder(c, message, args, message->parameter(1),
-                                 false);
+    TwitchMessageBuilder builder(
+        c, message, args,
+        message->parameter(1).replace(COMBINED_FIXER, ZERO_WIDTH_JOINER),
+        false);
 
     if (builder.isIgnored())
     {
@@ -920,31 +929,6 @@ void IrcMessageHandler::handleNoticeMessage(Communi::IrcNoticeMessage *message)
                              .split(", ");
             TwitchMessageBuilder::listOfUsersSystemMessage(msgParts.at(0),
                                                            users, tc, &builder);
-            channel->addMessage(builder.release());
-        }
-        else if (tags == "room_mods" || tags == "vips_success")
-        {
-            // /mods and /vips
-            // room_mods: The moderators of this channel are: ampzyh, antichriststollen, apa420, ...
-            // vips_success: The VIPs of this channel are: 8008, aiden, botfactory, ...
-
-            QString noticeText = msg->messageText;
-            if (tags == "vips_success")
-            {
-                // this one has a trailing period, need to get rid of it.
-                noticeText.chop(1);
-            }
-
-            QStringList msgParts = noticeText.split(':');
-            MessageBuilder builder;
-
-            auto tc = dynamic_cast<TwitchChannel *>(channel.get());
-            assert(tc != nullptr &&
-                   "IrcMessageHandler::handleNoticeMessage. Twitch specific "
-                   "functionality called in non twitch channel");
-
-            TwitchMessageBuilder::modsOrVipsSystemMessage(
-                msgParts.at(0), msgParts.at(1).split(", "), tc, &builder);
             channel->addMessage(builder.release());
         }
         else
