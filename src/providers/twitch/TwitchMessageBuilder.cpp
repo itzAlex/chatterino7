@@ -1558,6 +1558,11 @@ void TwitchMessageBuilder::listOfUsersSystemMessage(QString prefix,
                                                     Channel *channel,
                                                     MessageBuilder *builder)
 {
+    QString text = prefix + users.join(", ");
+
+    builder->message().messageText = text;
+    builder->message().searchText = text;
+
     builder->emplace<TimestampElement>();
     builder->message().flags.set(MessageFlag::System);
     builder->message().flags.set(MessageFlag::DoNotTriggerNotification);
