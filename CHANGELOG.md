@@ -9,6 +9,7 @@
 - Minor: Added options to disable all global emotes providers
 - Minor: Added `Show in mentions` option to badge highlights
 - Minor: Added the ability to select/exclude where a user should be highlighted
+- Minor: Added `/spam` command for mods/broadcaster
 - Bugfix: Fixed user & badge highlights not sounding (#6)
 
 - Major: Added customizable shortcuts. (#2340)

@@ -290,8 +290,10 @@ void IrcMessageHandler::handlePrivMessage(Communi::IrcPrivateMessage *message,
 
     this->addMessage(
         message, message->target(),
-        messageContent.isEmpty() ? message->content().replace(COMBINED_FIXER, ZERO_WIDTH_JOINER) : messageContent, server,
-        false, message->isAction());
+        messageContent.isEmpty()
+            ? message->content().replace(COMBINED_FIXER, ZERO_WIDTH_JOINER)
+            : messageContent,
+        server, false, message->isAction());
 }
 
 void IrcMessageHandler::addMessage(Communi::IrcMessage *_message,

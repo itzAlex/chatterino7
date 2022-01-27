@@ -445,7 +445,7 @@ void EmotePopup::filterEmotes(const QString &searchText)
     }
 
     auto homiesGlobalEmotes = this->filterEmoteMap(
-            searchText, getApp()->twitch2->getHomiesEmotes().emotes());
+        searchText, getApp()->twitch2->getHomiesEmotes().emotes());
     auto seventvGlobalEmotes = this->filterEmoteMap(
         searchText, getApp()->twitch2->getSeventvEmotes().emotes());
     auto bttvGlobalEmotes = this->filterEmoteMap(
@@ -453,7 +453,7 @@ void EmotePopup::filterEmotes(const QString &searchText)
     auto ffzGlobalEmotes = this->filterEmoteMap(
         searchText, getApp()->twitch2->getFfzEmotes().emotes());
     auto homiesChannelEmotes =
-            this->filterEmoteMap(searchText, this->twitchChannel_->homiesEmotes());
+        this->filterEmoteMap(searchText, this->twitchChannel_->homiesEmotes());
     auto seventvChannelEmotes =
         this->filterEmoteMap(searchText, this->twitchChannel_->seventvEmotes());
     auto bttvChannelEmotes =

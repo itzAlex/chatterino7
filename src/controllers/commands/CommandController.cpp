@@ -440,6 +440,80 @@ void CommandController::initialize(Settings &, Paths &paths)
             return "";
         });
 
+    this->registerCommand("/spam", [](const auto &words, auto channel) {
+        auto currentUser = getApp()->accounts->twitch.getCurrent();
+
+        if (currentUser->isAnon())
+        {
+            channel->addMessage(makeSystemMessage(
+                "You must be logged in to perform this action!"));
+            return "";
+        }
+
+        TwitchChannel *twitchChannel =
+            dynamic_cast<TwitchChannel *>(channel.get());
+
+        bool isModOrBroadcaster =
+            twitchChannel ? twitchChannel->hasModRights() : false;
+
+        if (!isModOrBroadcaster)
+        {
+            channel->addMessage(
+                makeSystemMessage("You don't have permissions to execute this "
+                                  "command in this channel!"));
+            return "";
+        }
+
+        if (words.size() < 3)
+        {
+            channel->addMessage(
+                makeSystemMessage("Usage: /spam [2-25] [mesasge]"));
+            return "";
+        }
+
+        bool isNum;
+        QString spamNumberString = words.at(1);
+        QList spamMessageList = words;
+
+        // takeFirst takes a constant time to execute - O(n)
+        for (int i = 0; i < 2; i++)
+        {
+            spamMessageList.takeFirst();
+        }
+
+        QString spamMessage = spamMessageList.join(" ");
+        int spamNumber = spamNumberString.toInt(&isNum);
+
+        if (isNum)
+        {
+            if (spamNumber >= 2 && spamNumber <= 25)
+            {
+                for (int i = 1; i <= spamNumber; i++)
+                {
+                    QTimer::singleShot((i - 1) * 250, [channel, spamMessage]() {
+                        channel->sendMessage(spamMessage);
+                    });
+                }
+            }
+            else
+            {
+                channel->addMessage(
+                    makeSystemMessage("The number of times to spam the message "
+                                      "must be between 2 and 25"));
+            }
+        }
+        else
+        {
+            channel->addMessage(
+                makeSystemMessage("A valid number has not been entered. Usage: "
+                                  "/spam [2-25] [mesasge]"));
+        }
+
+        // channel->sendMessage("Spam command debug: isMod " + QVariant(isModOrBroadcaster).toString() + " | spamNumber " + spamNumber + " | spamMessage " + spamMessage + " | First input is num? " + QVariant(isNum).toString());
+
+        return "";
+    });
+
     this->registerCommand("/massban", [](const auto &words, auto channel) {
         auto currentUser = getApp()->accounts->twitch.getCurrent();
 
