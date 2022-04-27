@@ -229,6 +229,9 @@ void Window::addDebugStuff(HotkeyController::HotkeyMap &actions)
     // Message with founder badge
     miscMessages.emplace_back(R"(@badge-info=founder/72;badges=founder/0,bits/5000;color=#FF0000;display-name=TranRed;emotes=;first-msg=0;flags=;id=7482163f-493d-41d9-b36f-fba50e0701b7;mod=0;room-id=11148817;subscriber=0;tmi-sent-ts=1641123773885;turbo=0;user-id=57019243;user-type= :tranred!tranred@tranred.tmi.twitch.tv PRIVMSG #pajlada :GFMP pajaE)");
 
+    // mod announcement
+    miscMessages.emplace_back(R"(@badge-info=subscriber/47;badges=broadcaster/1,subscriber/3012,twitchconAmsterdam2020/1;color=#FF0000;display-name=Supinic;emotes=;flags=;id=8c26e1ab-b50c-4d9d-bc11-3fd57a941d90;login=supinic;mod=0;msg-id=announcement;msg-param-color=PRIMARY;room-id=31400525;subscriber=1;system-msg=;tmi-sent-ts=1648762219962;user-id=31400525;user-type= :tmi.twitch.tv USERNOTICE #supinic :mm test lol)");
+
     // various link tests
     linkMessages.emplace_back(R"(@badge-info=subscriber/48;badges=broadcaster/1,subscriber/36,partner/1;color=#CC44FF;display-name=pajlada;emotes=;flags=;id=3c23cf3c-0864-4699-a76b-089350141147;mod=0;room-id=11148817;subscriber=1;tmi-sent-ts=1577628844607;turbo=0;user-id=11148817;user-type= :pajlada!pajlada@pajlada.tmi.twitch.tv PRIVMSG #pajlada : Links that should pass: )" + getValidLinks().join(' '));
     linkMessages.emplace_back(R"(@badge-info=subscriber/48;badges=broadcaster/1,subscriber/36,partner/1;color=#CC44FF;display-name=pajlada;emotes=;flags=;id=3c23cf3c-0864-4699-a76b-089350141147;mod=0;room-id=11148817;subscriber=1;tmi-sent-ts=1577628844607;turbo=0;user-id=11148817;user-type= :pajlada!pajlada@pajlada.tmi.twitch.tv PRIVMSG #pajlada : Links that should NOT pass: )" + getInvalidLinks().join(' '));
@@ -254,7 +257,7 @@ void Window::addDebugStuff(HotkeyController::HotkeyMap &actions)
         static int index = 0;
         auto app = getApp();
         const auto &msg = messages[index++ % messages.size()];
-        app->twitch.server->addFakeMessage(msg);
+        app->twitch->addFakeMessage(msg);
         return "";
     });
 
@@ -262,7 +265,7 @@ void Window::addDebugStuff(HotkeyController::HotkeyMap &actions)
         const auto &messages = cheerMessages;
         static int index = 0;
         const auto &msg = messages[index++ % messages.size()];
-        getApp()->twitch.server->addFakeMessage(msg);
+        getApp()->twitch->addFakeMessage(msg);
         return "";
     });
 
@@ -271,7 +274,7 @@ void Window::addDebugStuff(HotkeyController::HotkeyMap &actions)
         static int index = 0;
         auto app = getApp();
         const auto &msg = messages[index++ % messages.size()];
-        app->twitch.server->addFakeMessage(msg);
+        app->twitch->addFakeMessage(msg);
         return "";
     });
 
@@ -282,15 +285,15 @@ void Window::addDebugStuff(HotkeyController::HotkeyMap &actions)
         if (alt)
         {
             doc.Parse(channelRewardMessage);
-            app->twitch.server->addFakeMessage(channelRewardIRCMessage);
-            app->twitch.pubsub->signals_.pointReward.redeemed.invoke(
+            app->twitch->addFakeMessage(channelRewardIRCMessage);
+            app->twitch->pubsub->signals_.pointReward.redeemed.invoke(
                 doc["data"]["message"]["data"]["redemption"]);
             alt = !alt;
         }
         else
         {
             doc.Parse(channelRewardMessage2);
-            app->twitch.pubsub->signals_.pointReward.redeemed.invoke(
+            app->twitch->pubsub->signals_.pointReward.redeemed.invoke(
                 doc["data"]["message"]["data"]["redemption"]);
             alt = !alt;
         }
@@ -301,7 +304,7 @@ void Window::addDebugStuff(HotkeyController::HotkeyMap &actions)
         const auto &messages = emoteTestMessages;
         static int index = 0;
         const auto &msg = messages[index++ % messages.size()];
-        getApp()->twitch.server->addFakeMessage(msg);
+        getApp()->twitch->addFakeMessage(msg);
         return "";
     });
 #endif
@@ -466,7 +469,7 @@ void Window::addShortcuts()
              this->notebook_->select(splitContainer);
              Split *split = new Split(splitContainer);
              split->setChannel(
-                 getApp()->twitch.server->getOrAddChannel(si.channelName));
+                 getApp()->twitch->getOrAddChannel(si.channelName));
              split->setFilters(si.filters);
              splitContainer->appendSplit(split);
              return "";

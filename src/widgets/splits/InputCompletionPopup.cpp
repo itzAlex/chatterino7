@@ -116,24 +116,24 @@ void InputCompletionPopup::updateEmotes(const QString &text, ChannelPtr channel)
         if (getSettings()->enable7TVGlobalEmotes &&
             getSettings()->enable7TVCompletion)
         {
-            if (auto seventvG = getApp()->twitch2->getSeventvEmotes().emotes())
+            if (auto seventvG = getApp()->twitch->getSeventvEmotes().emotes())
                 addEmotes(emotes, *seventvG, text, "Global 7TV");
         }
         if (getSettings()->enableBTTVGlobalEmotes &&
             getSettings()->enableBTTVCompletion)
         {
-            if (auto bttvG = getApp()->twitch2->getBttvEmotes().emotes())
+            if (auto bttvG = getApp()->twitch->getBttvEmotes().emotes())
                 addEmotes(emotes, *bttvG, text, "Global BetterTTV");
         }
         if (getSettings()->enableFFZGlobalEmotes &&
             getSettings()->enableFFZCompletion)
         {
-            if (auto ffzG = getApp()->twitch2->getFfzEmotes().emotes())
+            if (auto ffzG = getApp()->twitch->getFfzEmotes().emotes())
                 addEmotes(emotes, *ffzG, text, "Global FrankerFaceZ");
         }
         if (getSettings()->enableHomiesGlobalEmotes &&
             getSettings()->enableHomiesCompletion)
-            if (auto homiesG = getApp()->twitch2->getHomiesEmotes().emotes())
+            if (auto homiesG = getApp()->twitch->getHomiesEmotes().emotes())
                 addEmotes(emotes, *homiesG, text, "Global Homies");
 
         addEmojis(emotes, getApp()->emotes->emojis.emojis, text);

@@ -21,7 +21,6 @@
 #include "providers/twitch/TwitchCommon.hpp"
 #include "providers/twitch/TwitchMessageBuilder.hpp"
 #include "providers/twitch/api/Helix.hpp"
-#include "providers/twitch/api/Kraken.hpp"
 #include "singletons/Emotes.hpp"
 #include "singletons/Settings.hpp"
 #include "singletons/Toasts.hpp"
@@ -523,7 +522,7 @@ bool TwitchChannel::canReconnect() const
 
 void TwitchChannel::reconnect()
 {
-    getApp()->twitch.server->connect();
+    getApp()->twitch->connect();
 }
 
 QString TwitchChannel::roomId() const
@@ -684,7 +683,7 @@ void TwitchChannel::setLive(bool newLiveStatus)
                 MessageBuilder builder2;
                 TwitchMessageBuilder::liveMessage(this->getDisplayName(),
                                                   &builder2);
-                getApp()->twitch2->liveChannel->addMessage(builder2.release());
+                getApp()->twitch->liveChannel->addMessage(builder2.release());
 
                 // Notify on all channels with a ping sound
                 if (getSettings()->notificationOnAnyChannel &&
@@ -704,7 +703,7 @@ void TwitchChannel::setLive(bool newLiveStatus)
 
                 // "delete" old 'CHANNEL is live' message
                 LimitedQueueSnapshot<MessagePtr> snapshot =
-                    getApp()->twitch2->liveChannel->getMessageSnapshot();
+                    getApp()->twitch->liveChannel->getMessageSnapshot();
                 int snapshotLength = snapshot.size();
 
                 // MSVC hates this code if the parens are not there
@@ -808,31 +807,8 @@ void TwitchChannel::parseLiveStatus(bool live, const HelixStream &stream)
     {
         auto status = this->streamStatus_.access();
         status->viewerCount = stream.viewerCount;
-        if (status->gameId != stream.gameId)
-        {
-            status->gameId = stream.gameId;
-
-            // Resolve game ID to game name
-            getHelix()->getGameById(
-                stream.gameId,
-                [this, weak = weakOf<Channel>(this)](const auto &game) {
-                    ChannelPtr shared = weak.lock();
-                    if (!shared)
-                    {
-                        return;
-                    }
-
-                    {
-                        auto status = this->streamStatus_.access();
-                        status->game = game.name;
-                    }
-
-                    this->liveStatusChanged.invoke();
-                },
-                [] {
-                    // failure
-                });
-        }
+        status->gameId = stream.gameId;
+        status->game = stream.gameName;
         status->title = stream.title;
         QDateTime since = QDateTime::fromString(stream.startedAt, Qt::ISODate);
         auto diff = since.secsTo(QDateTime::currentDateTime());
@@ -950,10 +926,9 @@ void TwitchChannel::refreshPubsub()
         return;
 
     auto account = getApp()->accounts->twitch.getCurrent();
-    getApp()->twitch2->pubsub->listenToChannelModerationActions(roomId,
-                                                                account);
-    getApp()->twitch2->pubsub->listenToAutomod(roomId, account);
-    getApp()->twitch2->pubsub->listenToChannelPointRewards(roomId, account);
+    getApp()->twitch->pubsub->listenToChannelModerationActions(roomId, account);
+    getApp()->twitch->pubsub->listenToAutomod(roomId, account);
+    getApp()->twitch->pubsub->listenToChannelPointRewards(roomId, account);
 }
 
 void TwitchChannel::refreshChatters()
