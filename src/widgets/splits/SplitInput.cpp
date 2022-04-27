@@ -310,7 +310,16 @@ void SplitInput::addShortcuts()
              QString sendMessage =
                  getApp()->commands->execCommand(message, c, false);
 
-             if (getSettings()->separateLinks &&
+             bool separateClip = true;
+             if (sendMessage.contains("https://clips.twitch.tv", Qt::CaseInsensitive))
+             {
+                if (!getSettings()->separateClipsLinks)
+                {
+                    separateClip = false;
+                }
+             }
+
+             if (separateClip && getSettings()->separateLinks &&
                  getSettings()->isSeparatedLinksChannel(
                      this->split_->getChannel()->getName()))
              {

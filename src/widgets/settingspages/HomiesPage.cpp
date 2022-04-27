@@ -105,7 +105,8 @@ void HomiesPage::initLayout(GeneralPageView &layout)
     layout.addCheckbox(
         "Automatically join separated links (http<s>:/ / → http<s>://)",
         s.joinSeparatedLinks);
-
+    layout.addCheckbox("Separate links of clips",
+                        s.separateClipsLinks);
     layout.addCheckbox(
         "Automatically separate links (http<s>:// → http<s>:/ /)",
         s.separateLinks);

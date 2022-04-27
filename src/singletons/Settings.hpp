@@ -199,6 +199,7 @@ public:
     BoolSetting mentionUsersWithComma = {"/behaviour/mentionUsersWithComma",
                                          true};
     BoolSetting joinSeparatedLinks = {"/behaviour/joinSeparatedLinks", false};
+    BoolSetting separateClipsLinks = {"/behaviour/separateClipsLinks", false};
     BoolSetting separateLinks = {"/behaviour/separateLinks", false};
 
     /// Commands
