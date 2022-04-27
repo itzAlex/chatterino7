@@ -11,7 +11,8 @@ public:
     ImageSet(const ImagePtr &image1, const ImagePtr &image2 = Image::getEmpty(),
              const ImagePtr &image3 = Image::getEmpty(),
              const ImagePtr &image4 = Image::getEmpty());
-    ImageSet(const Url &image1, const Url &image2 = {}, const Url &image3 = {});
+    ImageSet(const Url &image1, const Url &image2 = {}, const Url &image3 = {},
+             const Url &image4 = {});
 
     void setImage1(const ImagePtr &image);
     void setImage2(const ImagePtr &image);

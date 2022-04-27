@@ -145,7 +145,7 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
     if (getSettings()->enable7TVGlobalEmotes &&
         getSettings()->enable7TVCompletion)
     {
-        for (auto &emote : *getApp()->twitch2->getSeventvEmotes().emotes())
+        for (auto &emote : *getApp()->twitch->getSeventvEmotes().emotes())
         {
             addString(emote.first.string,
                       TaggedString::Type::SEVENTVGlobalEmote);
@@ -156,7 +156,7 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
     if (getSettings()->enableBTTVGlobalEmotes &&
         getSettings()->enableBTTVCompletion)
     {
-        for (auto &emote : *getApp()->twitch2->getBttvEmotes().emotes())
+        for (auto &emote : *getApp()->twitch->getBttvEmotes().emotes())
         {
             addString(emote.first.string, TaggedString::Type::BTTVChannelEmote);
         }
@@ -166,7 +166,7 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
     if (getSettings()->enableFFZGlobalEmotes &&
         getSettings()->enableFFZCompletion)
     {
-        for (auto &emote : *getApp()->twitch2->getFfzEmotes().emotes())
+        for (auto &emote : *getApp()->twitch->getFfzEmotes().emotes())
         {
             addString(emote.first.string, TaggedString::Type::FFZChannelEmote);
         }
@@ -176,7 +176,7 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
     if (getSettings()->enableHomiesGlobalEmotes &&
         getSettings()->enableHomiesCompletion)
     {
-        for (auto &emote : *getApp()->twitch2->getHomiesEmotes().emotes())
+        for (auto &emote : *getApp()->twitch->getHomiesEmotes().emotes())
         {
             addString(emote.first.string,
                       TaggedString::Type::HOMIESGlobalEmote);

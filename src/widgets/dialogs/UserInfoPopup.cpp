@@ -11,11 +11,12 @@
 #include "messages/MessageBuilder.hpp"
 #include "providers/IvrApi.hpp"
 #include "providers/twitch/TwitchChannel.hpp"
+#include "providers/twitch/TwitchIrcServer.hpp"
 #include "providers/twitch/api/Helix.hpp"
-#include "providers/twitch/api/Kraken.hpp"
 #include "singletons/Resources.hpp"
 #include "singletons/Settings.hpp"
 #include "singletons/Theme.hpp"
+#include "singletons/WindowManager.hpp"
 #include "util/Clipboard.hpp"
 #include "util/Helpers.hpp"
 #include "util/LayoutCreator.hpp"
@@ -23,9 +24,11 @@
 #include "util/StreamerMode.hpp"
 #include "widgets/Label.hpp"
 #include "widgets/Scrollbar.hpp"
+#include "widgets/Window.hpp"
 #include "widgets/helper/ChannelView.hpp"
 #include "widgets/helper/EffectLabel.hpp"
 #include "widgets/helper/Line.hpp"
+#include "widgets/splits/Split.hpp"
 
 #include <QCheckBox>
 #include <QDesktopServices>
@@ -174,6 +177,58 @@ UserInfoPopup::UserInfoPopup(bool closeAutomatically, QWidget *parent)
              }
              return "";
          }},
+        {"execModeratorAction",
+         [this](std::vector<QString> arguments) -> QString {
+             if (arguments.empty())
+             {
+                 return "execModeratorAction action needs an argument, which "
+                        "moderation action to execute, see description in the "
+                        "editor";
+             }
+             auto target = arguments.at(0);
+             QString msg;
+
+             // these can't have /timeout/ buttons because they are not timeouts
+             if (target == "ban")
+             {
+                 msg = QString("/ban %1").arg(this->userName_);
+             }
+             else if (target == "unban")
+             {
+                 msg = QString("/unban %1").arg(this->userName_);
+             }
+             else
+             {
+                 // find and execute timeout button #TARGET
+
+                 bool ok;
+                 int buttonNum = target.toInt(&ok);
+                 if (!ok)
+                 {
+                     return QString("Invalid argument for execModeratorAction: "
+                                    "%1. Use "
+                                    "\"ban\", \"unban\" or the number of the "
+                                    "timeout "
+                                    "button to execute")
+                         .arg(target);
+                 }
+
+                 const auto &timeoutButtons =
+                     getSettings()->timeoutButtons.getValue();
+                 if (timeoutButtons.size() < buttonNum || 0 >= buttonNum)
+                 {
+                     return QString("Invalid argument for execModeratorAction: "
+                                    "%1. Integer out of usable range: [1, %2]")
+                         .arg(buttonNum, timeoutButtons.size() - 1);
+                 }
+                 const auto &button = timeoutButtons.at(buttonNum - 1);
+                 msg = QString("/timeout %1 %2")
+                           .arg(this->userName_)
+                           .arg(calculateTimeoutDuration(button));
+             }
+             this->underlyingChannel_->sendMessage(msg);
+             return "";
+         }},
 
         // these actions make no sense in the context of a usercard, so they aren't implemented
         {"reject", nullptr},
@@ -234,6 +289,21 @@ UserInfoPopup::UserInfoPopup(bool closeAutomatically, QWidget *parent)
                         menu->addAction("Copy avatar link", [avatarUrl] {
                             crossPlatformCopy(avatarUrl);
                         });
+
+                        // we need to assign login name for msvc compilation
+                        auto loginName = this->userName_.toLower();
+                        menu->addAction(
+                            "Open channel in a new popup window", this,
+                            [loginName] {
+                                auto app = getApp();
+                                auto &window = app->windows->createWindow(
+                                    WindowType::Popup, true);
+                                auto split = window.getNotebook()
+                                                 .getOrAddSelectedPage()
+                                                 ->appendNewSplit(false);
+                                split->setChannel(app->twitch->getOrAddChannel(
+                                    loginName.toLower()));
+                            });
 
                         menu->popup(QCursor::pos());
                         menu->raise();
@@ -316,28 +386,28 @@ UserInfoPopup::UserInfoPopup(bool closeAutomatically, QWidget *parent)
 
         QObject::connect(usercard.getElement(), &Button::leftClicked, [this] {
             QDesktopServices::openUrl("https://www.twitch.tv/popout/" +
-                                      this->channel_->getName() +
+                                      this->underlyingChannel_->getName() +
                                       "/viewercard/" + this->userName_);
         });
 
         QObject::connect(mod.getElement(), &Button::leftClicked, [this] {
-            this->channel_->sendMessage("/mod " + this->userName_);
+            this->underlyingChannel_->sendMessage("/mod " + this->userName_);
         });
         QObject::connect(unmod.getElement(), &Button::leftClicked, [this] {
-            this->channel_->sendMessage("/unmod " + this->userName_);
+            this->underlyingChannel_->sendMessage("/unmod " + this->userName_);
         });
         QObject::connect(vip.getElement(), &Button::leftClicked, [this] {
-            this->channel_->sendMessage("/vip " + this->userName_);
+            this->underlyingChannel_->sendMessage("/vip " + this->userName_);
         });
         QObject::connect(unvip.getElement(), &Button::leftClicked, [this] {
-            this->channel_->sendMessage("/unvip " + this->userName_);
+            this->underlyingChannel_->sendMessage("/unvip " + this->userName_);
         });
 
         // userstate
         this->userStateChanged_.connect([this, mod, unmod, vip,
                                          unvip]() mutable {
             TwitchChannel *twitchChannel =
-                dynamic_cast<TwitchChannel *>(this->channel_.get());
+                dynamic_cast<TwitchChannel *>(this->underlyingChannel_.get());
 
             bool visibilityModButtons = false;
 
@@ -367,7 +437,7 @@ UserInfoPopup::UserInfoPopup(bool closeAutomatically, QWidget *parent)
 
         this->userStateChanged_.connect([this, lineMod, timeout]() mutable {
             TwitchChannel *twitchChannel =
-                dynamic_cast<TwitchChannel *>(this->channel_.get());
+                dynamic_cast<TwitchChannel *>(this->underlyingChannel_.get());
 
             bool hasModRights =
                 twitchChannel ? twitchChannel->hasModRights() : false;
@@ -383,26 +453,27 @@ UserInfoPopup::UserInfoPopup(bool closeAutomatically, QWidget *parent)
             switch (action)
             {
                 case TimeoutWidget::Ban: {
-                    if (this->channel_)
+                    if (this->underlyingChannel_)
                     {
-                        this->channel_->sendMessage("/ban " + this->userName_);
+                        this->underlyingChannel_->sendMessage("/ban " +
+                                                              this->userName_);
                     }
                 }
                 break;
                 case TimeoutWidget::Unban: {
-                    if (this->channel_)
+                    if (this->underlyingChannel_)
                     {
-                        this->channel_->sendMessage("/unban " +
-                                                    this->userName_);
+                        this->underlyingChannel_->sendMessage("/unban " +
+                                                              this->userName_);
                     }
                 }
                 break;
                 case TimeoutWidget::Timeout: {
-                    if (this->channel_)
+                    if (this->underlyingChannel_)
                     {
-                        this->channel_->sendMessage("/timeout " +
-                                                    this->userName_ + " " +
-                                                    QString::number(arg));
+                        this->underlyingChannel_->sendMessage(
+                            "/timeout " + this->userName_ + " " +
+                            QString::number(arg));
                     }
                 }
                 break;
@@ -693,9 +764,27 @@ void UserInfoPopup::installEvents()
 
 void UserInfoPopup::setData(const QString &name, const ChannelPtr &channel)
 {
+    this->setData(name, channel, channel);
+}
+
+void UserInfoPopup::setData(const QString &name,
+                            const ChannelPtr &contextChannel,
+                            const ChannelPtr &openingChannel)
+{
     this->userName_ = name;
-    this->channel_ = channel;
-    this->setWindowTitle(TEXT_TITLE.arg(name, channel->getName()));
+    this->channel_ = openingChannel;
+
+    if (!contextChannel->isEmpty())
+    {
+        this->underlyingChannel_ = contextChannel;
+    }
+    else
+    {
+        this->underlyingChannel_ = openingChannel;
+    }
+
+    this->setWindowTitle(
+        TEXT_TITLE.arg(name, this->underlyingChannel_->getName()));
 
     this->ui_.nameLabel->setText(name);
     this->ui_.nameLabel->setProperty("copy-text", name);
@@ -712,9 +801,10 @@ void UserInfoPopup::setData(const QString &name, const ChannelPtr &channel)
 
 void UserInfoPopup::updateLatestMessages()
 {
-    auto filteredChannel = filterMessages(this->userName_, this->channel_);
+    auto filteredChannel =
+        filterMessages(this->userName_, this->underlyingChannel_);
     this->ui_.latestMessages->setChannel(filteredChannel);
-    this->ui_.latestMessages->setSourceChannel(this->channel_);
+    this->ui_.latestMessages->setSourceChannel(this->underlyingChannel_);
 
     const bool hasMessages = filteredChannel->hasMessages();
     this->ui_.latestMessages->setVisible(hasMessages);
@@ -725,23 +815,24 @@ void UserInfoPopup::updateLatestMessages()
 
     this->refreshConnection_ =
         std::make_unique<pajlada::Signals::ScopedConnection>(
-            this->channel_->messageAppended.connect([this, hasMessages](
-                                                        auto message, auto) {
-                if (!checkMessageUserName(this->userName_, message))
-                    return;
+            this->underlyingChannel_->messageAppended.connect(
+                [this, hasMessages](auto message, auto) {
+                    if (!checkMessageUserName(this->userName_, message))
+                        return;
 
-                if (hasMessages)
-                {
-                    // display message in ChannelView
-                    this->ui_.latestMessages->channel()->addMessage(message);
-                }
-                else
-                {
-                    // The ChannelView is currently hidden, so manually refresh
-                    // and display the latest messages
-                    this->updateLatestMessages();
-                }
-            }));
+                    if (hasMessages)
+                    {
+                        // display message in ChannelView
+                        this->ui_.latestMessages->channel()->addMessage(
+                            message);
+                    }
+                    else
+                    {
+                        // The ChannelView is currently hidden, so manually refresh
+                        // and display the latest messages
+                        this->updateLatestMessages();
+                    }
+                }));
 }
 
 void UserInfoPopup::updateUserData()
@@ -778,7 +869,7 @@ void UserInfoPopup::updateUserData()
         }
 
         this->userId_ = user.id;
-        this->avatarUrl_ = user.profileImageUrl;
+        this->avatarUrl_ = QString();
 
         // copyable button for login name of users with a localized username
         if (user.displayName.toLower() != user.login)
@@ -795,8 +886,8 @@ void UserInfoPopup::updateUserData()
             this->ui_.nameLabel->setProperty("copy-text", user.displayName);
         }
 
-        this->setWindowTitle(
-            TEXT_TITLE.arg(user.displayName, this->channel_->getName()));
+        this->setWindowTitle(TEXT_TITLE.arg(
+            user.displayName, this->underlyingChannel_->getName()));
         this->ui_.viewCountLabel->setText(
             TEXT_VIEWS.arg(localizeNumbers(user.viewCount)));
         this->ui_.createdDateLabel->setText(
@@ -811,7 +902,7 @@ void UserInfoPopup::updateUserData()
         }
         else
         {
-            this->loadAvatar(user.profileImageUrl);
+            this->loadAvatar(user);
         }
 
         getHelix()->getUserFollowers(
@@ -876,7 +967,7 @@ void UserInfoPopup::updateUserData()
 
         // get followage and subage
         getIvr()->getSubage(
-            this->userName_, this->channel_->getName(),
+            this->userName_, this->underlyingChannel_->getName(),
             [this, hack](const IvrSubage &subageInfo) {
                 if (!hack.lock())
                 {
@@ -922,27 +1013,138 @@ void UserInfoPopup::updateUserData()
     this->ui_.ignoreHighlights->setEnabled(false);
 }
 
-void UserInfoPopup::loadAvatar(const QUrl &url)
+void UserInfoPopup::loadAvatar(const HelixUser &user)
 {
-    QNetworkRequest req(url);
-    static auto manager = new QNetworkAccessManager();
-    auto *reply = manager->get(req);
+    this->avatarUrl_ = user.profileImageUrl;
+    auto filename = this->getFilename(user.profileImageUrl);
+    auto loaded = false;
+    auto sevenTVEnabled = getSettings()->displaySevenTVAnimatedProfile;
 
-    QObject::connect(reply, &QNetworkReply::finished, this, [=] {
-        if (reply->error() == QNetworkReply::NoError)
-        {
-            const auto data = reply->readAll();
+    QFile cacheFile(filename);
+    if (cacheFile.exists())
+    {
+        cacheFile.open(QIODevice::ReadOnly);
+        QPixmap avatar{};
+        avatar.loadFromData(cacheFile.readAll());
+        this->ui_.avatarButton->setPixmap(avatar);
+        loaded = true;
+    }
+    if (!loaded)
+    {
+        QNetworkRequest req(user.profileImageUrl);
+        static auto manager = new QNetworkAccessManager();
+        auto *reply = manager->get(req);
 
-            // might want to cache the avatar image
-            QPixmap avatar;
-            avatar.loadFromData(data);
-            this->ui_.avatarButton->setPixmap(avatar);
-        }
-        else
+        QObject::connect(reply, &QNetworkReply::finished, this, [=] {
+            if (reply->error() == QNetworkReply::NoError)
+            {
+                auto data = reply->readAll();
+                auto twitchFilename = this->getFilename(user.profileImageUrl);
+
+                QPixmap avatar;
+                avatar.loadFromData(data);
+                this->ui_.avatarButton->setPixmap(avatar);
+                this->saveCacheAvatar(data, twitchFilename);
+
+                if (sevenTVEnabled)
+                {
+                    this->fetchSevenTVAvatar(user);
+                }
+            }
+            else
+            {
+                this->ui_.avatarButton->setPixmap(QPixmap());
+            }
+        });
+    }
+    else if (sevenTVEnabled)
+    {
+        this->fetchSevenTVAvatar(user);
+    }
+}
+
+void UserInfoPopup::fetchSevenTVAvatar(const HelixUser &user)
+{
+    NetworkRequest(SEVENTV_USER_API.arg(user.login))
+        .timeout(20000)
+        .header("Content-Type", "application/json")
+        .onSuccess([=](NetworkResult result) -> Outcome {
+            auto root = result.parseJson();
+            auto id = root.value(QStringLiteral("id")).toString();
+            auto profile_picture_id =
+                root.value(QStringLiteral("profile_picture_id")).toString();
+
+            if (profile_picture_id.length() > 0)
+            {
+                auto URI = SEVENTV_CDR_PP.arg(id, profile_picture_id);
+                this->avatarUrl_ = URI;
+
+                NetworkRequest(URI)
+                    .timeout(20000)
+                    .onSuccess([=](NetworkResult outcome) -> Outcome {
+                        auto data = outcome.getData();
+                        QCryptographicHash hash(
+                            QCryptographicHash::Algorithm::Sha1);
+                        auto SHA = QString(data.size()).toUtf8();
+                        hash.addData(SHA.data(), SHA.size() + 1);
+
+                        auto filename =
+                            this->getFilename(hash.result().toHex());
+
+                        this->saveCacheAvatar(data, filename);
+                        this->setSevenTVAvatar(filename);
+
+                        return Success;
+                    })
+                    .execute();
+            }
+            return Success;
+        })
+        .execute();
+}
+
+void UserInfoPopup::setSevenTVAvatar(const QString &filename)
+{
+    auto movie = new QMovie(filename);
+    if (!movie->isValid())
+    {
+        qCWarning(chatterinoImage) << "Error reading SevenTV Profile Picture, "
+                                   << movie->lastErrorString();
+        this->ui_.avatarButton->setPixmap(QPixmap());
+    }
+    else
+    {
+        QObject::connect(movie, &QMovie::frameChanged, this, [=] {
+            this->ui_.avatarButton->setPixmap(movie->currentPixmap());
+        });
+        movie->start();
+    }
+}
+
+void UserInfoPopup::saveCacheAvatar(const QByteArray &avatar,
+                                    const QString &filename)
+{
+    QFile outfile(filename);
+    if (outfile.open(QIODevice::WriteOnly))
+    {
+        if (outfile.write(avatar) == -1)
         {
+            qCWarning(chatterinoImage) << "Error writing to cache" << filename;
             this->ui_.avatarButton->setPixmap(QPixmap());
         }
-    });
+    }
+    else
+    {
+        qCWarning(chatterinoImage) << "Error writing to cache" << filename;
+        this->ui_.avatarButton->setPixmap(QPixmap());
+    }
+}
+
+QString UserInfoPopup::getFilename(const QString &url)
+{
+    auto filename = getPaths()->cacheDirectory() + "/" +
+                    url.right(url.lastIndexOf('/')).replace('/', 'a');
+    return filename;
 }
 
 //

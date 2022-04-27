@@ -11,9 +11,13 @@ public:
     struct {
         QPixmap _1xelerate;
         QPixmap alazymeme;
+        QPixmap brian6932;
         QPixmap fourtf;
+        QPixmap hicupalot;
+        QPixmap iprodigy;
         QPixmap itzalex;
         QPixmap kararty;
+        QPixmap karlpolice;
         QPixmap mm2pl;
         QPixmap pajlada;
         QPixmap slch;

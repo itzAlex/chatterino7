@@ -3,7 +3,7 @@
 #include <QString>
 #include <QtGlobal>
 
-#define CHATTERINO_VERSION "7.3.4H6"
+#define CHATTERINO_VERSION "7.3.5H1"
 
 #if defined(Q_OS_WIN)
 #    define CHATTERINO_OS "win"
