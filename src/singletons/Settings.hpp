@@ -211,7 +211,7 @@ public:
     BoolSetting enableEmoteImages = {"/emotes/enableEmoteImages", true};
     BoolSetting animateEmotes = {"/emotes/enableGifAnimations", true};
     FloatSetting emoteScale = {"/emotes/scale", 1.f};
-    BoolSetting showUnlistedEmotes = {"/emotes/showUnlistedEmotes", false};
+    BoolSetting showUnlistedEmotes = {"/emotes/showUnlistedEmotes", true};
 
     QStringSetting emojiSet = {"/emotes/emojiSet", "Twitter"};
 
