@@ -926,7 +926,7 @@ void SplitHeader::reloadChannelEmotes()
     using namespace std::chrono_literals;
 
     auto now = std::chrono::steady_clock::now();
-    if (this->lastReloadedChannelEmotes_ + 30s > now)
+    if (this->lastReloadedChannelEmotes_ + 10s > now)
     {
         return;
     }
@@ -940,6 +940,7 @@ void SplitHeader::reloadChannelEmotes()
         twitchChannel->refreshFFZChannelEmotes(true);
         twitchChannel->refreshBTTVChannelEmotes(true);
         twitchChannel->refreshHomiesChannelEmotes(true);
+        twitchChannel->refreshBadgesProviders();
     }
 }
 
