@@ -344,11 +344,6 @@ void EmotePopup::loadChannel(ChannelPtr channel)
     auto globalChannel = std::make_shared<Channel>("", Channel::Type::None);
     auto channelChannel = std::make_shared<Channel>("", Channel::Type::None);
 
-    // twitch
-    addEmoteSets(
-        getApp()->accounts->twitch.getCurrent()->accessEmotes()->emoteSets,
-        *globalChannel, *subChannel, this->channel_->getName());
-
     // global
     if (getSettings()->enableHomiesGlobalEmotes)
     {
@@ -444,6 +439,8 @@ void EmotePopup::filterTwitchEmotes(std::shared_ptr<Channel> searchChannel,
             twitchGlobalEmotes.push_back(setCopy);
     }
 
+    auto homiesGlobalEmotes = this->filterEmoteMap(
+            searchText, getApp()->twitch->getHomiesEmotes().emotes());
     auto seventvGlobalEmotes = this->filterEmoteMap(
         searchText, getApp()->twitch->getSeventvEmotes().emotes());
     auto bttvGlobalEmotes = this->filterEmoteMap(
@@ -451,18 +448,17 @@ void EmotePopup::filterTwitchEmotes(std::shared_ptr<Channel> searchChannel,
     auto ffzGlobalEmotes = this->filterEmoteMap(
         searchText, getApp()->twitch->getFfzEmotes().emotes());
 
-    // twitch
-    addEmoteSets(twitchGlobalEmotes, *searchChannel, *searchChannel,
-                 this->channel_->getName());
-
     // global
-    if (seventvGlobalEmotes->size() > 0)
+    if (getSettings()->enableHomiesGlobalEmotes && homiesGlobalEmotes->size() > 0)
+        addEmotes(*searchChannel, *homiesGlobalEmotes, "Homies (Global)",
+                  MessageElementFlag::HomiesEmote);
+    if (getSettings()->enable7TVGlobalEmotes && seventvGlobalEmotes->size() > 0)
         addEmotes(*searchChannel, *seventvGlobalEmotes, "SevenTV (Global)",
                   MessageElementFlag::SeventvEmote);
-    if (bttvGlobalEmotes->size() > 0)
+    if (getSettings()->enableBTTVGlobalEmotes && bttvGlobalEmotes->size() > 0)
         addEmotes(*searchChannel, *bttvGlobalEmotes, "BetterTTV (Global)",
                   MessageElementFlag::BttvEmote);
-    if (ffzGlobalEmotes->size() > 0)
+    if (getSettings()->enableFFZGlobalEmotes && ffzGlobalEmotes->size() > 0)
         addEmotes(*searchChannel, *ffzGlobalEmotes, "FrankerFaceZ (Global)",
                   MessageElementFlag::FfzEmote);
 
@@ -471,6 +467,8 @@ void EmotePopup::filterTwitchEmotes(std::shared_ptr<Channel> searchChannel,
         return;
     }
 
+    auto homiesChannelEmotes =
+            this->filterEmoteMap(searchText, this->twitchChannel_->homiesEmotes());
     auto seventvChannelEmotes =
         this->filterEmoteMap(searchText, this->twitchChannel_->seventvEmotes());
     auto bttvChannelEmotes =
@@ -478,6 +476,9 @@ void EmotePopup::filterTwitchEmotes(std::shared_ptr<Channel> searchChannel,
     auto ffzChannelEmotes =
         this->filterEmoteMap(searchText, this->twitchChannel_->ffzEmotes());
     // channel
+    if (homiesChannelEmotes->size() > 0)
+        addEmotes(*searchChannel, *homiesChannelEmotes, "Homies (Channel)",
+                  MessageElementFlag::HomiesEmote);
     if (seventvChannelEmotes->size() > 0)
         addEmotes(*searchChannel, *seventvChannelEmotes, "SevenTV (Channel)",
                   MessageElementFlag::SeventvEmote);
