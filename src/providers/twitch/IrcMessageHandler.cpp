@@ -9,7 +9,6 @@
 #include "providers/twitch/TwitchChannel.hpp"
 #include "providers/twitch/TwitchHelpers.hpp"
 #include "providers/twitch/TwitchIrcServer.hpp"
-#include "providers/twitch/TwitchMessageBuilder.hpp"
 #include "singletons/Resources.hpp"
 #include "singletons/Settings.hpp"
 #include "singletons/WindowManager.hpp"
@@ -19,6 +18,7 @@
 
 #include <IrcMessage>
 
+#include <memory>
 #include <unordered_set>
 
 namespace {
@@ -33,6 +33,11 @@ static const QSet<QString> specialMessageTypes{
     "ritual",         // new viewer ritual
     "announcement",   // new mod announcement thing
 };
+
+static QRegularExpression separatedLinkRegex("https?:\\/\\s\\/\\S+");
+static QRegularExpression validDomainRegex(
+        "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,"
+        "61}[a-z0-9]");
 
 MessagePtr generateBannedMessage(bool confirmedBan)
 {
@@ -65,6 +70,30 @@ MessagePtr generateBannedMessage(bool confirmedBan)
         ->setLink(accountsLink);
 
     return builder.release();
+}
+
+QString joinSeparatedLinks(QString message) {
+    QString messageContent = "";
+
+    if (getSettings()->joinSeparatedLinks)
+    {
+        auto separatedLinkMatch = separatedLinkRegex.match(message);
+
+        if (separatedLinkMatch.hasMatch())
+        {
+            QString separatedLink =
+                    separatedLinkMatch.captured(0).simplified().remove(" ");
+
+            auto validDomainMatch = validDomainRegex.match(separatedLink);
+            if (validDomainMatch.hasMatch())
+            {
+                messageContent = message.replace(
+                        separatedLinkMatch.captured(0), separatedLink);
+            }
+        }
+    }
+
+    return messageContent;
 }
 
 }  // namespace
@@ -105,8 +134,8 @@ static float relativeSimilarity(const QString &str1, const QString &str2)
 
     // ensure that no div by 0
     return z == 0 ? 0.f
-                  : float(z) /
-                        std::max<int>(1, std::max(str1.size(), str2.size()));
+                  : float(z) / std::max<int>(
+                                   1, std::max<int>(str1.size(), str2.size()));
 };
 
 float IrcMessageHandler::similarity(
@@ -132,7 +161,7 @@ float IrcMessageHandler::similarity(
             continue;
         }
         ++checked;
-        similarityPercent = std::max(
+        similarityPercent = std::max<float>(
             similarityPercent,
             relativeSimilarity(msg->messageText, prevMsg->messageText));
     }
@@ -216,29 +245,7 @@ std::vector<MessagePtr> IrcMessageHandler::parseMessage(
 std::vector<MessagePtr> IrcMessageHandler::parsePrivMessage(
     Channel *channel, Communi::IrcPrivateMessage *message)
 {
-    QString messageContent = "";
-
-    if (getSettings()->joinSeparatedLinks)
-    {
-        static QRegularExpression separatedLinkRegex("https?:\\/\\s\\/\\S+");
-        static QRegularExpression validDomainRegex(
-            "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,"
-            "61}[a-z0-9]");
-        auto separatedLinkMatch = separatedLinkRegex.match(message->content());
-
-        if (separatedLinkMatch.hasMatch())
-        {
-            QString separatedLink =
-                separatedLinkMatch.captured(0).simplified().remove(" ");
-
-            auto validDomainMatch = validDomainRegex.match(separatedLink);
-            if (validDomainMatch.hasMatch())
-            {
-                messageContent = message->content().replace(
-                    separatedLinkMatch.captured(0), separatedLink);
-            }
-        }
-    }
+    QString messageContent = joinSeparatedLinks(message->content());
 
     std::vector<MessagePtr> builtMessages;
     MessageParseArgs args;
@@ -257,30 +264,7 @@ std::vector<MessagePtr> IrcMessageHandler::parsePrivMessage(
 void IrcMessageHandler::handlePrivMessage(Communi::IrcPrivateMessage *message,
                                           TwitchIrcServer &server)
 {
-    QString messageContent = "";
-
-    if (getSettings()->joinSeparatedLinks)
-    {
-        static QRegularExpression separatedLinkRegex("https?:\\/\\s\\/\\S+");
-        static QRegularExpression validDomainRegex(
-            "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,"
-            "61}[a-z0-9]");
-        auto separatedLinkMatch =
-            separatedLinkRegex.match(message->content().replace("  ", " "));
-
-        if (separatedLinkMatch.hasMatch())
-        {
-            QString separatedLink =
-                separatedLinkMatch.captured(0).simplified().remove(" ");
-
-            auto validDomainMatch = validDomainRegex.match(separatedLink);
-            if (validDomainMatch.hasMatch())
-            {
-                messageContent = message->content().replace("  ", "").replace(
-                    separatedLinkMatch.captured(0), separatedLink);
-            }
-        }
-    }
+    QString messageContent = joinSeparatedLinks(message->content());
 
     // This is to make sure that combined emoji go through properly, see
     // https://github.com/Chatterino/chatterino2/issues/3384 and
@@ -295,6 +279,93 @@ void IrcMessageHandler::handlePrivMessage(Communi::IrcPrivateMessage *message,
             ? message->content().replace(COMBINED_FIXER, ZERO_WIDTH_JOINER)
             : messageContent,
         server, false, message->isAction());
+}
+
+std::vector<MessagePtr> IrcMessageHandler::parseMessageWithReply(
+    Channel *channel, Communi::IrcMessage *message,
+    const std::vector<MessagePtr> &otherLoaded)
+{
+    std::vector<MessagePtr> builtMessages;
+
+    auto command = message->command();
+
+    if (command == "PRIVMSG")
+    {
+        auto privMsg = static_cast<Communi::IrcPrivateMessage *>(message);
+        auto tc = dynamic_cast<TwitchChannel *>(channel);
+        if (!tc)
+        {
+            return this->parsePrivMessage(channel, privMsg);
+        }
+
+        QString messageContent = joinSeparatedLinks(privMsg->content());
+
+        MessageParseArgs args;
+        TwitchMessageBuilder builder(
+            channel, message, args,
+            messageContent.isEmpty() ? privMsg->content() : messageContent,
+            privMsg->isAction());
+
+        this->populateReply(tc, message, otherLoaded, builder);
+
+        if (!builder.isIgnored())
+        {
+            builtMessages.emplace_back(builder.build());
+            builder.triggerHighlights();
+        }
+    }
+    else if (command == "USERNOTICE")
+    {
+        // No need to separate the link here, user should have permissions to send links
+        return this->parseUserNoticeMessage(channel, message);
+    }
+    else if (command == "NOTICE")
+    {
+        // No need to separate the link here, user should have permissions to send links
+        return this->parseNoticeMessage(
+            static_cast<Communi::IrcNoticeMessage *>(message));
+    }
+
+    return builtMessages;
+}
+
+void IrcMessageHandler::populateReply(
+    TwitchChannel *channel, Communi::IrcMessage *message,
+    const std::vector<MessagePtr> &otherLoaded, TwitchMessageBuilder &builder)
+{
+    const auto &tags = message->tags();
+    if (const auto it = tags.find("reply-parent-msg-id"); it != tags.end())
+    {
+        const QString replyID = it.value().toString();
+        auto threadIt = channel->threads_.find(replyID);
+        if (threadIt != channel->threads_.end())
+        {
+            const auto owned = threadIt->second.lock();
+            if (owned)
+            {
+                // Thread already exists (has a reply)
+                builder.setThread(owned);
+                return;
+            }
+        }
+
+        // Thread does not yet exist, find root reply and create thread.
+        // Linear search is justified by the infrequent use of replies
+        for (auto &otherMsg : otherLoaded)
+        {
+            if (otherMsg->id == replyID)
+            {
+                // Found root reply message
+                std::shared_ptr<MessageThread> newThread =
+                    std::make_shared<MessageThread>(otherMsg);
+
+                builder.setThread(newThread);
+                // Store weak reference to thread in channel
+                channel->addReplyThread(newThread);
+                break;
+            }
+        }
+    }
 }
 
 void IrcMessageHandler::addMessage(Communi::IrcMessage *_message,
@@ -319,6 +390,7 @@ void IrcMessageHandler::addMessage(Communi::IrcMessage *_message,
     MessageParseArgs args;
     if (isSub)
     {
+        args.isSubscriptionMessage = true;
         args.trimSubscriberUsername = true;
     }
 
@@ -330,7 +402,7 @@ void IrcMessageHandler::addMessage(Communi::IrcMessage *_message,
     auto channel = dynamic_cast<TwitchChannel *>(chan.get());
 
     const auto &tags = _message->tags();
-    if (const auto &it = tags.find("custom-reward-id"); it != tags.end())
+    if (const auto it = tags.find("custom-reward-id"); it != tags.end())
     {
         const auto rewardId = it.value().toString();
         if (!channel->isChannelPointRewardKnown(rewardId))
@@ -354,6 +426,31 @@ void IrcMessageHandler::addMessage(Communi::IrcMessage *_message,
     }
 
     TwitchMessageBuilder builder(chan.get(), _message, args, content, isAction);
+
+    if (const auto it = tags.find("reply-parent-msg-id"); it != tags.end())
+    {
+        const QString replyID = it.value().toString();
+        auto threadIt = channel->threads_.find(replyID);
+        if (threadIt != channel->threads_.end() && !threadIt->second.expired())
+        {
+            // Thread already exists (has a reply)
+            builder.setThread(threadIt->second.lock());
+        }
+        else
+        {
+            // Thread does not yet exist, find root reply and create thread.
+            auto root = channel->findMessage(replyID);
+            if (root)
+            {
+                // Found root reply message
+                const auto newThread = std::make_shared<MessageThread>(root);
+
+                builder.setThread(newThread);
+                // Store weak reference to thread in channel
+                channel->addReplyThread(newThread);
+            }
+        }
+    }
 
     if (isSub || !builder.isIgnored())
     {
@@ -476,7 +573,7 @@ void IrcMessageHandler::handleClearChatMessage(Communi::IrcMessage *message)
         chan->disableAllMessages();
         chan->addMessage(
             makeSystemMessage("Chat has been cleared by a moderator.",
-                              calculateMessageTimestamp(message)));
+                              calculateMessageTime(message).time()));
 
         return;
     }
@@ -492,7 +589,7 @@ void IrcMessageHandler::handleClearChatMessage(Communi::IrcMessage *message)
 
     auto timeoutMsg =
         MessageBuilder(timeoutMessage, username, durationInSeconds, false,
-                       calculateMessageTimestamp(message))
+                       calculateMessageTime(message).time())
             .release();
     chan->addOrReplaceTimeout(timeoutMsg);
 
@@ -711,7 +808,7 @@ std::vector<MessagePtr> IrcMessageHandler::parseUserNoticeMessage(
         }
 
         auto b = MessageBuilder(systemMessage, parseTagString(messageText),
-                                calculateMessageTimestamp(message));
+                                calculateMessageTime(message).time());
 
         b->flags.set(MessageFlag::Subscription);
         auto newMessage = b.release();
@@ -765,7 +862,7 @@ void IrcMessageHandler::handleUserNoticeMessage(Communi::IrcMessage *message,
         }
 
         auto b = MessageBuilder(systemMessage, parseTagString(messageText),
-                                calculateMessageTimestamp(message));
+                                calculateMessageTime(message).time());
 
         b->flags.set(MessageFlag::Subscription);
         auto newMessage = b.release();
@@ -835,7 +932,7 @@ std::vector<MessagePtr> IrcMessageHandler::parseNoticeMessage(
                 .arg(remainingTime.isEmpty() ? "0s" : remainingTime);
 
         builtMessage.emplace_back(makeSystemMessage(
-            formattedMessage, calculateMessageTimestamp(message)));
+            formattedMessage, calculateMessageTime(message).time()));
 
         return builtMessage;
     }
@@ -844,7 +941,7 @@ std::vector<MessagePtr> IrcMessageHandler::parseNoticeMessage(
     std::vector<MessagePtr> builtMessages;
 
     builtMessages.emplace_back(makeSystemMessage(
-        message->content(), calculateMessageTimestamp(message)));
+        message->content(), calculateMessageTime(message).time()));
 
     return builtMessages;
 }

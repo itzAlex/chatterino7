@@ -150,34 +150,47 @@ void GeneralPage::initLayout(GeneralPageView &layout)
             return fuzzyToFloat(args.value, 1.f);
         });
     ComboBox *tabDirectionDropdown =
-        layout.addDropdown<std::underlying_type<NotebookTabDirection>::type>(
-            "Tab layout", {"Horizontal", "Vertical"}, s.tabDirection,
+        layout.addDropdown<std::underlying_type<NotebookTabLocation>::type>(
+            "Tab layout", {"Top", "Left", "Right", "Bottom"}, s.tabDirection,
             [](auto val) {
                 switch (val)
                 {
-                    case NotebookTabDirection::Horizontal:
-                        return "Horizontal";
-                    case NotebookTabDirection::Vertical:
-                        return "Vertical";
+                    case NotebookTabLocation::Top:
+                        return "Top";
+                    case NotebookTabLocation::Left:
+                        return "Left";
+                    case NotebookTabLocation::Right:
+                        return "Right";
+                    case NotebookTabLocation::Bottom:
+                        return "Bottom";
                 }
 
                 return "";
             },
             [](auto args) {
-                if (args.value == "Vertical")
+                if (args.value == "Bottom")
                 {
-                    return NotebookTabDirection::Vertical;
+                    return NotebookTabLocation::Bottom;
+                }
+                else if (args.value == "Left")
+                {
+                    return NotebookTabLocation::Left;
+                }
+                else if (args.value == "Right")
+                {
+                    return NotebookTabLocation::Right;
                 }
                 else
                 {
-                    // default to horizontal
-                    return NotebookTabDirection::Horizontal;
+                    // default to top
+                    return NotebookTabLocation::Top;
                 }
             },
             false);
     tabDirectionDropdown->setMinimumWidth(
         tabDirectionDropdown->minimumSizeHint().width());
 
+    layout.addCheckbox("Show message reply button", s.showReplyButton);
     layout.addCheckbox("Show tab close button", s.showTabCloseButton);
     layout.addCheckbox("Always on top", s.windowTopMost);
 #ifdef USEWINSDK
@@ -358,14 +371,14 @@ void GeneralPage::initLayout(GeneralPageView &layout)
 
     layout.addTitle("Streamer Mode");
     layout.addDescription(
-        "Chatterino can automatically change behavior if it detects that \"OBS "
-        "Studio\" is running.\nSelect which things you want to change while "
-        "streaming");
+        "Chatterino can automatically change behavior if it detects that any "
+        "streaming software is running.\nSelect which things you want to "
+        "change while streaming");
 
     ComboBox *dankDropdown =
         layout.addDropdown<std::underlying_type<StreamerModeSetting>::type>(
             "Enable Streamer Mode",
-            {"Disabled", "Enabled", "Automatic (Detect OBS)"},
+            {"Disabled", "Enabled", "Automatic (Detect streaming software)"},
             s.enableStreamerMode,
             [](int value) {
                 return value;
@@ -374,7 +387,7 @@ void GeneralPage::initLayout(GeneralPageView &layout)
                 return static_cast<StreamerModeSetting>(args.index);
             },
             false);
-    dankDropdown->setMinimumWidth(dankDropdown->minimumSizeHint().width() + 10);
+    dankDropdown->setMinimumWidth(dankDropdown->minimumSizeHint().width() + 30);
 
     layout.addCheckbox("Hide usercard avatars",
                        s.streamerModeHideUsercardAvatars);
@@ -643,6 +656,8 @@ void GeneralPage::initLayout(GeneralPageView &layout)
 
     layout.addCheckbox("Show 7TV Animated Profile Picture",
                        s.displaySevenTVAnimatedProfile);
+    layout.addCheckbox("Enable 7TV EventApi (requires restart)",
+                       s.enableSevenTVEventApi);
     layout.addCheckbox("Show moderation messages", s.hideModerationActions,
                        true);
     layout.addCheckbox("Show deletions of single messages",
@@ -655,7 +670,11 @@ void GeneralPage::initLayout(GeneralPageView &layout)
     layout.addCheckbox("Show parted users (< 1000 chatters)", s.showParts);
     layout.addCheckbox("Automatically close user popup when it loses focus",
                        s.autoCloseUserPopup);
+    layout.addCheckbox(
+        "Automatically close reply thread popup when it loses focus",
+        s.autoCloseThreadPopup);
     layout.addCheckbox("Lowercase domains (anti-phishing)", s.lowercaseDomains);
+    layout.addCheckbox("Display 7TV Paints", s.displaySevenTVPaints);
     layout.addCheckbox("Bold @usernames", s.boldUsernames);
     layout.addCheckbox("Color @usernames", s.colorUsernames);
     layout.addCheckbox("Try to find usernames without @ prefix",

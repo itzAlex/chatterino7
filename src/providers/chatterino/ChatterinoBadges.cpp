@@ -33,9 +33,6 @@ boost::optional<EmotePtr> ChatterinoBadges::getBadge(const UserId &id)
 
 void ChatterinoBadges::loadChatterinoBadges()
 {
-    badgeMap.clear();
-    emotes.clear();
-
     static QUrl url("https://api.chatterino.com/badges");
 
     NetworkRequest(url)

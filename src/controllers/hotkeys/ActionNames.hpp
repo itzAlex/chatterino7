@@ -89,6 +89,7 @@ inline const std::map<HotkeyCategory, ActionDefinitionMap> actionNames{
               1,
           }},
          {"scrollToBottom", ActionDefinition{"Scroll to the bottom"}},
+         {"scrollToTop", ActionDefinition{"Scroll to the top"}},
          {"setChannelNotification",
           ActionDefinition{
               "Set channel live notification",
@@ -103,7 +104,8 @@ inline const std::map<HotkeyCategory, ActionDefinitionMap> actionNames{
               0,
               1,
           }},
-         {"showSearch", ActionDefinition{"Search"}},
+         {"showSearch", ActionDefinition{"Search current channel"}},
+         {"showGlobalSearch", ActionDefinition{"Search all channels"}},
          {"startWatching", ActionDefinition{"Start watching"}},
          {"debug", ActionDefinition{"Show debug popup"}},
      }},

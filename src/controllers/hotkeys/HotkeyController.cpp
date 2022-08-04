@@ -340,6 +340,9 @@ void HotkeyController::addDefaults(std::set<QString> &addedHotkeys)
                             QKeySequence("Ctrl+F"), "showSearch",
                             std::vector<QString>(), "show search");
         this->tryAddDefault(addedHotkeys, HotkeyCategory::Split,
+                            QKeySequence("Ctrl+Shift+F"), "showGlobalSearch",
+                            std::vector<QString>(), "show global search");
+        this->tryAddDefault(addedHotkeys, HotkeyCategory::Split,
                             QKeySequence("Ctrl+F5"), "reconnect",
                             std::vector<QString>(), "reconnect");
         this->tryAddDefault(addedHotkeys, HotkeyCategory::Split,
@@ -372,6 +375,9 @@ void HotkeyController::addDefaults(std::set<QString> &addedHotkeys)
         this->tryAddDefault(addedHotkeys, HotkeyCategory::Split,
                             QKeySequence("Ctrl+End"), "scrollToBottom",
                             std::vector<QString>(), "scroll to bottom");
+        this->tryAddDefault(addedHotkeys, HotkeyCategory::Split,
+                            QKeySequence("Ctrl+Home"), "scrollToTop",
+                            std::vector<QString>(), "scroll to top");
         this->tryAddDefault(addedHotkeys, HotkeyCategory::Split,
                             QKeySequence("F10"), "debug",
                             std::vector<QString>(), "open debug popup");

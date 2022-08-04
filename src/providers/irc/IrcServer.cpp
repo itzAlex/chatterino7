@@ -58,6 +58,11 @@ const QString &IrcServer::nick()
     return this->data_->nick.isEmpty() ? this->data_->user : this->data_->nick;
 }
 
+const QString &IrcServer::userFriendlyIdentifier()
+{
+    return this->data_->host;
+}
+
 void IrcServer::initializeConnectionSignals(IrcConnection *connection,
                                             ConnectionType type)
 {
@@ -270,7 +275,7 @@ void IrcServer::readConnectionMessageReceived(Communi::IrcMessage *message)
                 MessageBuilder builder;
 
                 builder.emplace<TimestampElement>(
-                    calculateMessageTimestamp(message));
+                    calculateMessageTime(message).time());
                 builder.emplace<TextElement>(message->toData(),
                                              MessageElementFlag::Text);
                 builder->flags.set(MessageFlag::Debug);

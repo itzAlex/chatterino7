@@ -1,15 +1,23 @@
 #include "messages/layouts/MessageLayoutElement.hpp"
 
 #include "Application.hpp"
+#include "BaseSettings.hpp"
 #include "messages/Emote.hpp"
 #include "messages/Image.hpp"
 #include "messages/MessageElement.hpp"
+#include "providers/seventv/SeventvPaints.hpp"
+#include "providers/seventv/paints/PaintDropShadow.hpp"
 #include "providers/twitch/TwitchEmotes.hpp"
 #include "singletons/Theme.hpp"
 #include "util/DebugCount.hpp"
 
 #include <QDebug>
+#include <QGraphicsDropShadowEffect>
+#include <QGraphicsPixmapItem>
+#include <QLabel>
 #include <QPainter>
+#include <QPainterPath>
+#include <QPixmap>
 
 namespace chatterino {
 
@@ -206,6 +214,44 @@ void ImageWithBackgroundLayoutElement::paint(QPainter &painter)
 }
 
 //
+// IMAGE WITH CIRCLE BACKGROUND
+//
+ImageWithCircleBackgroundLayoutElement::ImageWithCircleBackgroundLayoutElement(
+    MessageElement &creator, ImagePtr image, const QSize &imageSize,
+    QColor color, int padding)
+    : ImageLayoutElement(creator, image,
+                         imageSize + QSize(padding, padding) * 2)
+    , color_(color)
+    , imageSize_(imageSize)
+    , padding_(padding)
+{
+}
+
+void ImageWithCircleBackgroundLayoutElement::paint(QPainter &painter)
+{
+    if (this->image_ == nullptr)
+    {
+        return;
+    }
+
+    auto pixmap = this->image_->pixmapOrLoad();
+    if (pixmap && !this->image_->animated())
+    {
+        QRectF boxRect(this->getRect());
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(QBrush(this->color_, Qt::SolidPattern));
+        painter.drawEllipse(boxRect);
+
+        QRectF imgRect;
+        imgRect.setTopLeft(boxRect.topLeft());
+        imgRect.setSize(this->imageSize_);
+        imgRect.translate(this->padding_, this->padding_);
+
+        painter.drawPixmap(imgRect, *pixmap, QRectF());
+    }
+}
+
+//
 // TEXT
 //
 
@@ -246,19 +292,70 @@ int TextLayoutElement::getSelectionIndexCount() const
 
 void TextLayoutElement::paint(QPainter &painter)
 {
-    auto app = getApp();
+    if (this->getRect().isEmpty())
+        return;
 
-    painter.setPen(this->color_);
+    const auto font = getApp()->getFonts()->getFont(this->style_, this->scale_);
 
-    painter.setFont(app->fonts->getFont(this->style_, this->scale_));
+    const bool isNametag =
+        this->getLink().type == chatterino::Link::UserInfo ||
+        this->getLink().type == chatterino::Link::UserWhisper;
+    const bool drawPaint = isNametag && getSettings()->displaySevenTVPaints;
+    const auto seventvPaint =
+        getApp()->seventvPaints->getPaint(this->getLink().value.toLower());
+    if (drawPaint && seventvPaint.has_value())
+    {
+        if (seventvPaint.value()->animated())
+            return;
 
-    painter.drawText(
-        QRectF(this->getRect().x(), this->getRect().y(), 10000, 10000),
-        this->getText(), QTextOption(Qt::AlignLeft | Qt::AlignTop));
+        const auto paint = seventvPaint.value();
+
+        const auto paintPixmap =
+            paint->getPixmap(this->getText(), font, this->color_,
+                             this->getRect().size(), this->scale_);
+
+        painter.drawPixmap(QRect(this->getRect().x(), this->getRect().y(),
+                                 paintPixmap.width(), paintPixmap.height()),
+                           paintPixmap);
+    }
+    else
+    {
+        painter.setPen(this->color_);
+        painter.setFont(font);
+
+        painter.drawText(
+            QRectF(this->getRect().x(), this->getRect().y(), 10000, 10000),
+            this->getText(), QTextOption(Qt::AlignLeft | Qt::AlignTop));
+    }
 }
 
-void TextLayoutElement::paintAnimated(QPainter &, int)
+void TextLayoutElement::paintAnimated(QPainter &painter, const int yOffset)
 {
+    if (this->getRect().isEmpty())
+        return;
+
+    const auto font = getApp()->getFonts()->getFont(this->style_, this->scale_);
+
+    const bool isNametag =
+        this->getLink().type == chatterino::Link::UserInfo ||
+        this->getLink().type == chatterino::Link::UserWhisper;
+    const bool drawPaint = isNametag && getSettings()->displaySevenTVPaints;
+    const auto seventvPaint =
+        getApp()->seventvPaints->getPaint(this->getLink().value.toLower());
+
+    if (drawPaint && seventvPaint.has_value() &&
+        seventvPaint.value()->animated())
+    {
+        const auto paint = seventvPaint.value();
+
+        const auto paintPixmap =
+            paint->getPixmap(this->getText(), font, this->color_,
+                             this->getRect().size(), this->scale_);
+
+        auto rect = this->getRect();
+        rect.moveTop(rect.y() + yOffset);
+        painter.drawPixmap(rect, paintPixmap, QRectF());
+    }
 }
 
 int TextLayoutElement::getMouseOverIndex(const QPoint &abs) const
@@ -400,6 +497,69 @@ int TextIconLayoutElement::getXFromIndex(int index)
     {
         return this->getRect().right();
     }
+}
+
+ReplyCurveLayoutElement::ReplyCurveLayoutElement(MessageElement &creator,
+                                                 const QSize &size,
+                                                 float thickness,
+                                                 float neededMargin)
+    : MessageLayoutElement(creator, size)
+    , pen_(QColor("#888"), thickness, Qt::SolidLine, Qt::RoundCap)
+    , neededMargin_(neededMargin)
+{
+}
+
+void ReplyCurveLayoutElement::paint(QPainter &painter)
+{
+    QRectF paintRect(this->getRect());
+    QPainterPath bezierPath;
+
+    qreal top = paintRect.top() + paintRect.height() * 0.25;  // 25% from top
+    qreal left = paintRect.left() + this->neededMargin_;
+    qreal bottom = paintRect.bottom() - this->neededMargin_;
+    QPointF startPoint(left, bottom);
+    QPointF controlPoint(left, top);
+    QPointF endPoint(paintRect.right(), top);
+
+    // Create curve path
+    bezierPath.moveTo(startPoint);
+    bezierPath.quadTo(controlPoint, endPoint);
+
+    // Render curve
+    painter.setPen(this->pen_);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.drawPath(bezierPath);
+}
+
+void ReplyCurveLayoutElement::paintAnimated(QPainter &painter, int yOffset)
+{
+}
+
+int ReplyCurveLayoutElement::getMouseOverIndex(const QPoint &abs) const
+{
+    return 0;
+}
+
+int ReplyCurveLayoutElement::getXFromIndex(int index)
+{
+    if (index <= 0)
+    {
+        return this->getRect().left();
+    }
+    else
+    {
+        return this->getRect().right();
+    }
+}
+
+void ReplyCurveLayoutElement::addCopyTextToString(QString &str, int from,
+                                                  int to) const
+{
+}
+
+int ReplyCurveLayoutElement::getSelectionIndexCount() const
+{
+    return 1;
 }
 
 }  // namespace chatterino

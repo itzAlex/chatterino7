@@ -49,6 +49,9 @@ public:
     // SIGNALS
     pajlada::Signals::Signal<const QString &, const QString &, bool &>
         sendMessageSignal;
+    pajlada::Signals::Signal<const QString &, const QString &, const QString &,
+                             bool &>
+        sendReplySignal;
     pajlada::Signals::Signal<MessagePtr &> messageRemovedFromStart;
     pajlada::Signals::Signal<MessagePtr &, boost::optional<MessageFlags>>
         messageAppended;
@@ -74,6 +77,7 @@ public:
         boost::optional<MessageFlags> overridingFlags = boost::none);
     void addMessagesAtStart(std::vector<MessagePtr> &messages_);
     void addOrReplaceTimeout(MessagePtr message);
+    void addOrReplaceSevenTvEventAddRemove(MessagePtr message);
     void disableAllMessages();
     void replaceMessage(MessagePtr message, MessagePtr replacement);
     void replaceMessage(size_t index, MessagePtr replacement);
@@ -84,6 +88,7 @@ public:
 
     // CHANNEL INFO
     virtual bool canSendMessage() const;
+    virtual bool isWritable() const;  // whether split input will be usable
     virtual void sendMessage(const QString &message);
     virtual bool isMod() const;
     virtual bool isBroadcaster() const;
@@ -125,7 +130,7 @@ public:
     IndirectChannel(ChannelPtr channel,
                     Channel::Type type = Channel::Type::Direct);
 
-    ChannelPtr get();
+    ChannelPtr get() const;
     void reset(ChannelPtr channel);
     pajlada::Signals::NoArgSignal &getChannelChanged();
     Channel::Type getType();

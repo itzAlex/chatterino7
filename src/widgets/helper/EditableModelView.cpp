@@ -1,4 +1,5 @@
 #include "EditableModelView.hpp"
+#include "widgets/helper/RegExpItemDelegate.hpp"
 
 #include <QAbstractItemView>
 #include <QAbstractTableModel>
@@ -98,6 +99,10 @@ EditableModelView::EditableModelView(QAbstractTableModel *model, bool movable)
     // finish button layout
     buttons->addStretch(1);
 }
+void EditableModelView::setValidationRegexp(QRegularExpression regexp)
+{
+    this->tableView_->setItemDelegate(new RegExpItemDelegate(this, regexp));
+}
 
 void EditableModelView::setTitles(std::initializer_list<QString> titles)
 {
@@ -132,7 +137,7 @@ void EditableModelView::addCustomButton(QWidget *widget)
 void EditableModelView::addSelectChannelHighlight()
 {
     this->selectChannel->setText("Select channels");
-    this->selectChannel->setEnabled(false);
+    this->disableSelectChannelButton();
 
     this->buttons_->addWidget(this->selectChannel);
 
@@ -154,7 +159,7 @@ void EditableModelView::enableSelectChannelButton()
 void EditableModelView::addExcludeChannelHighlight()
 {
     this->excludeChannel->setText("Exclude channels");
-    this->excludeChannel->setEnabled(false);
+    this->disableExcludeChannelButton();
 
     this->buttons_->addWidget(this->excludeChannel);
 

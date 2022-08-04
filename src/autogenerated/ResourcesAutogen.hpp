@@ -15,6 +15,7 @@ public:
         QPixmap fourtf;
         QPixmap hicupalot;
         QPixmap iprodigy;
+        QPixmap jaxkey;
         QPixmap itzalex;
         QPixmap kararty;
         QPixmap karlpolice;
@@ -39,6 +40,8 @@ public:
         QPixmap modModeDisabled2;
         QPixmap modModeEnabled;
         QPixmap modModeEnabled2;
+        QPixmap replyDark;
+        QPixmap replyThreadDark;
         QPixmap search;
         QPixmap timeout;
         QPixmap trashCan;

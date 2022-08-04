@@ -39,6 +39,7 @@ class Scrollbar;
 class EffectLabel;
 struct Link;
 class MessageLayoutElement;
+class Split;
 
 enum class PauseReason {
     Mouse,
@@ -61,7 +62,15 @@ class ChannelView final : public BaseWidget
     Q_OBJECT
 
 public:
-    explicit ChannelView(BaseWidget *parent = nullptr);
+    enum class Context {
+        None,
+        UserCard,
+        ReplyThread,
+        Search,
+    };
+
+    explicit ChannelView(BaseWidget *parent = nullptr, Split *split = nullptr,
+                         Context context = Context::None);
 
     void queueUpdate();
     Scrollbar &getScrollBar();
@@ -81,6 +90,8 @@ public:
     void pause(PauseReason reason, boost::optional<uint> msecs = boost::none);
     void unpause(PauseReason reason);
 
+    MessageElementFlags getFlags() const;
+
     ChannelPtr channel();
     void setChannel(ChannelPtr channel_);
 
@@ -92,10 +103,12 @@ public:
     void setSourceChannel(ChannelPtr sourceChannel);
     bool hasSourceChannel() const;
 
-    LimitedQueueSnapshot<MessageLayoutPtr> getMessagesSnapshot();
+    LimitedQueueSnapshot<MessageLayoutPtr> &getMessagesSnapshot();
     void queueLayout();
 
     void clearMessages();
+
+    Context getContext() const;
 
     /**
      * @brief Creates and shows a UserInfoPopup dialog
@@ -159,7 +172,6 @@ private:
 
     void drawMessages(QPainter &painter);
     void setSelection(const SelectionItem &start, const SelectionItem &end);
-    MessageElementFlags getFlags() const;
     void selectWholeMessage(MessageLayout *layout, int &messageIndex);
     void getWordBounds(MessageLayout *layout,
                        const MessageLayoutElement *element,
@@ -185,12 +197,20 @@ private:
     void addHiddenContextMenuItems(const MessageLayoutElement *hoveredElement,
                                    MessageLayoutPtr layout, QMouseEvent *event,
                                    QMenu &menu);
+    void addCommandExecutionContextMenuItems(
+        const MessageLayoutElement *hoveredElement, MessageLayoutPtr layout,
+        QMouseEvent *event, QMenu &menu);
+
     int getLayoutWidth() const;
     void updatePauses();
     void unpaused();
 
     void enableScrolling(const QPointF &scrollStart);
     void disableScrolling();
+
+    void setInputReply(const MessagePtr &message);
+    void showReplyThreadPopup(const MessagePtr &message);
+    bool canReplyToMessages() const;
 
     QTimer *layoutCooldown_;
     bool layoutQueued_;
@@ -218,6 +238,7 @@ private:
     ChannelPtr channel_ = nullptr;
     ChannelPtr underlyingChannel_ = nullptr;
     ChannelPtr sourceChannel_ = nullptr;
+    Split *split_ = nullptr;
 
     Scrollbar *scrollBar_;
     EffectLabel *goToBottom_;
@@ -260,6 +281,8 @@ private:
 
     Selection selection_;
     bool selecting_ = false;
+
+    const Context context_;
 
     LimitedQueue<MessageLayoutPtr> messages_;
 
