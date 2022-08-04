@@ -414,24 +414,27 @@ void HighlightingPage::tableCellClicked(const QModelIndex &clicked,
     switch (tab)
     {
         case HighlightTab::Messages:
-            if (clicked.row() >= 5)
-            {
+        case HighlightTab::Users: {
+            if (tab == HighlightTab::Messages) {
+                if (clicked.row() >= 5)
+                {
+                    view->enableSelectChannelButton();
+                    view->enableExcludeChannelButton();
+                }
+                else
+                {
+                    view->disableSelectChannelButton();
+                    view->disableExcludeChannelButton();
+                }
+            } else {
                 view->enableSelectChannelButton();
                 view->enableExcludeChannelButton();
             }
-            else
-            {
-                view->disableSelectChannelButton();
-                view->disableExcludeChannelButton();
-            }
-        case HighlightTab::Users: {
-            view->enableSelectChannelButton();
-            view->enableExcludeChannelButton();
-
             using Column = HighlightModel::Column;
             bool restrictColorRow =
                 (tab == HighlightTab::Messages &&
-                 clicked.row() == HighlightModel::WHISPER_ROW);
+                 clicked.row() ==
+                     HighlightModel::HighlightRowIndexes::WhisperRow);
             if (clicked.column() == Column::SoundPath)
             {
                 this->openSoundDialog(clicked, view, Column::SoundPath);

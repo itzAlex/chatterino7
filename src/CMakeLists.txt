@@ -81,6 +81,8 @@ set(SOURCE_FILES
         controllers/highlights/HighlightBadge.hpp
         controllers/highlights/HighlightBlacklistModel.cpp
         controllers/highlights/HighlightBlacklistModel.hpp
+        controllers/highlights/HighlightController.cpp
+        controllers/highlights/HighlightController.hpp
         controllers/highlights/HighlightModel.cpp
         controllers/highlights/HighlightModel.hpp
         controllers/highlights/HighlightPhrase.cpp
@@ -138,10 +140,10 @@ set(SOURCE_FILES
         messages/MessageBuilder.hpp
         messages/MessageColor.cpp
         messages/MessageColor.hpp
-        messages/MessageContainer.cpp
-        messages/MessageContainer.hpp
         messages/MessageElement.cpp
         messages/MessageElement.hpp
+        messages/MessageThread.cpp
+        messages/MessageThread.hpp
 
         messages/SharedMessageBuilder.cpp
         messages/SharedMessageBuilder.hpp
@@ -172,8 +174,33 @@ set(SOURCE_FILES
 
         providers/seventv/SeventvBadges.cpp
         providers/seventv/SeventvBadges.hpp
+        providers/seventv/SeventvPaints.cpp
+        providers/seventv/SeventvPaints.hpp
         providers/seventv/SeventvEmotes.cpp
         providers/seventv/SeventvEmotes.hpp
+        providers/seventv/paints/Paint.hpp
+        providers/seventv/paints/Paint.cpp
+        providers/seventv/paints/PaintDropShadow.hpp
+        providers/seventv/paints/PaintDropShadow.cpp
+        providers/seventv/paints/LinearGradientPaint.hpp
+        providers/seventv/paints/LinearGradientPaint.cpp
+        providers/seventv/paints/RadialGradientPaint.hpp
+        providers/seventv/paints/RadialGradientPaint.cpp
+        providers/seventv/paints/UrlPaint.hpp
+        providers/seventv/paints/UrlPaint.cpp
+        providers/seventv/SeventvEventApiClient.cpp
+        providers/seventv/SeventvEventApiClient.hpp
+        providers/seventv/SeventvEventApiManager.cpp
+        providers/seventv/SeventvEventApiManager.hpp
+        providers/seventv/SeventvEventApiMessages.hpp
+        providers/seventv/SeventvEventApiWebsocket.hpp
+
+        providers/seventv/eventapimessages/EventApiMessage.cpp
+        providers/seventv/eventapimessages/EventApiMessage.hpp
+        providers/seventv/eventapimessages/EventApiEmoteUpdate.cpp
+        providers/seventv/eventapimessages/EventApiEmoteUpdate.hpp
+        providers/seventv/eventapimessages/EventApiEmoteData.cpp
+        providers/seventv/eventapimessages/EventApiEmoteData.hpp
 
         providers/bttv/BttvEmotes.cpp
         providers/bttv/BttvEmotes.hpp
@@ -220,12 +247,16 @@ set(SOURCE_FILES
         providers/twitch/ChannelPointReward.hpp
         providers/twitch/IrcMessageHandler.cpp
         providers/twitch/IrcMessageHandler.hpp
-        providers/twitch/PubsubActions.cpp
-        providers/twitch/PubsubActions.hpp
-        providers/twitch/PubsubClient.cpp
-        providers/twitch/PubsubClient.hpp
-        providers/twitch/PubsubHelpers.cpp
-        providers/twitch/PubsubHelpers.hpp
+        providers/twitch/PubSubActions.cpp
+        providers/twitch/PubSubActions.hpp
+        providers/twitch/PubSubClient.cpp
+        providers/twitch/PubSubClient.hpp
+        providers/twitch/PubSubClientOptions.hpp
+        providers/twitch/PubSubHelpers.hpp
+        providers/twitch/PubSubManager.cpp
+        providers/twitch/PubSubManager.hpp
+        providers/twitch/PubSubMessages.hpp
+        providers/twitch/PubSubWebsocket.hpp
         providers/twitch/TwitchAccount.cpp
         providers/twitch/TwitchAccount.hpp
         providers/twitch/TwitchAccountManager.cpp
@@ -246,6 +277,22 @@ set(SOURCE_FILES
         providers/twitch/TwitchMessageBuilder.hpp
         providers/twitch/TwitchUser.cpp
         providers/twitch/TwitchUser.hpp
+
+        providers/twitch/pubsubmessages/AutoMod.cpp
+        providers/twitch/pubsubmessages/AutoMod.hpp
+        providers/twitch/pubsubmessages/Base.cpp
+        providers/twitch/pubsubmessages/Base.hpp
+        providers/twitch/pubsubmessages/ChannelPoints.cpp
+        providers/twitch/pubsubmessages/ChannelPoints.hpp
+        providers/twitch/pubsubmessages/ChatModeratorAction.cpp
+        providers/twitch/pubsubmessages/ChatModeratorAction.hpp
+        providers/twitch/pubsubmessages/Listen.cpp
+        providers/twitch/pubsubmessages/Listen.hpp
+        providers/twitch/pubsubmessages/Message.hpp
+        providers/twitch/pubsubmessages/Unlisten.cpp
+        providers/twitch/pubsubmessages/Unlisten.hpp
+        providers/twitch/pubsubmessages/Whisper.cpp
+        providers/twitch/pubsubmessages/Whisper.hpp
 
         providers/twitch/api/Helix.cpp
         providers/twitch/api/Helix.hpp
@@ -310,6 +357,8 @@ set(SOURCE_FILES
         util/RapidjsonHelpers.hpp
         util/RatelimitBucket.cpp
         util/RatelimitBucket.hpp
+        util/SampleData.cpp
+        util/SampleData.hpp
         util/SplitCommand.cpp
         util/SplitCommand.hpp
         util/StreamLink.cpp
@@ -333,6 +382,8 @@ set(SOURCE_FILES
         widgets/BaseWidget.hpp
         widgets/BaseWindow.cpp
         widgets/BaseWindow.hpp
+        widgets/DraggablePopup.cpp
+        widgets/DraggablePopup.hpp
         widgets/FramelessEmbedWindow.cpp
         widgets/FramelessEmbedWindow.hpp
         widgets/Label.cpp
@@ -369,6 +420,8 @@ set(SOURCE_FILES
         widgets/dialogs/NotificationPopup.hpp
         widgets/dialogs/QualityPopup.cpp
         widgets/dialogs/QualityPopup.hpp
+        widgets/dialogs/ReplyThreadPopup.cpp
+        widgets/dialogs/ReplyThreadPopup.hpp
         widgets/dialogs/SelectChannelDialog.cpp
         widgets/dialogs/SelectChannelDialog.hpp
         widgets/dialogs/SelectChannelFiltersDialog.cpp
@@ -387,6 +440,8 @@ set(SOURCE_FILES
         widgets/dialogs/SelectChannelSeparateLinksDialog.hpp
         widgets/dialogs/TokenDialog.cpp
         widgets/dialogs/TokenDialog.hpp
+        widgets/dialogs/switcher/NewPopupItem.cpp
+        widgets/dialogs/switcher/NewPopupItem.hpp
         widgets/dialogs/switcher/NewTabItem.cpp
         widgets/dialogs/switcher/NewTabItem.hpp
         widgets/dialogs/switcher/QuickSwitcherModel.cpp
@@ -416,6 +471,10 @@ set(SOURCE_FILES
         widgets/helper/NotebookTab.hpp
         widgets/helper/QColorPicker.cpp
         widgets/helper/QColorPicker.hpp
+        widgets/helper/RegExpItemDelegate.cpp
+        widgets/helper/RegExpItemDelegate.hpp
+        widgets/helper/TrimRegExpValidator.cpp
+        widgets/helper/TrimRegExpValidator.hpp
         widgets/helper/ResizingTextEdit.cpp
         widgets/helper/ResizingTextEdit.hpp
         widgets/helper/ScrollbarHighlight.cpp
@@ -528,6 +587,7 @@ target_link_libraries(${LIBRARY_PROJECT}
         Threads::Threads
         RapidJSON::RapidJSON
         LRUCache
+        MagicEnum
         )
 if (BUILD_WITH_QTKEYCHAIN)
     target_link_libraries(${LIBRARY_PROJECT}
@@ -542,7 +602,11 @@ else()
 endif()
 
 if (BUILD_APP)
-    add_executable(${EXECUTABLE_PROJECT} main.cpp)
+    if (APPLE)
+        add_executable(${EXECUTABLE_PROJECT} ${MACOS_BUNDLE_ICON_FILE} main.cpp)
+    else()
+        add_executable(${EXECUTABLE_PROJECT} main.cpp)
+    endif()
     add_sanitizers(${EXECUTABLE_PROJECT})
 
     target_include_directories(${EXECUTABLE_PROJECT} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
@@ -613,7 +677,11 @@ set_target_properties(${LIBRARY_PROJECT}
 # compilation in CMake is a more involved, as documented in https://stackoverflow.com/q/24292898.
 # For CI runs, however, the date of build file generation should be consistent with the date of
 # compilation so this approximation is "good enough" for our purpose.
-string(TIMESTAMP cmake_gen_date "%Y-%m-%d")
+if (DEFINED ENV{CHATTERINO_SKIP_DATE_GEN})
+    set(cmake_gen_date "1970-01-01")
+else ()
+    string(TIMESTAMP cmake_gen_date "%Y-%m-%d")
+endif ()
 
 target_compile_definitions(${LIBRARY_PROJECT} PUBLIC
     CHATTERINO
@@ -629,6 +697,11 @@ target_compile_definitions(${LIBRARY_PROJECT} PUBLIC
 
     CHATTERINO_CMAKE_GEN_DATE=\"${cmake_gen_date}\"
     )
+if (GIT_MODIFIED)
+    target_compile_definitions(${LIBRARY_PROJECT} PUBLIC
+        CHATTERINO_GIT_MODIFIED
+        )
+endif ()
 if (USE_SYSTEM_QTKEYCHAIN)
     target_compile_definitions(${LIBRARY_PROJECT} PUBLIC
         CMAKE_BUILD
@@ -644,7 +717,7 @@ if (WIN32)
 endif ()
 
 if (MSVC)
-    target_compile_options(${LIBRARY_PROJECT} PUBLIC /EHsc)
+    target_compile_options(${LIBRARY_PROJECT} PUBLIC /EHsc /bigobj)
 endif ()
 
 if (APPLE AND BUILD_APP)
@@ -677,7 +750,7 @@ if (USE_CONAN AND TARGET CONAN_PKG::boost)
 else ()
     target_link_libraries(${LIBRARY_PROJECT}
         PUBLIC
-        Boost::boost
+        ${Boost_LIBRARIES}
         )
 endif ()
 
@@ -703,3 +776,55 @@ if (LIBRT)
         )
 endif ()
 
+
+# Configure compiler warnings
+if (MSVC)
+    # 4714 - function marked as __forceinline not inlined
+    # 4996 - occurs when the compiler encounters a function or variable that is marked as deprecated.
+    #        These functions may have a different preferred name, may be insecure or have
+    #        a more secure variant, or may be obsolete.
+    # 4505 - unreferenced local version has been removed
+    # 4127 - conditional expression is constant
+    # 4503 - decorated name length exceeded, name was truncated
+    # 4100 - unreferences formal parameter
+    # 4305 - possible truncation of data
+    # 4267 - possible loss of data in return
+    target_compile_options(${LIBRARY_PROJECT} PUBLIC
+        /W4
+        # Disable the following warnings
+        /wd4714
+        /wd4996
+        /wd4505
+        /wd4127
+        /wd4503
+        /wd4100
+        /wd4305
+        /wd4267
+    )
+else ()
+    target_compile_options(${LIBRARY_PROJECT} PUBLIC
+        -Wall
+        # Disable the following warnings
+        -Wno-unused-function
+        -Wno-switch
+        -Wno-deprecated-declarations
+        -Wno-sign-compare
+        -Wno-unused-variable
+
+        # Disabling strict-aliasing warnings for now, although we probably want to re-enable this in the future
+        -Wno-strict-aliasing
+
+        -Werror=return-type
+    )
+
+    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        target_compile_options(${LIBRARY_PROJECT} PUBLIC
+            -Wno-unused-local-typedef
+            -Wno-unused-private-field
+        )
+    else ()
+        target_compile_options(${LIBRARY_PROJECT} PUBLIC
+            -Wno-class-memaccess
+        )
+    endif()
+endif ()

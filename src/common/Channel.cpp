@@ -3,6 +3,8 @@
 #include "Application.hpp"
 #include "messages/Message.hpp"
 #include "messages/MessageBuilder.hpp"
+#include "providers/irc/IrcChannel2.hpp"
+#include "providers/irc/IrcServer.hpp"
 #include "providers/twitch/IrcMessageHandler.hpp"
 #include "singletons/Emotes.hpp"
 #include "singletons/Logging.hpp"
@@ -81,11 +83,20 @@ void Channel::addMessage(MessagePtr message,
     auto app = getApp();
     MessagePtr deleted;
 
-    // FOURTF: change this when adding more providers
-    if (this->isTwitchChannel() &&
-        (!overridingFlags || !overridingFlags->has(MessageFlag::DoNotLog)))
+    if (!overridingFlags || !overridingFlags->has(MessageFlag::DoNotLog))
     {
-        app->logging->addMessage(this->name_, message);
+        QString channelPlatform("other");
+        if (this->type_ == Type::Irc)
+        {
+            auto irc = static_cast<IrcChannel *>(this);
+            channelPlatform =
+                QString("irc-%1").arg(irc->server()->userFriendlyIdentifier());
+        }
+        else if (this->isTwitchChannel())
+        {
+            channelPlatform = "twitch";
+        }
+        app->logging->addMessage(this->name_, message, channelPlatform);
     }
 
     if (this->messages_.pushBack(message, deleted))
@@ -191,6 +202,102 @@ void Channel::addOrReplaceTimeout(MessagePtr message)
     // WindowManager::instance().repaintVisibleChatWidgets(this);
 }
 
+void Channel::addOrReplaceSevenTvEventAddRemove(MessagePtr message)
+{
+    LimitedQueueSnapshot<MessagePtr> snapshot = this->getMessageSnapshot();
+    int snapshotLength = snapshot.size();
+
+    int end = std::max(0, snapshotLength - 20);
+
+    auto addMessage = true;
+    auto skip = false;
+
+    QTime minimumTime = QTime::currentTime().addSecs(-5);
+
+    MessageFlag currentFlag;
+    if (message->flags.has(MessageFlag::SevenTvEventApiAddEmoteMessage))
+    {
+        currentFlag = MessageFlag::SevenTvEventApiAddEmoteMessage;
+    }
+    else if (message->flags.has(MessageFlag::SevenTvEventApiRemoveEmoteMessage))
+    {
+        currentFlag = MessageFlag::SevenTvEventApiRemoveEmoteMessage;
+    }
+    else
+    {
+        // this case should be unreachable because this function is only called with messages which contain the above flags
+        skip = true;
+    }
+
+    if (!skip)
+    {
+        for (int i = snapshotLength - 1; i >= end; --i)
+        {
+            auto &s = snapshot[i];
+
+            if (s->parseTime < minimumTime)
+            {
+                break;
+            }
+
+            if (s->flags.has(currentFlag) && s->loginName != message->loginName)
+                break;
+
+            if (s->flags.hasAny(
+                    {MessageFlag::SevenTvEventApiAddEmoteMessage,
+                     MessageFlag::SevenTvEventApiRemoveEmoteMessage,
+                     MessageFlag::SevenTvEventApiUpdateEmoteMessage}))
+            {
+                auto anyMatchingEmote = std::any_of(
+                    s->seventvEventTargetEmotes.begin(),
+                    s->seventvEventTargetEmotes.end(),
+                    [messageEmotes =
+                         message->seventvEventTargetEmotes](const auto &emote) {
+                        return std::find(messageEmotes.begin(),
+                                         messageEmotes.end(),
+                                         emote) != messageEmotes.end();
+                    });
+
+                if (anyMatchingEmote)
+                    break;
+            }
+
+            if (s->flags.has(currentFlag))
+            {
+                auto emotes = s->seventvEventTargetEmotes;
+                for (auto const &e : message->seventvEventTargetEmotes)
+                {
+                    emotes.push_back(e);
+                }
+
+                MessageBuilder replacement;
+                if (currentFlag == MessageFlag::SevenTvEventApiAddEmoteMessage)
+                {
+                    replacement = MessageBuilder(seventvAddEmoteMessage,
+                                                 message->loginName, emotes);
+                }
+                else  // current == RemoveEmoteMessage
+                {
+                    replacement = MessageBuilder(seventvRemoveEmoteMessage,
+                                                 message->loginName, emotes);
+                }
+
+                replacement->flags = message->flags;
+
+                this->replaceMessage(s, replacement.release());
+
+                addMessage = false;
+                break;
+            }
+        }
+    }
+
+    if (addMessage)
+    {
+        this->addMessage(message);
+    }
+}
+
 void Channel::disableAllMessages()
 {
     LimitedQueueSnapshot<MessagePtr> snapshot = this->getMessageSnapshot();
@@ -246,28 +353,32 @@ void Channel::deleteMessage(QString messageID)
         msg->flags.set(MessageFlag::Disabled);
     }
 }
+
 MessagePtr Channel::findMessage(QString messageID)
 {
-    LimitedQueueSnapshot<MessagePtr> snapshot = this->getMessageSnapshot();
-    int snapshotLength = snapshot.size();
+    MessagePtr res;
 
-    int end = std::max(0, snapshotLength - 200);
-
-    for (int i = snapshotLength - 1; i >= end; --i)
+    if (auto msg = this->messages_.rfind([&messageID](const MessagePtr &msg) {
+            return msg->id == messageID;
+        });
+        msg)
     {
-        auto &s = snapshot[i];
-
-        if (s->id == messageID)
-        {
-            return s;
-        }
+        res = *msg;
     }
-    return nullptr;
+
+    return res;
 }
 
 bool Channel::canSendMessage() const
 {
     return false;
+}
+
+bool Channel::isWritable() const
+{
+    using Type = Channel::Type;
+    auto type = this->getType();
+    return type != Type::TwitchMentions && type != Type::TwitchLive;
 }
 
 void Channel::sendMessage(const QString &message)
@@ -339,7 +450,7 @@ IndirectChannel::IndirectChannel(ChannelPtr channel, Channel::Type type)
 {
 }
 
-ChannelPtr IndirectChannel::get()
+ChannelPtr IndirectChannel::get() const
 {
     return data_->channel;
 }

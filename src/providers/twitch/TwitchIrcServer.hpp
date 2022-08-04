@@ -9,6 +9,7 @@
 #include "providers/irc/AbstractIrcServer.hpp"
 #include "providers/itzalex/HomiesEmotes.hpp"
 #include "providers/seventv/SeventvEmotes.hpp"
+#include "providers/seventv/SeventvEventApiManager.hpp"
 
 #include <chrono>
 #include <memory>
@@ -20,6 +21,7 @@ class Settings;
 class Paths;
 class PubSub;
 class TwitchChannel;
+class SeventvEventApi;
 
 class TwitchIrcServer final : public AbstractIrcServer, public Singleton
 {
@@ -33,6 +35,8 @@ public:
 
     std::shared_ptr<Channel> getChannelOrEmptyByID(const QString &channelID);
 
+    void bulkRefreshLiveStatus();
+
     Atomic<QString> lastUserThatWhisperedMe;
 
     const ChannelPtr whispersChannel;
@@ -41,6 +45,7 @@ public:
     IndirectChannel watchingChannel;
 
     PubSub *pubsub;
+    std::unique_ptr<SeventvEventApi> eventApi;
 
     const SeventvEmotes &getSeventvEmotes() const;
     const BttvEmotes &getBttvEmotes() const;
@@ -69,6 +74,10 @@ protected:
 private:
     void onMessageSendRequested(TwitchChannel *channel, const QString &message,
                                 bool &sent);
+    void onReplySendRequested(TwitchChannel *channel, const QString &message,
+                              const QString &replyId, bool &sent);
+
+    bool prepareToSend(TwitchChannel *channel);
 
     std::mutex lastMessageMutex_;
     std::queue<std::chrono::steady_clock::time_point> lastMessagePleb_;
@@ -80,6 +89,7 @@ private:
     BttvEmotes bttv;
     FfzEmotes ffz;
     HomiesEmotes homies;
+    QTimer bulkLiveStatusTimer_;
 
     pajlada::Signals::SignalHolder signalHolder_;
 };

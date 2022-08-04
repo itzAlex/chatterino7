@@ -3,6 +3,7 @@
 #include "messages/MessageElement.hpp"
 
 #include <QRegularExpression>
+#include <boost/optional.hpp>
 #include <ctime>
 #include <utility>
 
@@ -19,8 +20,17 @@ struct SystemMessageTag {
 };
 struct TimeoutMessageTag {
 };
+struct SevenTvEventApiUpdateEmoteMessageTag {
+};
+struct SevenTvEventApiRemoveEmoteMessageTag {
+};
+struct SevenTvEventApiAddEmoteMessageTag {
+};
 const SystemMessageTag systemMessage{};
 const TimeoutMessageTag timeoutMessage{};
+const SevenTvEventApiUpdateEmoteMessageTag seventvUpdateEmoteMessage{};
+const SevenTvEventApiRemoveEmoteMessageTag seventvRemoveEmoteMessage{};
+const SevenTvEventApiAddEmoteMessageTag seventvAddEmoteMessage{};
 
 MessagePtr makeSystemMessage(const QString &text);
 MessagePtr makeSystemMessage(const QString &text, const QTime &time);
@@ -34,6 +44,7 @@ struct MessageParseArgs {
     bool isSentWhisper = false;
     bool trimSubscriberUsername = false;
     bool isStaffOrBroadcaster = false;
+    bool isSubscriptionMessage = false;
     QString channelPointRewardId = "";
 };
 
@@ -48,9 +59,16 @@ public:
     MessageBuilder(TimeoutMessageTag, const QString &username,
                    const QString &durationInSeconds, bool multipleTimes,
                    const QTime &time = QTime::currentTime());
+    MessageBuilder(SevenTvEventApiAddEmoteMessageTag, const QString &actor,
+                   std::vector<QString> emoteNames);
+    MessageBuilder(SevenTvEventApiRemoveEmoteMessageTag, const QString &actor,
+                   std::vector<QString> emoteNames);
+    MessageBuilder(SevenTvEventApiUpdateEmoteMessageTag, const QString &actor,
+                   const QString &emoteName, const QString &oldEmoteName);
     MessageBuilder(const BanAction &action, uint32_t count = 1);
     MessageBuilder(const UnbanAction &action);
     MessageBuilder(const AutomodUserAction &action);
+
     virtual ~MessageBuilder() = default;
 
     Message *operator->();
@@ -63,7 +81,10 @@ public:
     void addLink(const QString &origLink, const QString &matchedLink);
 
     template <typename T, typename... Args>
+    // clang-format off
+    // clang-format can be enabled once clang-format v11+ has been installed in CI
     T *emplace(Args &&...args)
+    // clang-format on
     {
         static_assert(std::is_base_of<MessageElement, T>::value,
                       "T must extend MessageElement");

@@ -49,8 +49,8 @@ enum class MessageElementFlag : int64_t {
     FfzEmoteText = (1LL << 10),
     FfzEmote = FfzEmoteImage | FfzEmoteText,
 
-    SeventvEmoteImage = (1LL << 32),
-    SeventvEmoteText = (1LL << 33),
+    SeventvEmoteImage = (1LL << 41), // These guys are so funny
+    SeventvEmoteText = (1LL << 42),
     SeventvEmote = SeventvEmoteImage | SeventvEmoteText,
 
     HomiesEmoteImage = (1LL << 34),
@@ -116,7 +116,7 @@ enum class MessageElementFlag : int64_t {
 
     // Slot 9: itzAlex custom badges
     // - Custom badges
-    BadgeitzAlex = (1LL << 41),
+    BadgeitzAlex = (1LL << 61),
 
     Badges = BadgeGlobalAuthority | BadgePredictions | BadgeChannelAuthority |
              BadgeSubscription | BadgeVanity | BadgeChatterino | BadgeSeventv |
@@ -128,7 +128,7 @@ enum class MessageElementFlag : int64_t {
 
     ModeratorTools = (1LL << 22),
 
-    ModeratorUsercard = (1LL << 42),
+    ModeratorUsercard = (1LL << 60),
 
     EmojiImage = (1LL << 23),
     EmojiText = (1LL << 24),
@@ -152,8 +152,11 @@ enum class MessageElementFlag : int64_t {
     // e.g. BTTV's SoSnowy during christmas season or zerowidth 7TV/Homies emotes
     ZeroWidthEmote = (1LL << 36),
 
-    // (1LL << 32) is used by SeventvEmoteImage, it is next to FfzEmote
-    // (1LL << 33) is used by SeventvEmoteText, it is next to SeventvEmoteImage
+    // for elements of the message reply
+    RepliedMessage = (1LL << 32),
+
+    // for the reply button element
+    ReplyButton = (1LL << 33),
 
     Default = Timestamp | Badges | Username | BitsStatic | FfzEmoteImage |
               BttvEmoteImage | SeventvEmoteImage | HomiesEmoteImage |
@@ -238,6 +241,22 @@ private:
     ImagePtr image_;
 };
 
+// contains a image with a circular background color
+class CircularImageElement : public MessageElement
+{
+public:
+    CircularImageElement(ImagePtr image, int padding, QColor background,
+                         MessageElementFlags flags);
+
+    void addToContainer(MessageLayoutContainer &container,
+                        MessageElementFlags flags) override;
+
+private:
+    ImagePtr image_;
+    int padding_;
+    QColor background_;
+};
+
 // contains a text, it will split it into words
 class TextElement : public MessageElement
 {
@@ -246,6 +265,29 @@ public:
                 const MessageColor &color = MessageColor::Text,
                 FontStyle style = FontStyle::ChatMedium);
     ~TextElement() override = default;
+
+    void addToContainer(MessageLayoutContainer &container,
+                        MessageElementFlags flags) override;
+
+private:
+    MessageColor color_;
+    FontStyle style_;
+
+    struct Word {
+        QString text;
+        int width = -1;
+    };
+    std::vector<Word> words_;
+};
+
+// contains a text that will be truncated to one line
+class SingleLineTextElement : public MessageElement
+{
+public:
+    SingleLineTextElement(const QString &text, MessageElementFlags flags,
+                          const MessageColor &color = MessageColor::Text,
+                          FontStyle style = FontStyle::ChatMedium);
+    ~SingleLineTextElement() override = default;
 
     void addToContainer(MessageLayoutContainer &container,
                         MessageElementFlags flags) override;
@@ -325,12 +367,12 @@ class FfzBadgeElement : public BadgeElement
 {
 public:
     FfzBadgeElement(const EmotePtr &data, MessageElementFlags flags_,
-                    QColor &color);
+                    QColor color_);
 
 protected:
     MessageLayoutElement *makeImageLayoutElement(const ImagePtr &image,
                                                  const QSize &size) override;
-    QColor color;
+    const QColor color;
 };
 
 // contains a text, formated depending on the preferences
@@ -414,4 +456,18 @@ public:
 private:
     ImageSet images_;
 };
+
+class ReplyCurveElement : public MessageElement
+{
+public:
+    ReplyCurveElement();
+
+    void addToContainer(MessageLayoutContainer &container,
+                        MessageElementFlags flags) override;
+
+private:
+    int neededMargin_;
+    QSize size_;
+};
+
 }  // namespace chatterino
