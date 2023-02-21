@@ -232,6 +232,11 @@ set(SOURCE_FILES
         providers/chatterino/ChatterinoBadges.cpp
         providers/chatterino/ChatterinoBadges.hpp
 
+        providers/homies/HomiesBadges.cpp
+        providers/homies/HomiesBadges.hpp
+        providers/homies/HomiesEmotes.cpp
+        providers/homies/HomiesEmotes.hpp
+
         providers/colors/ColorProvider.cpp
         providers/colors/ColorProvider.hpp
 

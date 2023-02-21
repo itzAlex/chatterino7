@@ -170,6 +170,7 @@ public:
     BoolSetting useCustomFfzVipBadges = {
         "/appearance/badges/useCustomFfzVipBadges", true};
     BoolSetting showBadgesSevenTV = {"/appearance/badges/seventv", true};
+    BoolSetting showBadgesHomies = {"/appearance/badges/homies", true};
 
     /// Behaviour
     BoolSetting allowDuplicateMessages = {"/behaviour/allowDuplicateMessages",
@@ -216,7 +217,7 @@ public:
     BoolSetting animateEmotes = {"/emotes/enableGifAnimations", true};
     FloatSetting emoteScale = {"/emotes/scale", 1.f};
     BoolSetting showUnlistedSevenTVEmotes = {
-        "/emotes/showUnlistedSevenTVEmotes", false};
+        "/emotes/showUnlistedSevenTVEmotes", true};
     /**
      * This setting is kept for backwards compatibility.
      */
@@ -237,6 +238,8 @@ public:
     BoolSetting enableSevenTVGlobalEmotes = {"/emotes/seventv/global", true};
     BoolSetting enableSevenTVChannelEmotes = {"/emotes/seventv/channel", true};
     BoolSetting enableSevenTVEventAPI = {"/emotes/seventv/eventapi", true};
+    BoolSetting enableHomiesGlobalEmotes = {"/emotes/homies/global", true};
+    BoolSetting enableHomiesChannelEmotes = {"/emotes/homies/channel", true};
 
     /// Links
     BoolSetting linksDoubleClickOnly = {"/links/doubleClickToOpen", false};

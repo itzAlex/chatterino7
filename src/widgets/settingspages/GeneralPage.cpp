@@ -440,6 +440,8 @@ void GeneralPage::initLayout(GeneralPageView &layout)
     layout.addCheckbox("Show 7TV channel emotes", s.enableSevenTVChannelEmotes);
     layout.addCheckbox("Enable 7TV live emote updates (requires restart)",
                        s.enableSevenTVEventAPI);
+    layout.addCheckbox("Show Homies global emotes", s.enableHomiesGlobalEmotes);
+    layout.addCheckbox("Show Homies channel emotes", s.enableHomiesChannelEmotes);
 
     layout.addTitle("Streamer Mode");
     layout.addDescription(
@@ -731,6 +733,8 @@ void GeneralPage::initLayout(GeneralPageView &layout)
                        "e.g. Bot, FFZ supporter, FFZ developer");
     layout.addCheckbox("7TV", s.showBadgesSevenTV, false,
                        "Badges for 7TV admins, developers, and supporters");
+    layout.addCheckbox("Homies", s.showBadgesHomies, false,
+                       "e.g Custom badge, Homies developer, Homies supporter");
     layout.addSeperator();
     layout.addCheckbox("Use custom FrankerFaceZ moderator badges",
                        s.useCustomFfzModeratorBadges);

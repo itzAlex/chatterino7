@@ -34,6 +34,7 @@ class ChatterinoBadges;
 class SeventvBadges;
 class SeventvPaints;
 class FfzBadges;
+class HomiesBadges;
 class SeventvBadges;
 
 class IApplication
@@ -57,6 +58,7 @@ public:
     virtual TwitchIrcServer *getTwitch() = 0;
     virtual ChatterinoBadges *getChatterinoBadges() = 0;
     virtual FfzBadges *getFfzBadges() = 0;
+    virtual HomiesBadges *getHomiesBadges() = 0;
     virtual IUserDataController *getUserData() = 0;
 };
 
@@ -93,6 +95,7 @@ public:
     TwitchIrcServer *const twitch{};
     ChatterinoBadges *const chatterinoBadges{};
     FfzBadges *const ffzBadges{};
+    HomiesBadges *const homiesBadges{};
     SeventvBadges *const seventvBadges{};
     SeventvPaints *const seventvPaints{};
     UserDataController *const userData{};
@@ -148,6 +151,10 @@ public:
     FfzBadges *getFfzBadges() override
     {
         return this->ffzBadges;
+    }
+    HomiesBadges *getHomiesBadges() override
+    {
+        return this->homiesBadges;
     }
     IUserDataController *getUserData() override;
 

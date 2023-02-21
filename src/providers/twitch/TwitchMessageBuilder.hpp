@@ -117,6 +117,7 @@ private:
     void appendChatterinoBadges();
     void appendFfzBadges();
     void appendSeventvBadges();
+    void appendHomiesBadges();
     Outcome tryParseCheermote(const QString &string);
 
     bool shouldAddModerationElements() const;
