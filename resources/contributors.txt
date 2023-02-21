@@ -11,6 +11,7 @@
 
 fourtf | https://fourtf.com | :/avatars/fourtf.png | Author, main developer
 pajlada | https://pajlada.se | :/avatars/pajlada.png | Collaborator, co-developer
+itzAlexPL | https://github.com/itzAlex | :/avatars/itzalex.png | Homies developer
 zneix | https://github.com/zneix | :/avatars/zneix.png | Collaborator
 Mm2PL | https://github.com/mm2pl | :/avatars/mm2pl.png | Collaborator
 YungLPR | https://github.com/leon-richardt | | Collaborator
