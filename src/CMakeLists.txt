@@ -480,6 +480,12 @@ set(SOURCE_FILES
         widgets/dialogs/UserInfoPopup.hpp
         widgets/dialogs/WelcomeDialog.cpp
         widgets/dialogs/WelcomeDialog.hpp
+        widgets/dialogs/SelectChannelHighlightPopup.cpp
+        widgets/dialogs/SelectChannelHighlightPopup.hpp
+        widgets/dialogs/SelectChannelSeparateLinksDialog.cpp
+        widgets/dialogs/SelectChannelSeparateLinksDialog.hpp
+        widgets/dialogs/TokenDialog.cpp
+        widgets/dialogs/TokenDialog.hpp
         widgets/dialogs/switcher/NewPopupItem.cpp
         widgets/dialogs/switcher/NewPopupItem.hpp
         widgets/dialogs/switcher/NewTabItem.cpp
@@ -565,6 +571,8 @@ set(SOURCE_FILES
         widgets/settingspages/NotificationPage.hpp
         widgets/settingspages/SettingsPage.cpp
         widgets/settingspages/SettingsPage.hpp
+        widgets/settingspages/HomiesPage.cpp
+        widgets/settingspages/HomiesPage.hpp
 
         widgets/splits/ClosedSplits.cpp
         widgets/splits/ClosedSplits.hpp

@@ -42,11 +42,15 @@ public:
     SignalVector<Nickname> &nicknames;
     SignalVector<ModerationAction> &moderationActions;
     SignalVector<ChannelLog> &loggedChannels;
+    SignalVector<QString> &separateLinksChannels;
 
     bool isHighlightedUser(const QString &username);
     bool isBlacklistedUser(const QString &username);
     bool isMutedChannel(const QString &channelName);
     bool toggleMutedChannel(const QString &channelName);
+    bool isSeparatedLinksChannel(const QString &channelName);
+    void addSeparatedLinkChannel(const QString &channelName);
+    void clearSeparatedLinkChannels();
 
 private:
     void mute(const QString &channelName);
@@ -118,6 +122,8 @@ public:
     EnumSetting<NotebookTabLocation> tabDirection = {"/appearance/tabDirection",
                                                      NotebookTabLocation::Top};
 
+    BoolSetting grayOutRecents = {"/appearance/messages/grayOutRecents", true};
+
     //    BoolSetting collapseLongMessages =
     //    {"/appearance/messages/collapseLongMessages", false};
     BoolSetting hideReplyContext = {"/appearance/hideReplyContext", false};
@@ -175,7 +181,7 @@ public:
     /// Behaviour
     BoolSetting allowDuplicateMessages = {"/behaviour/allowDuplicateMessages",
                                           true};
-    BoolSetting mentionUsersWithAt = {"/behaviour/mentionUsersWithAt", false};
+    BoolSetting mentionUsersWithAt = {"/behaviour/mentionUsersWithAt", true};
     BoolSetting showJoins = {"/behaviour/showJoins", false};
     BoolSetting showParts = {"/behaviour/showParts", false};
     FloatSetting mouseScrollMultiplier = {"/behaviour/mouseScrollMultiplier",
@@ -183,6 +189,7 @@ public:
     BoolSetting autoCloseUserPopup = {"/behaviour/autoCloseUserPopup", true};
     BoolSetting autoCloseThreadPopup = {"/behaviour/autoCloseThreadPopup",
                                         false};
+    QStringSetting searchEngine = {"/behaviour/searchEngine", "Google"};
     // BoolSetting twitchSeperateWriteConnection =
     // {"/behaviour/twitchSeperateWriteConnection", false};
 
@@ -199,6 +206,14 @@ public:
         "/behaviour/autocompletion/emoteCompletionWithColon", true};
     BoolSetting showUsernameCompletionMenu = {
         "/behaviour/autocompletion/showUsernameCompletionMenu", true};
+    BoolSetting enableHomiesCompletion = {
+            "/behaviour/autocompletion/enableHomiesCompletion", true};
+    BoolSetting enableFFZCompletion = {
+            "/behaviour/autocompletion/enableFFZCompletion", true};
+    BoolSetting enableBTTVCompletion = {
+            "/behaviour/autocompletion/enableBTTVCompletion", true};
+    BoolSetting enable7TVCompletion = {
+            "/behaviour/autocompletion/enable7TVCompletion", true};
 
     FloatSetting pauseOnHoverDuration = {"/behaviour/pauseOnHoverDuration", 0};
     EnumSetting<Qt::KeyboardModifier> pauseChatModifier = {
@@ -206,6 +221,9 @@ public:
     BoolSetting autorun = {"/behaviour/autorun", false};
     BoolSetting mentionUsersWithComma = {"/behaviour/mentionUsersWithComma",
                                          true};
+    BoolSetting joinSeparatedLinks = {"/behaviour/joinSeparatedLinks", false};
+    BoolSetting separateClipsLinks = {"/behaviour/separateClipsLinks", false};
+    BoolSetting separateLinks = {"/behaviour/separateLinks", false};
 
     /// Commands
     BoolSetting allowCommandsAtEnd = {"/commands/allowCommandsAtEnd", false};

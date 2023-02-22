@@ -122,6 +122,12 @@ public:
         this->itemsChanged_();
     }
 
+    void clear()
+    {
+        assertInGuiThread();
+        this->items_.clear();
+    }
+
     const std::vector<T> &raw() const
     {
         assertInGuiThread();
@@ -150,7 +156,7 @@ public:
     decltype(auto) operator[](size_t index)
     {
         assertInGuiThread();
-        return this->items[index];
+        return this->items_[index];
     }
 
     auto empty()

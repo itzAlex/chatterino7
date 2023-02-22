@@ -19,12 +19,11 @@ class SeventvBadges : public Singleton
 {
 public:
     void initialize(Settings &settings, Paths &paths) override;
+    void loadSeventvBadges();
 
     boost::optional<EmotePtr> getBadge(const UserId &id);
 
 private:
-    void loadSeventvBadges();
-
     // Mutex for both `badgeMap_` and `emotes_`
     std::shared_mutex mutex_;
 

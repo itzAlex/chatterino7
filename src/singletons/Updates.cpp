@@ -247,16 +247,14 @@ void Updates::checkForUpdates()
         return;
     }
 
-    QString url = "https://api.7tv.app/v2/chatterino/version/" CHATTERINO_OS
-                  "/" +
-                  currentBranch();
+    QString url = "https://chatterinohomies.com/api/latest-release";
 
     NetworkRequest(url)
         .timeout(60000)
         .onSuccess([this](auto result) -> Outcome {
             auto object = result.parseJson();
             /// Version available on every platform
-            QJsonValue version_val = object.value("version");
+            QJsonValue version_val = object.value("tag_name");
 
             if (!version_val.isString())
             {
@@ -265,9 +263,14 @@ void Updates::checkForUpdates()
                 return Failure;
             }
 
-#if defined Q_OS_WIN || defined Q_OS_MACOS
+#if defined Q_OS_WIN // || defined Q_OS_MACOS
             /// Downloads an installer for the new version
-            QJsonValue updateExe_val = object.value("updateexe");
+            QJsonValue updateExe_val = object.value("download")
+                                           .toObject()
+                                           .value("installer")
+                                           .toObject()
+                                           .value("url");
+
             if (!updateExe_val.isString())
             {
                 this->setStatus_(SearchFailed);
@@ -278,7 +281,12 @@ void Updates::checkForUpdates()
 
 #    ifdef Q_OS_WIN
             /// Windows portable
-            QJsonValue portable_val = object.value("portable_download");
+            QJsonValue portable_val = object.value("download")
+                                          .toObject()
+                                          .value("portable")
+                                          .toObject()
+                                          .value("url");
+
             if (!portable_val.isString())
             {
                 this->setStatus_(SearchFailed);
@@ -287,13 +295,14 @@ void Updates::checkForUpdates()
             }
             this->updatePortable_ = portable_val.toString();
 #    endif
-
+/*
 #elif defined Q_OS_LINUX
             QJsonValue updateGuide_val = object.value("updateguide");
             if (updateGuide_val.isString())
             {
                 this->updateGuideLink_ = updateGuide_val.toString();
             }
+*/
 #else
             return Failure;
 #endif
@@ -302,7 +311,7 @@ void Updates::checkForUpdates()
             this->onlineVersion_ = version_val.toString();
 
             /// Update available :)
-            if (this->currentVersion_ != this->onlineVersion_)
+            if ("v." + this->currentVersion_ != this->onlineVersion_)
             {
                 this->setStatus_(UpdateAvailable);
                 this->isDowngrade_ = Updates::isDowngradeOf(

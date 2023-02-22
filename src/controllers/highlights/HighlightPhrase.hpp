@@ -25,7 +25,10 @@ public:
      */
     HighlightPhrase(const QString &pattern, bool showInMentions, bool hasAlert,
                     bool hasSound, bool isRegex, bool isCaseSensitive,
-                    const QString &soundUrl, QColor color);
+                    const QString &soundUrl, QColor color,
+                    bool globalHighlight = true,
+                    std::vector<std::string> channels = {},
+                    std::vector<std::string> ExcludedChannels = {});
 
     /**
      * @brief Create a new HighlightPhrase.
@@ -34,7 +37,10 @@ public:
      */
     HighlightPhrase(const QString &pattern, bool showInMentions, bool hasAlert,
                     bool hasSound, bool isRegex, bool isCaseSensitive,
-                    const QString &soundUrl, std::shared_ptr<QColor> color);
+                    const QString &soundUrl, std::shared_ptr<QColor> color,
+                    bool globalHighlight = true,
+                    std::vector<std::string> channels = {},
+                    std::vector<std::string> ExcludedChannels = {});
 
     const QString &getPattern() const;
     bool showInMentions() const;
@@ -73,6 +79,9 @@ public:
     bool isCaseSensitive() const;
     const QUrl &getSoundUrl() const;
     const std::shared_ptr<QColor> getColor() const;
+    bool isGlobalHighlight() const;
+    const std::vector<std::string> &getChannels() const;
+    const std::vector<std::string> &getExcludedChannels() const;
 
     /*
      * XXX: Use the constexpr constructor here once we are building with
@@ -97,6 +106,9 @@ private:
     QUrl soundUrl_;
     std::shared_ptr<QColor> color_;
     QRegularExpression regex_;
+    bool globalHighlight_;
+    std::vector<std::string> channels_;
+    std::vector<std::string> ExcludedChannels_;
 };
 
 }  // namespace chatterino
@@ -106,8 +118,9 @@ namespace pajlada {
 namespace {
     chatterino::HighlightPhrase constructError()
     {
-        return chatterino::HighlightPhrase(QString(), false, false, false,
-                                           false, false, QString(), QColor());
+        return chatterino::HighlightPhrase(
+                QString(), false, false, false, false, false, QString(), QColor(),
+                true, std::vector<std::string>(), std::vector<std::string>());
     }
 }  // namespace
 
@@ -117,6 +130,8 @@ struct Serialize<chatterino::HighlightPhrase> {
                                 rapidjson::Document::AllocatorType &a)
     {
         rapidjson::Value ret(rapidjson::kObjectType);
+        rapidjson::Value ret_array(rapidjson::kArrayType);
+        rapidjson::Value ret_array2(rapidjson::kArrayType);
 
         chatterino::rj::set(ret, "pattern", value.getPattern(), a);
         chatterino::rj::set(ret, "showInMentions", value.showInMentions(), a);
@@ -127,6 +142,21 @@ struct Serialize<chatterino::HighlightPhrase> {
         chatterino::rj::set(ret, "soundUrl", value.getSoundUrl().toString(), a);
         chatterino::rj::set(ret, "color",
                             value.getColor()->name(QColor::HexArgb), a);
+        chatterino::rj::set(ret, "global", value.isGlobalHighlight(), a);
+
+        for (const auto &channel : value.getChannels())
+        {
+            chatterino::rj::add(ret_array, channel, a);
+        }
+
+        chatterino::rj::set(ret, "channels", ret_array, a);
+
+        for (const auto &channel : value.getExcludedChannels())
+        {
+            chatterino::rj::add(ret_array2, channel, a);
+        }
+
+        chatterino::rj::set(ret, "ExcludedChannels", ret_array2, a);
 
         return ret;
     }
@@ -152,6 +182,9 @@ struct Deserialize<chatterino::HighlightPhrase> {
         bool _isCaseSensitive = false;
         QString _soundUrl;
         QString encodedColor;
+        bool _isGlobalHighlight = true;
+        std::vector<std::string> channels;
+        std::vector<std::string> ExcludedChannels;
 
         chatterino::rj::getSafe(value, "pattern", _pattern);
         chatterino::rj::getSafe(value, "showInMentions", _showInMentions);
@@ -161,14 +194,18 @@ struct Deserialize<chatterino::HighlightPhrase> {
         chatterino::rj::getSafe(value, "case", _isCaseSensitive);
         chatterino::rj::getSafe(value, "soundUrl", _soundUrl);
         chatterino::rj::getSafe(value, "color", encodedColor);
+        chatterino::rj::getSafe(value, "global", _isGlobalHighlight);
+        chatterino::rj::getSafe(value, "channels", channels);
+        chatterino::rj::getSafe(value, "ExcludedChannels", ExcludedChannels);
 
         auto _color = QColor(encodedColor);
         if (!_color.isValid())
             _color = chatterino::HighlightPhrase::FALLBACK_HIGHLIGHT_COLOR;
 
-        return chatterino::HighlightPhrase(_pattern, _showInMentions, _hasAlert,
-                                           _hasSound, _isRegex,
-                                           _isCaseSensitive, _soundUrl, _color);
+        return chatterino::HighlightPhrase(
+                _pattern, _showInMentions, _hasAlert, _hasSound, _isRegex,
+                _isCaseSensitive, _soundUrl, _color, _isGlobalHighlight, channels,
+                ExcludedChannels);
     }
 };
 
