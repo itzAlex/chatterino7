@@ -2,6 +2,7 @@
 
 #include "common/Aliases.hpp"
 #include "common/Atomic.hpp"
+#include "providers/twitch/TwitchChannel.hpp"
 
 #include <boost/optional.hpp>
 
@@ -28,6 +29,7 @@ public:
 
     std::shared_ptr<const EmoteMap> emotes() const;
     boost::optional<EmotePtr> emote(const EmoteName &name) const;
+    static void addEmote(QString emoteID, TwitchChannel *channel);
     void loadEmotes();
     static void loadChannel(std::weak_ptr<Channel> channel,
                             const QString &channelId,

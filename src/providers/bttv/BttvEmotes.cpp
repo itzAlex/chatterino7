@@ -189,6 +189,89 @@ boost::optional<EmotePtr> BttvEmotes::emote(const EmoteName &name) const
     return it->second;
 }
 
+void BttvEmotes::addEmote(QString emoteID, TwitchChannel *channel)
+{
+    QString BTTV_TOKEN = pajlada::Settings::Setting<QString>::get("/BTTVToken");
+
+    BTTV_TOKEN = BTTV_TOKEN.replace("Bearer ", "");
+
+    if (BTTV_TOKEN.isEmpty())
+    {
+        channel->addMessage(makeSystemMessage(
+                "To add an emote you must first add your BTTV token!"));
+        return;
+    }
+
+    QString channelID = channel->roomId();
+
+    NetworkRequest(QString(bttvChannelEmoteApiUrl) + channelID)
+            .timeout(20000)
+            .onSuccess([=](NetworkResult result) -> Outcome {
+                QString BTTVChannelID = result.parseJson().value("id").toString();
+
+                const QString urlTemplate(
+                        "https://api.betterttv.net/3/emotes/%1/shared/%2");
+
+                NetworkRequest(urlTemplate.arg(emoteID, BTTVChannelID),
+                               NetworkRequestType::Put)
+                        .timeout(20000)
+                        .header("Authorization", "Bearer " + BTTV_TOKEN)
+                        .onSuccess([=](NetworkResult result) -> Outcome {
+                            channel->addMessage(
+                                    makeSystemMessage("BTTV emote added successfully!"));
+
+                            return Success;
+                        })
+                        .onError([=](NetworkResult result) {
+                            QString error =
+                                    result.parseJson().value("message").toString();
+
+                            if (error.startsWith("emote not found"))
+                            {
+                                channel->addMessage(makeSystemMessage(
+                                        "There is no emote with this identifier in BTTV!"));
+                            }
+
+                            if (error.startsWith("forbidden"))
+                            {
+                                channel->addMessage(makeSystemMessage(
+                                        "You do not have permission to modify BTTV emotes "
+                                        "in this channel!"));
+                            }
+
+                            if (error.startsWith("user not found"))
+                            {
+                                channel->addMessage(makeSystemMessage(
+                                        "This channel is unknown to BTTV"));
+                            }
+
+                            if (error.startsWith("unauthorized"))
+                            {
+                                channel->addMessage(makeSystemMessage(
+                                        "The BTTV token you have entered is invalid!"));
+                            }
+
+                            if (error.startsWith("too many emotes"))
+                            {
+                                channel->addMessage(
+                                        makeSystemMessage("This channel has already used "
+                                                          "all BTTV emotes slots!"));
+                            }
+
+                            else
+                            {
+                                channel->addMessage(
+                                        makeSystemMessage("An unknown error occurred while "
+                                                          "adding the BTTV emote!"));
+                            }
+                        })
+                        .execute();
+
+                return Success;
+            })
+            .execute();
+}
+
 void BttvEmotes::loadEmotes()
 {
     if (!Settings::instance().enableBTTVGlobalEmotes)

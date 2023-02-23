@@ -4,6 +4,7 @@
 #include "common/Aliases.hpp"
 #include "common/Atomic.hpp"
 #include "common/FlagsEnum.hpp"
+#include "providers/twitch/TwitchChannel.hpp"
 
 #include <memory>
 
@@ -63,6 +64,7 @@ class EmoteMap;
 
 class SeventvEmotes final
 {
+    static constexpr const char *apiUrlGQL = "https://7tv.io/v3/gql";
 public:
     struct ChannelInfo {
         QString userID;
@@ -74,6 +76,7 @@ public:
 
     std::shared_ptr<const EmoteMap> globalEmotes() const;
     boost::optional<EmotePtr> globalEmote(const EmoteName &name) const;
+    static void addEmote(QString emoteID, TwitchChannel *channel);
     void loadGlobalEmotes();
     static void loadChannelEmotes(
         const std::weak_ptr<Channel> &channel, const QString &channelId,

@@ -70,6 +70,12 @@
 
 namespace chatterino {
 namespace {
+    // Regex to detect URL of 7TV & BTTV emotes
+    static QRegularExpression SevenTVEmoteLink(
+            "7tv\\.app\\/emotes\\/(\\w{24})");
+    static QRegularExpression BTTVEmoteLink(
+            "betterttv\\.com\\/emotes\\/(\\w{24})");
+
     void addEmoteContextMenuItems(const Emote &emote,
                                   MessageElementFlags creatorFlags, QMenu &menu)
     {
@@ -2206,6 +2212,29 @@ void ChannelView::addLinkContextMenuItems(
 
     // Link copy
     QString url = link.value;
+
+    auto SevenTVEmoteLinkMatch = SevenTVEmoteLink.match(url);
+    auto BTTVEmoteLinkMatch = BTTVEmoteLink.match(url);
+
+    // 7TV Add emote button
+    if (SevenTVEmoteLinkMatch.hasMatch()) {
+        QString emoteID = SevenTVEmoteLinkMatch.captured(1);
+        menu.addAction("Add 7TV Emote", [=] {
+            TwitchChannel *twitchChannel = dynamic_cast<TwitchChannel *>(
+                    this->underlyingChannel_.get());
+            SeventvEmotes::addEmote(emoteID, twitchChannel);
+        });
+    }
+
+    // BTTV Add emote button
+    if (BTTVEmoteLinkMatch.hasMatch()) {
+        QString emoteID = BTTVEmoteLinkMatch.captured(1);
+        menu.addAction("Add BTTV Emote", [=] {
+            TwitchChannel *twitchChannel = dynamic_cast<TwitchChannel *>(
+                    this->underlyingChannel_.get());
+            BttvEmotes::addEmote(emoteID, twitchChannel);
+        });
+    }
 
     // open link
     menu.addAction("Open link", [url] {
