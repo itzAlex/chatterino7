@@ -43,6 +43,11 @@ static const QSet<QString> specialMessageTypes{
     "announcement",   // new mod announcement thing
 };
 
+static QRegularExpression separatedLinkRegex("https?:\\/\\s\\/\\S+");
+static QRegularExpression validDomainRegex(
+        "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,"
+        "61}[a-z0-9]");
+
 MessagePtr generateBannedMessage(bool confirmedBan)
 {
     const auto linkColor = MessageColor(MessageColor::Link);
@@ -74,6 +79,30 @@ MessagePtr generateBannedMessage(bool confirmedBan)
         ->setLink(accountsLink);
 
     return builder.release();
+}
+
+QString joinSeparatedLinks(QString message) {
+    QString messageContent = "";
+
+    if (getSettings()->joinSeparatedLinks)
+    {
+        auto separatedLinkMatch = separatedLinkRegex.match(message);
+
+        if (separatedLinkMatch.hasMatch())
+        {
+            QString separatedLink =
+                    separatedLinkMatch.captured(0).simplified().remove(" ");
+
+            auto validDomainMatch = validDomainRegex.match(separatedLink);
+            if (validDomainMatch.hasMatch())
+            {
+                messageContent = message.replace(
+                        separatedLinkMatch.captured(0), separatedLink);
+            }
+        }
+    }
+
+    return messageContent;
 }
 
 int stripLeadingReplyMention(const QVariantMap &tags, QString &content)
@@ -296,10 +325,13 @@ std::vector<MessagePtr> IrcMessageHandler::parseMessage(
 std::vector<MessagePtr> IrcMessageHandler::parsePrivMessage(
     Channel *channel, Communi::IrcPrivateMessage *message)
 {
+    QString messageContent = joinSeparatedLinks(message->content());
     std::vector<MessagePtr> builtMessages;
     MessageParseArgs args;
-    TwitchMessageBuilder builder(channel, message, args, message->content(),
-                                 message->isAction());
+    TwitchMessageBuilder builder(
+            channel, message, args,
+            messageContent.isEmpty() ? message->content() : messageContent,
+            message->isAction());
     if (!builder.isIgnored())
     {
         builtMessages.emplace_back(builder.build());
@@ -311,6 +343,9 @@ std::vector<MessagePtr> IrcMessageHandler::parsePrivMessage(
 void IrcMessageHandler::handlePrivMessage(Communi::IrcPrivateMessage *message,
                                           TwitchIrcServer &server)
 {
+    QString messageContent = joinSeparatedLinks(message->content());
+    messageContent.replace(COMBINED_FIXER, ZERO_WIDTH_JOINER);
+
     // This is for compatibility with older Chatterino versions. Twitch didn't use
     // to allow ZERO WIDTH JOINER unicode character, so Chatterino used ESCAPE_TAG
     // instead.
@@ -318,9 +353,11 @@ void IrcMessageHandler::handlePrivMessage(Communi::IrcPrivateMessage *message,
     // https://mm2pl.github.io/emoji_rfc.pdf for more details
 
     this->addMessage(
-        message, message->target(),
-        message->content().replace(COMBINED_FIXER, ZERO_WIDTH_JOINER), server,
-        false, message->isAction());
+            message, message->target(),
+            messageContent.isEmpty()
+            ? message->content().replace(COMBINED_FIXER, ZERO_WIDTH_JOINER)
+            : messageContent,
+            server, false, message->isAction());
 }
 
 std::vector<MessagePtr> IrcMessageHandler::parseMessageWithReply(
@@ -341,10 +378,13 @@ std::vector<MessagePtr> IrcMessageHandler::parseMessageWithReply(
         }
 
         QString content = privMsg->content();
+        QString messageContent = joinSeparatedLinks(content);
         int messageOffset = stripLeadingReplyMention(privMsg->tags(), content);
         MessageParseArgs args;
-        TwitchMessageBuilder builder(channel, message, args, content,
-                                     privMsg->isAction());
+        TwitchMessageBuilder builder(
+                channel, message, args,
+                messageContent.isEmpty() ? content : messageContent,
+                privMsg->isAction());
         builder.setMessageOffset(messageOffset);
 
         this->populateReply(tc, message, otherLoaded, builder);
