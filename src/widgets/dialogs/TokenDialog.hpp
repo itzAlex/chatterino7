@@ -13,14 +13,14 @@ class QStandardItemModel;
 class QString;
 
 namespace chatterino {
-    class TokenDialog : public QDialog
-    {
-    public:
-        TokenDialog(int provider, QWidget *parent = 0);
+class TokenDialog : public QDialog
+{
+public:
+    TokenDialog(int provider, QWidget *parent = 0);
 
-    private:
-        struct {
-            QVBoxLayout mainLayout;
-        } ui_;
-    };
+private:
+    struct {
+        QVBoxLayout mainLayout;
+    } ui_;
+};
 }  // namespace chatterino

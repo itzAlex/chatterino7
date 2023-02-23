@@ -17,9 +17,9 @@
 #include "messages/MessageBuilder.hpp"
 #include "messages/MessageElement.hpp"
 #include "messages/MessageThread.hpp"
-#include "providers/LinkResolver.hpp"
 #include "providers/bttv/BttvEmotes.hpp"
 #include "providers/homies/HomiesEmotes.hpp"
+#include "providers/LinkResolver.hpp"
 #include "providers/seventv/SeventvEmotes.hpp"
 #include "providers/twitch/TwitchAccount.hpp"
 #include "providers/twitch/TwitchChannel.hpp"
@@ -72,9 +72,9 @@ namespace chatterino {
 namespace {
     // Regex to detect URL of 7TV & BTTV emotes
     static QRegularExpression SevenTVEmoteLink(
-            "7tv\\.app\\/emotes\\/(\\w{24})");
+        "7tv\\.app\\/emotes\\/(\\w{24})");
     static QRegularExpression BTTVEmoteLink(
-            "betterttv\\.com\\/emotes\\/(\\w{24})");
+        "betterttv\\.com\\/emotes\\/(\\w{24})");
 
     void addEmoteContextMenuItems(const Emote &emote,
                                   MessageElementFlags creatorFlags, QMenu &menu)
@@ -2217,21 +2217,23 @@ void ChannelView::addLinkContextMenuItems(
     auto BTTVEmoteLinkMatch = BTTVEmoteLink.match(url);
 
     // 7TV Add emote button
-    if (SevenTVEmoteLinkMatch.hasMatch()) {
+    if (SevenTVEmoteLinkMatch.hasMatch())
+    {
         QString emoteID = SevenTVEmoteLinkMatch.captured(1);
         menu.addAction("Add 7TV Emote", [=] {
-            TwitchChannel *twitchChannel = dynamic_cast<TwitchChannel *>(
-                    this->underlyingChannel_.get());
+            TwitchChannel *twitchChannel =
+                dynamic_cast<TwitchChannel *>(this->underlyingChannel_.get());
             SeventvEmotes::addEmote(emoteID, twitchChannel);
         });
     }
 
     // BTTV Add emote button
-    if (BTTVEmoteLinkMatch.hasMatch()) {
+    if (BTTVEmoteLinkMatch.hasMatch())
+    {
         QString emoteID = BTTVEmoteLinkMatch.captured(1);
         menu.addAction("Add BTTV Emote", [=] {
-            TwitchChannel *twitchChannel = dynamic_cast<TwitchChannel *>(
-                    this->underlyingChannel_.get());
+            TwitchChannel *twitchChannel =
+                dynamic_cast<TwitchChannel *>(this->underlyingChannel_.get());
             BttvEmotes::addEmote(emoteID, twitchChannel);
         });
     }
@@ -2648,8 +2650,8 @@ void ChannelView::handleLinkClick(QMouseEvent *event, const Link &link,
             QString value = link.value;
 
             ChannelPtr channel = this->hasSourceChannel()
-                                 ? this->sourceChannel_
-                                 : this->underlyingChannel_;
+                                     ? this->sourceChannel_
+                                     : this->underlyingChannel_;
             SearchPopup *searchPopup =
                 dynamic_cast<SearchPopup *>(this->parentWidget());
             if (searchPopup != nullptr)

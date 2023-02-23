@@ -13,17 +13,17 @@ class QStandardItemModel;
 class QString;
 
 namespace chatterino {
-    class SelectChannelSeparateLinksDialog : public QDialog
-    {
-    public:
-        SelectChannelSeparateLinksDialog(QWidget *parent = 0);
+class SelectChannelSeparateLinksDialog : public QDialog
+{
+public:
+    SelectChannelSeparateLinksDialog(QWidget *parent = 0);
 
-    private:
-        struct {
-            QVBoxLayout mainLayout;
-            QHBoxLayout *buttons_;
-            QStandardItemModel *model_;
-            QTableView *tableView_;
-        } ui_;
-    };
+private:
+    struct {
+        QVBoxLayout mainLayout;
+        QHBoxLayout *buttons_;
+        QStandardItemModel *model_;
+        QTableView *tableView_;
+    } ui_;
+};
 }  // namespace chatterino

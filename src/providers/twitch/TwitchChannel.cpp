@@ -17,12 +17,12 @@
 #include "providers/bttv/BttvEmotes.hpp"
 #include "providers/bttv/BttvLiveUpdates.hpp"
 #include "providers/bttv/liveupdates/BttvLiveUpdateMessages.hpp"
-#include "providers/RecentMessagesApi.hpp"
 #include "providers/homies/HomiesBadges.hpp"
+#include "providers/homies/HomiesEmotes.hpp"
+#include "providers/RecentMessagesApi.hpp"
 #include "providers/seventv/eventapi/Dispatch.hpp"
 #include "providers/seventv/SeventvEmotes.hpp"
 #include "providers/seventv/SeventvEventAPI.hpp"
-#include "providers/homies/HomiesEmotes.hpp"
 #include "providers/twitch/api/Helix.hpp"
 #include "providers/twitch/ChannelPointReward.hpp"
 #include "providers/twitch/IrcMessageHandler.hpp"
@@ -299,13 +299,13 @@ void TwitchChannel::refreshHomiesChannelEmotes(bool manualRefresh)
     }
 
     HomiesEmotes::loadChannel(
-            weakOf<Channel>(this), this->roomId(),
-            [this, weak = weakOf<Channel>(this)](auto &&emoteMap) {
-                if (auto shared = weak.lock())
-                    this->homiesEmotes_.set(
-                            std::make_shared<EmoteMap>(std::move(emoteMap)));
-            },
-            manualRefresh);
+        weakOf<Channel>(this), this->roomId(),
+        [this, weak = weakOf<Channel>(this)](auto &&emoteMap) {
+            if (auto shared = weak.lock())
+                this->homiesEmotes_.set(
+                    std::make_shared<EmoteMap>(std::move(emoteMap)));
+        },
+        manualRefresh);
 }
 
 void TwitchChannel::addChannelPointReward(const ChannelPointReward &reward)
@@ -646,7 +646,7 @@ boost::optional<EmotePtr> TwitchChannel::seventvEmote(
 }
 
 boost::optional<EmotePtr> TwitchChannel::homiesEmote(
-        const EmoteName &name) const
+    const EmoteName &name) const
 {
     auto emotes = this->homiesEmotes_.get();
     auto it = emotes->find(name);

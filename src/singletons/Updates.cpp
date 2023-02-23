@@ -263,7 +263,7 @@ void Updates::checkForUpdates()
                 return Failure;
             }
 
-#if defined Q_OS_WIN // || defined Q_OS_MACOS
+#if defined Q_OS_WIN  // || defined Q_OS_MACOS
             /// Downloads an installer for the new version
             QJsonValue updateExe_val = object.value("download")
                                            .toObject()

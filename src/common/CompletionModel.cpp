@@ -154,16 +154,19 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
     // 7TV Global
     if (getSettings()->enable7TVCompletion)
     {
-        for (const auto &emote:
-                *getApp()->twitch->getSeventvEmotes().globalEmotes()) {
-            addString(emote.first.string, TaggedString::Type::SeventvGlobalEmote);
+        for (const auto &emote :
+             *getApp()->twitch->getSeventvEmotes().globalEmotes())
+        {
+            addString(emote.first.string,
+                      TaggedString::Type::SeventvGlobalEmote);
         }
     }
 
     // Bttv Global
     if (getSettings()->enableBTTVCompletion)
     {
-        for (const auto &emote: *getApp()->twitch->getBttvEmotes().emotes()) {
+        for (const auto &emote : *getApp()->twitch->getBttvEmotes().emotes())
+        {
             addString(emote.first.string, TaggedString::Type::BTTVChannelEmote);
         }
     }
@@ -171,7 +174,8 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
     // Ffz Global
     if (getSettings()->enableFFZCompletion)
     {
-        for (const auto &emote: *getApp()->twitch->getFfzEmotes().emotes()) {
+        for (const auto &emote : *getApp()->twitch->getFfzEmotes().emotes())
+        {
             addString(emote.first.string, TaggedString::Type::FFZChannelEmote);
         }
     }
@@ -213,11 +217,10 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
 
         for (const auto &name : chatters)
         {
-            addString(
-                formatUserMention(name, isFirstWord,
-                                    getSettings()->mentionUsersWithComma,
-                                    getSettings()->mentionUsersWithAt),
-                TaggedString::Type::Username);
+            addString(formatUserMention(name, isFirstWord,
+                                        getSettings()->mentionUsersWithComma,
+                                        getSettings()->mentionUsersWithAt),
+                      TaggedString::Type::Username);
         }
     }
     else if (!getSettings()->userCompletionOnlyWithAt)

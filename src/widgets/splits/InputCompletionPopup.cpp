@@ -138,7 +138,8 @@ void InputCompletionPopup::updateEmotes(const QString &text, ChannelPtr channel)
 
         if (getSettings()->enable7TVCompletion)
         {
-            if (auto seventvG = getApp()->twitch->getSeventvEmotes().globalEmotes())
+            if (auto seventvG =
+                    getApp()->twitch->getSeventvEmotes().globalEmotes())
             {
                 addEmotes(emotes, *seventvG, text, "Global 7TV");
             }

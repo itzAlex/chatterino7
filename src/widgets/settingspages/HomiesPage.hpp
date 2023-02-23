@@ -8,27 +8,27 @@ class QComboBox;
 
 namespace chatterino {
 
-    class GeneralPageView;
-    class DescriptionLabel;
-    struct DropdownArgs;
+class GeneralPageView;
+class DescriptionLabel;
+struct DropdownArgs;
 
-    class HomiesPage : public SettingsPage
-    {
-        Q_OBJECT
+class HomiesPage : public SettingsPage
+{
+    Q_OBJECT
 
-    public:
-        HomiesPage();
+public:
+    HomiesPage();
 
-        bool filterElements(const QString &query);
+    bool filterElements(const QString &query);
 
-    private:
-        void initLayout(GeneralPageView &layout);
-        void initExtra();
+private:
+    void initLayout(GeneralPageView &layout);
+    void initExtra();
 
-        QString getFont(const DropdownArgs &args) const;
+    QString getFont(const DropdownArgs &args) const;
 
-        DescriptionLabel *cachePath_{};
-        GeneralPageView *view_{};
-    };
+    DescriptionLabel *cachePath_{};
+    GeneralPageView *view_{};
+};
 
 }  //namespace chatterino

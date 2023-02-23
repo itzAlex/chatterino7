@@ -566,10 +566,10 @@ UserInfoPopup::UserInfoPopup(bool closeAutomatically, QWidget *parent,
 
         this->userStateChanged_.connect([this]() mutable {
             TwitchChannel *twitchChannel =
-                    dynamic_cast<TwitchChannel *>(this->channel_.get());
+                dynamic_cast<TwitchChannel *>(this->channel_.get());
 
             bool isModUsercard =
-                    twitchChannel ? twitchChannel->hasModRights() : false;
+                twitchChannel ? twitchChannel->hasModRights() : false;
 
             if (isModUsercard)
             {

@@ -414,14 +414,14 @@ void EmotePopup::loadChannel(ChannelPtr channel)
 
     // twitch
     addTwitchEmoteSets(
-            getApp()->accounts->twitch.getCurrent()->accessEmotes()->emoteSets,
-            *globalChannel, *subChannel, this->channel_->getName());
+        getApp()->accounts->twitch.getCurrent()->accessEmotes()->emoteSets,
+        *globalChannel, *subChannel, this->channel_->getName());
 
     // channel
     if (Settings::instance().enableBTTVChannelEmotes)
     {
-        addEmotes(*channelChannel, *this->twitchChannel_->homiesEmotes(), "Homies",
-                  MessageElementFlag::HomiesEmote);
+        addEmotes(*channelChannel, *this->twitchChannel_->homiesEmotes(),
+                  "Homies", MessageElementFlag::HomiesEmote);
     }
     if (Settings::instance().enableSevenTVChannelEmotes)
     {
@@ -458,8 +458,8 @@ void EmotePopup::loadChannel(ChannelPtr channel)
 void EmotePopup::filterTwitchEmotes(std::shared_ptr<Channel> searchChannel,
                                     const QString &searchText)
 {
-    auto homiesGlobalEmotes =
-            filterEmoteMap(searchText, getApp()->twitch->getHomiesEmotes().emotes());
+    auto homiesGlobalEmotes = filterEmoteMap(
+        searchText, getApp()->twitch->getHomiesEmotes().emotes());
     auto bttvGlobalEmotes =
         filterEmoteMap(searchText, getApp()->twitch->getBttvEmotes().emotes());
     auto ffzGlobalEmotes =
@@ -490,18 +490,18 @@ void EmotePopup::filterTwitchEmotes(std::shared_ptr<Channel> searchChannel,
     }
 
     auto twitchEmoteSets =
-            getApp()->accounts->twitch.getCurrent()->accessEmotes()->emoteSets;
+        getApp()->accounts->twitch.getCurrent()->accessEmotes()->emoteSets;
     std::vector<std::shared_ptr<TwitchAccount::EmoteSet>> twitchGlobalEmotes{};
 
     for (const auto &set : twitchEmoteSets)
     {
         auto setCopy = std::make_shared<TwitchAccount::EmoteSet>(*set);
         auto setIt =
-                std::remove_if(setCopy->emotes.begin(), setCopy->emotes.end(),
-                               [searchText](auto &emote) {
-                                   return !emote.name.string.contains(
-                                           searchText, Qt::CaseInsensitive);
-                               });
+            std::remove_if(setCopy->emotes.begin(), setCopy->emotes.end(),
+                           [searchText](auto &emote) {
+                               return !emote.name.string.contains(
+                                   searchText, Qt::CaseInsensitive);
+                           });
         setCopy->emotes.resize(std::distance(setCopy->emotes.begin(), setIt));
 
         if (!setCopy->emotes.empty())

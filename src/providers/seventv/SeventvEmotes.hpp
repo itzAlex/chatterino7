@@ -65,6 +65,7 @@ class EmoteMap;
 class SeventvEmotes final
 {
     static constexpr const char *apiUrlGQL = "https://7tv.io/v3/gql";
+
 public:
     struct ChannelInfo {
         QString userID;

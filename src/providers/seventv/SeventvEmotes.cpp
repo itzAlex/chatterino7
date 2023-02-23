@@ -283,14 +283,14 @@ void SeventvEmotes::addEmote(QString emoteID, TwitchChannel *channel)
     })";
 
     QString SevenTV_TOKEN =
-            pajlada::Settings::Setting<QString>::get("/SevenTVToken");
+        pajlada::Settings::Setting<QString>::get("/SevenTVToken");
 
     SevenTV_TOKEN = SevenTV_TOKEN.replace("Bearer ", "");
 
     if (SevenTV_TOKEN.isEmpty())
     {
         channel->addMessage(makeSystemMessage(
-                "To add an emote you must first add your 7TV token!"));
+            "To add an emote you must first add your 7TV token!"));
         return;
     }
 
@@ -300,40 +300,40 @@ void SeventvEmotes::addEmote(QString emoteID, TwitchChannel *channel)
     payload1.insert("variables", variables1);
 
     NetworkRequest(apiUrlGQL, NetworkRequestType::Post)
-            .timeout(20000)
-            .header("Content-Type", "application/json")
-            .header("Authorization", "Bearer " + SevenTV_TOKEN)
-            .payload(QJsonDocument(payload1).toJson(QJsonDocument::Compact))
-            .onSuccess([=](NetworkResult result) -> Outcome {
-                QString userID = result.parseJson()
-                        .value("data")
-                        .toObject()
-                        .value("users")
-                        .toArray()
-                        .first()
-                        .toObject()
-                        .value("id")
-                        .toString();
+        .timeout(20000)
+        .header("Content-Type", "application/json")
+        .header("Authorization", "Bearer " + SevenTV_TOKEN)
+        .payload(QJsonDocument(payload1).toJson(QJsonDocument::Compact))
+        .onSuccess([=](NetworkResult result) -> Outcome {
+            QString userID = result.parseJson()
+                                 .value("data")
+                                 .toObject()
+                                 .value("users")
+                                 .toArray()
+                                 .first()
+                                 .toObject()
+                                 .value("id")
+                                 .toString();
 
-                QString error = result.parseJson()
-                        .value("errors")
-                        .toArray()
-                        .first()
-                        .toObject()
-                        .value("message")
-                        .toString();
+            QString error = result.parseJson()
+                                .value("errors")
+                                .toArray()
+                                .first()
+                                .toObject()
+                                .value("message")
+                                .toString();
 
-                if (!error.isEmpty())
-                {
-                    channel->addMessage(
-                            makeSystemMessage("Failed to add 7TV emote. Probably "
-                                              "your token is invalid."));
-                    return Failure;
-                }
+            if (!error.isEmpty())
+            {
+                channel->addMessage(
+                    makeSystemMessage("Failed to add 7TV emote. Probably "
+                                      "your token is invalid."));
+                return Failure;
+            }
 
-                QJsonObject payload2, variables2;
+            QJsonObject payload2, variables2;
 
-                QString query2 = R"(
+            QString query2 = R"(
                     mutation ChangeEmoteInSet($id: ObjectID!, $action: ListItemAction!, $emote_id: ObjectID!) {
                         emoteSet(id: $id) {
                             id
@@ -344,79 +344,82 @@ void SeventvEmotes::addEmote(QString emoteID, TwitchChannel *channel)
                         }
                      })";
 
-                variables2.insert("id", userID);
-                variables2.insert("action", QString("ADD"));
-                variables2.insert("emote_id", emoteID);
+            variables2.insert("id", userID);
+            variables2.insert("action", QString("ADD"));
+            variables2.insert("emote_id", emoteID);
 
-                payload2.insert("query", query2.replace(whitespaceRegex, " "));
-                payload2.insert("variables", variables2);
+            payload2.insert("query", query2.replace(whitespaceRegex, " "));
+            payload2.insert("variables", variables2);
 
-                NetworkRequest(apiUrlGQL, NetworkRequestType::Post)
-                        .timeout(20000)
-                        .header("Content-Type", "application/json")
-                        .header("Authorization", "Bearer " + SevenTV_TOKEN)
-                        .payload(QJsonDocument(payload2).toJson(QJsonDocument::Compact))
-                        .onSuccess([=](NetworkResult result) -> Outcome {
-                            qDebug() << "Data: " << result.getData();
-                            QString error = result.parseJson()
-                                    .value("errors")
-                                    .toArray()
-                                    .first()
-                                    .toObject()
-                                    .value("message")
-                                    .toString();
+            NetworkRequest(apiUrlGQL, NetworkRequestType::Post)
+                .timeout(20000)
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + SevenTV_TOKEN)
+                .payload(QJsonDocument(payload2).toJson(QJsonDocument::Compact))
+                .onSuccess([=](NetworkResult result) -> Outcome {
+                    qDebug() << "Data: " << result.getData();
+                    QString error = result.parseJson()
+                                        .value("errors")
+                                        .toArray()
+                                        .first()
+                                        .toObject()
+                                        .value("message")
+                                        .toString();
 
-                            if (error.isEmpty())
-                            {
-                                channel->addMessage(
-                                        makeSystemMessage("7TV emote added successfully!"));
-                                return Success;
-                            }
+                    if (error.isEmpty())
+                    {
+                        channel->addMessage(
+                            makeSystemMessage("7TV emote added successfully!"));
+                        return Success;
+                    }
 
-                            if (error.contains("No Space Available"))
-                            {
-                                channel->addMessage(
-                                        makeSystemMessage("This channel has already used "
-                                                          "all 7TV emotes slots"));
-                            }
-                            else if (error.contains("Unknown User"))
-                            {
-                                channel->addMessage(makeSystemMessage(
-                                        "This channel is unknown to 7TV"));
-                            }
-                            else if (error.contains("Unknown Emote"))
-                            {
-                                channel->addMessage(makeSystemMessage(
-                                        "There is no emote with this identifier in 7TV"));
-                            }
-                            else if (error.contains("Insufficient Privilege"))
-                            {
-                                channel->addMessage(makeSystemMessage(
-                                        "You do not have permission to modify 7TV emotes "
-                                        "in this channel!"));
-                            }
-                            else
-                            {
-                                channel->addMessage(makeSystemMessage("Failed to add 7TV emote. An unknown error happened."));
+                    if (error.contains("No Space Available"))
+                    {
+                        channel->addMessage(
+                            makeSystemMessage("This channel has already used "
+                                              "all 7TV emotes slots"));
+                    }
+                    else if (error.contains("Unknown User"))
+                    {
+                        channel->addMessage(makeSystemMessage(
+                            "This channel is unknown to 7TV"));
+                    }
+                    else if (error.contains("Unknown Emote"))
+                    {
+                        channel->addMessage(makeSystemMessage(
+                            "There is no emote with this identifier in 7TV"));
+                    }
+                    else if (error.contains("Insufficient Privilege"))
+                    {
+                        channel->addMessage(makeSystemMessage(
+                            "You do not have permission to modify 7TV emotes "
+                            "in this channel!"));
+                    }
+                    else
+                    {
+                        channel->addMessage(
+                            makeSystemMessage("Failed to add 7TV emote. An "
+                                              "unknown error happened."));
+                    }
 
-                            }
+                    return Failure;
+                })
+                .onError([=](NetworkResult result) {
+                    qDebug() << result.getData();
+                    channel->addMessage(makeSystemMessage(
+                        "Failed to add 7TV emote. An unknown error happened."));
+                    return Failure;
+                })
+                .execute();
 
-                            return Failure;
-                        })
-                        .onError([=](NetworkResult result) {
-                            qDebug() << result.getData();
-                            channel->addMessage(makeSystemMessage("Failed to add 7TV emote. An unknown error happened."));
-                            return Failure;
-                        })
-                        .execute();
-
-                return Failure;
-            })
-            .onError([=](NetworkResult result) {
-                qDebug() << result.getData();
-                channel->addMessage(makeSystemMessage("Failed to add 7TV emote. An unknown error happened."));
-            })
-            .execute();
+            return Failure;
+        })
+        .onError([=](NetworkResult result) {
+            qDebug() << result.getData();
+            channel->addMessage(makeSystemMessage(
+                "Failed to add 7TV emote. An unknown error happened."));
+        })
+        .execute();
 }
 
 void SeventvEmotes::loadGlobalEmotes()

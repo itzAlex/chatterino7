@@ -441,7 +441,8 @@ void GeneralPage::initLayout(GeneralPageView &layout)
     layout.addCheckbox("Enable 7TV live emote updates (requires restart)",
                        s.enableSevenTVEventAPI);
     layout.addCheckbox("Show Homies global emotes", s.enableHomiesGlobalEmotes);
-    layout.addCheckbox("Show Homies channel emotes", s.enableHomiesChannelEmotes);
+    layout.addCheckbox("Show Homies channel emotes",
+                       s.enableHomiesChannelEmotes);
 
     layout.addTitle("Streamer Mode");
     layout.addDescription(

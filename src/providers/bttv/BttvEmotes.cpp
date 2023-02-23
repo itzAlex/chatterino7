@@ -198,78 +198,78 @@ void BttvEmotes::addEmote(QString emoteID, TwitchChannel *channel)
     if (BTTV_TOKEN.isEmpty())
     {
         channel->addMessage(makeSystemMessage(
-                "To add an emote you must first add your BTTV token!"));
+            "To add an emote you must first add your BTTV token!"));
         return;
     }
 
     QString channelID = channel->roomId();
 
     NetworkRequest(QString(bttvChannelEmoteApiUrl) + channelID)
-            .timeout(20000)
-            .onSuccess([=](NetworkResult result) -> Outcome {
-                QString BTTVChannelID = result.parseJson().value("id").toString();
+        .timeout(20000)
+        .onSuccess([=](NetworkResult result) -> Outcome {
+            QString BTTVChannelID = result.parseJson().value("id").toString();
 
-                const QString urlTemplate(
-                        "https://api.betterttv.net/3/emotes/%1/shared/%2");
+            const QString urlTemplate(
+                "https://api.betterttv.net/3/emotes/%1/shared/%2");
 
-                NetworkRequest(urlTemplate.arg(emoteID, BTTVChannelID),
-                               NetworkRequestType::Put)
-                        .timeout(20000)
-                        .header("Authorization", "Bearer " + BTTV_TOKEN)
-                        .onSuccess([=](NetworkResult result) -> Outcome {
-                            channel->addMessage(
-                                    makeSystemMessage("BTTV emote added successfully!"));
+            NetworkRequest(urlTemplate.arg(emoteID, BTTVChannelID),
+                           NetworkRequestType::Put)
+                .timeout(20000)
+                .header("Authorization", "Bearer " + BTTV_TOKEN)
+                .onSuccess([=](NetworkResult result) -> Outcome {
+                    channel->addMessage(
+                        makeSystemMessage("BTTV emote added successfully!"));
 
-                            return Success;
-                        })
-                        .onError([=](NetworkResult result) {
-                            QString error =
-                                    result.parseJson().value("message").toString();
+                    return Success;
+                })
+                .onError([=](NetworkResult result) {
+                    QString error =
+                        result.parseJson().value("message").toString();
 
-                            if (error.startsWith("emote not found"))
-                            {
-                                channel->addMessage(makeSystemMessage(
-                                        "There is no emote with this identifier in BTTV!"));
-                            }
+                    if (error.startsWith("emote not found"))
+                    {
+                        channel->addMessage(makeSystemMessage(
+                            "There is no emote with this identifier in BTTV!"));
+                    }
 
-                            if (error.startsWith("forbidden"))
-                            {
-                                channel->addMessage(makeSystemMessage(
-                                        "You do not have permission to modify BTTV emotes "
-                                        "in this channel!"));
-                            }
+                    if (error.startsWith("forbidden"))
+                    {
+                        channel->addMessage(makeSystemMessage(
+                            "You do not have permission to modify BTTV emotes "
+                            "in this channel!"));
+                    }
 
-                            if (error.startsWith("user not found"))
-                            {
-                                channel->addMessage(makeSystemMessage(
-                                        "This channel is unknown to BTTV"));
-                            }
+                    if (error.startsWith("user not found"))
+                    {
+                        channel->addMessage(makeSystemMessage(
+                            "This channel is unknown to BTTV"));
+                    }
 
-                            if (error.startsWith("unauthorized"))
-                            {
-                                channel->addMessage(makeSystemMessage(
-                                        "The BTTV token you have entered is invalid!"));
-                            }
+                    if (error.startsWith("unauthorized"))
+                    {
+                        channel->addMessage(makeSystemMessage(
+                            "The BTTV token you have entered is invalid!"));
+                    }
 
-                            if (error.startsWith("too many emotes"))
-                            {
-                                channel->addMessage(
-                                        makeSystemMessage("This channel has already used "
-                                                          "all BTTV emotes slots!"));
-                            }
+                    if (error.startsWith("too many emotes"))
+                    {
+                        channel->addMessage(
+                            makeSystemMessage("This channel has already used "
+                                              "all BTTV emotes slots!"));
+                    }
 
-                            else
-                            {
-                                channel->addMessage(
-                                        makeSystemMessage("An unknown error occurred while "
-                                                          "adding the BTTV emote!"));
-                            }
-                        })
-                        .execute();
+                    else
+                    {
+                        channel->addMessage(
+                            makeSystemMessage("An unknown error occurred while "
+                                              "adding the BTTV emote!"));
+                    }
+                })
+                .execute();
 
-                return Success;
-            })
-            .execute();
+            return Success;
+        })
+        .execute();
 }
 
 void BttvEmotes::loadEmotes()

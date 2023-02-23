@@ -45,8 +45,8 @@ static const QSet<QString> specialMessageTypes{
 
 static QRegularExpression separatedLinkRegex("https?:\\/\\s\\/\\S+");
 static QRegularExpression validDomainRegex(
-        "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,"
-        "61}[a-z0-9]");
+    "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,"
+    "61}[a-z0-9]");
 
 MessagePtr generateBannedMessage(bool confirmedBan)
 {
@@ -81,7 +81,8 @@ MessagePtr generateBannedMessage(bool confirmedBan)
     return builder.release();
 }
 
-QString joinSeparatedLinks(QString message) {
+QString joinSeparatedLinks(QString message)
+{
     QString messageContent = "";
 
     if (getSettings()->joinSeparatedLinks)
@@ -91,13 +92,13 @@ QString joinSeparatedLinks(QString message) {
         if (separatedLinkMatch.hasMatch())
         {
             QString separatedLink =
-                    separatedLinkMatch.captured(0).simplified().remove(" ");
+                separatedLinkMatch.captured(0).simplified().remove(" ");
 
             auto validDomainMatch = validDomainRegex.match(separatedLink);
             if (validDomainMatch.hasMatch())
             {
-                messageContent = message.replace(
-                        separatedLinkMatch.captured(0), separatedLink);
+                messageContent = message.replace(separatedLinkMatch.captured(0),
+                                                 separatedLink);
             }
         }
     }
@@ -329,9 +330,9 @@ std::vector<MessagePtr> IrcMessageHandler::parsePrivMessage(
     std::vector<MessagePtr> builtMessages;
     MessageParseArgs args;
     TwitchMessageBuilder builder(
-            channel, message, args,
-            messageContent.isEmpty() ? message->content() : messageContent,
-            message->isAction());
+        channel, message, args,
+        messageContent.isEmpty() ? message->content() : messageContent,
+        message->isAction());
     if (!builder.isIgnored())
     {
         builtMessages.emplace_back(builder.build());
@@ -353,11 +354,11 @@ void IrcMessageHandler::handlePrivMessage(Communi::IrcPrivateMessage *message,
     // https://mm2pl.github.io/emoji_rfc.pdf for more details
 
     this->addMessage(
-            message, message->target(),
-            messageContent.isEmpty()
+        message, message->target(),
+        messageContent.isEmpty()
             ? message->content().replace(COMBINED_FIXER, ZERO_WIDTH_JOINER)
             : messageContent,
-            server, false, message->isAction());
+        server, false, message->isAction());
 }
 
 std::vector<MessagePtr> IrcMessageHandler::parseMessageWithReply(
@@ -382,9 +383,9 @@ std::vector<MessagePtr> IrcMessageHandler::parseMessageWithReply(
         int messageOffset = stripLeadingReplyMention(privMsg->tags(), content);
         MessageParseArgs args;
         TwitchMessageBuilder builder(
-                channel, message, args,
-                messageContent.isEmpty() ? content : messageContent,
-                privMsg->isAction());
+            channel, message, args,
+            messageContent.isEmpty() ? content : messageContent,
+            privMsg->isAction());
         builder.setMessageOffset(messageOffset);
 
         this->populateReply(tc, message, otherLoaded, builder);

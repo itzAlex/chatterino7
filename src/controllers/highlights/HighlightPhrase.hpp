@@ -119,8 +119,8 @@ namespace {
     chatterino::HighlightPhrase constructError()
     {
         return chatterino::HighlightPhrase(
-                QString(), false, false, false, false, false, QString(), QColor(),
-                true, std::vector<std::string>(), std::vector<std::string>());
+            QString(), false, false, false, false, false, QString(), QColor(),
+            true, std::vector<std::string>(), std::vector<std::string>());
     }
 }  // namespace
 
@@ -203,9 +203,9 @@ struct Deserialize<chatterino::HighlightPhrase> {
             _color = chatterino::HighlightPhrase::FALLBACK_HIGHLIGHT_COLOR;
 
         return chatterino::HighlightPhrase(
-                _pattern, _showInMentions, _hasAlert, _hasSound, _isRegex,
-                _isCaseSensitive, _soundUrl, _color, _isGlobalHighlight, channels,
-                ExcludedChannels);
+            _pattern, _showInMentions, _hasAlert, _hasSound, _isRegex,
+            _isCaseSensitive, _soundUrl, _color, _isGlobalHighlight, channels,
+            ExcludedChannels);
     }
 };
 

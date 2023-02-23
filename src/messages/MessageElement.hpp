@@ -58,12 +58,10 @@ enum class MessageElementFlag : int64_t {
     HomiesEmoteText = (1LL << 63),
     HomiesEmote = HomiesEmoteImage | HomiesEmoteText,
 
-    EmoteImages =
-        TwitchEmoteImage | BttvEmoteImage | FfzEmoteImage | SevenTVEmoteImage |
-        HomiesEmoteImage,
-    EmoteText =
-        TwitchEmoteText | BttvEmoteText | FfzEmoteText | SevenTVEmoteText |
-        HomiesEmoteText,
+    EmoteImages = TwitchEmoteImage | BttvEmoteImage | FfzEmoteImage |
+                  SevenTVEmoteImage | HomiesEmoteImage,
+    EmoteText = TwitchEmoteText | BttvEmoteText | FfzEmoteText |
+                SevenTVEmoteText | HomiesEmoteText,
 
     BitsStatic = (1LL << 11),
     BitsAnimated = (1LL << 12),
