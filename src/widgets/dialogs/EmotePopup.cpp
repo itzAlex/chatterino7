@@ -389,12 +389,18 @@ void EmotePopup::loadChannel(ChannelPtr channel)
     auto globalChannel = std::make_shared<Channel>("", Channel::Type::None);
     auto channelChannel = std::make_shared<Channel>("", Channel::Type::None);
 
-    // twitch
-    addTwitchEmoteSets(
-        getApp()->accounts->twitch.getCurrent()->accessEmotes()->emoteSets,
-        *globalChannel, *subChannel, this->channel_->getName());
-
     // global
+    if (Settings::instance().enableHomiesGlobalEmotes)
+    {
+        addEmotes(*globalChannel, *getApp()->twitch->getHomiesEmotes().emotes(),
+                  "Homies", MessageElementFlag::HomiesEmote);
+    }
+    if (Settings::instance().enableSevenTVGlobalEmotes)
+    {
+        addEmotes(*globalChannel,
+                  *getApp()->twitch->getSeventvEmotes().globalEmotes(), "7TV",
+                  MessageElementFlag::SevenTVEmote);
+    }
     if (Settings::instance().enableBTTVGlobalEmotes)
     {
         addEmotes(*globalChannel, *getApp()->twitch->getBttvEmotes().emotes(),
@@ -405,14 +411,23 @@ void EmotePopup::loadChannel(ChannelPtr channel)
         addEmotes(*globalChannel, *getApp()->twitch->getFfzEmotes().emotes(),
                   "FrankerFaceZ", MessageElementFlag::FfzEmote);
     }
-    if (Settings::instance().enableSevenTVGlobalEmotes)
-    {
-        addEmotes(*globalChannel,
-                  *getApp()->twitch->getSeventvEmotes().globalEmotes(), "7TV",
-                  MessageElementFlag::SevenTVEmote);
-    }
+
+    // twitch
+    addTwitchEmoteSets(
+            getApp()->accounts->twitch.getCurrent()->accessEmotes()->emoteSets,
+            *globalChannel, *subChannel, this->channel_->getName());
 
     // channel
+    if (Settings::instance().enableBTTVChannelEmotes)
+    {
+        addEmotes(*channelChannel, *this->twitchChannel_->homiesEmotes(), "Homies",
+                  MessageElementFlag::HomiesEmote);
+    }
+    if (Settings::instance().enableSevenTVChannelEmotes)
+    {
+        addEmotes(*channelChannel, *this->twitchChannel_->seventvEmotes(),
+                  "7TV", MessageElementFlag::SevenTVEmote);
+    }
     if (Settings::instance().enableBTTVChannelEmotes)
     {
         addEmotes(*channelChannel, *this->twitchChannel_->bttvEmotes(),
@@ -422,11 +437,6 @@ void EmotePopup::loadChannel(ChannelPtr channel)
     {
         addEmotes(*channelChannel, *this->twitchChannel_->ffzEmotes(),
                   "FrankerFaceZ", MessageElementFlag::FfzEmote);
-    }
-    if (Settings::instance().enableSevenTVChannelEmotes)
-    {
-        addEmotes(*channelChannel, *this->twitchChannel_->seventvEmotes(),
-                  "7TV", MessageElementFlag::SevenTVEmote);
     }
 
     this->globalEmotesView_->setChannel(globalChannel);
@@ -448,27 +458,8 @@ void EmotePopup::loadChannel(ChannelPtr channel)
 void EmotePopup::filterTwitchEmotes(std::shared_ptr<Channel> searchChannel,
                                     const QString &searchText)
 {
-    auto twitchEmoteSets =
-        getApp()->accounts->twitch.getCurrent()->accessEmotes()->emoteSets;
-    std::vector<std::shared_ptr<TwitchAccount::EmoteSet>> twitchGlobalEmotes{};
-
-    for (const auto &set : twitchEmoteSets)
-    {
-        auto setCopy = std::make_shared<TwitchAccount::EmoteSet>(*set);
-        auto setIt =
-            std::remove_if(setCopy->emotes.begin(), setCopy->emotes.end(),
-                           [searchText](auto &emote) {
-                               return !emote.name.string.contains(
-                                   searchText, Qt::CaseInsensitive);
-                           });
-        setCopy->emotes.resize(std::distance(setCopy->emotes.begin(), setIt));
-
-        if (!setCopy->emotes.empty())
-        {
-            twitchGlobalEmotes.push_back(setCopy);
-        }
-    }
-
+    auto homiesGlobalEmotes =
+            filterEmoteMap(searchText, getApp()->twitch->getHomiesEmotes().emotes());
     auto bttvGlobalEmotes =
         filterEmoteMap(searchText, getApp()->twitch->getBttvEmotes().emotes());
     auto ffzGlobalEmotes =
@@ -476,11 +467,17 @@ void EmotePopup::filterTwitchEmotes(std::shared_ptr<Channel> searchChannel,
     auto seventvGlobalEmotes = filterEmoteMap(
         searchText, getApp()->twitch->getSeventvEmotes().globalEmotes());
 
-    // twitch
-    addTwitchEmoteSets(twitchGlobalEmotes, *searchChannel, *searchChannel,
-                       this->channel_->getName());
-
     // global
+    if (!homiesGlobalEmotes.empty())
+    {
+        addEmotes(*searchChannel, homiesGlobalEmotes, "Homies (Global)",
+                  MessageElementFlag::HomiesEmote);
+    }
+    if (!seventvGlobalEmotes.empty())
+    {
+        addEmotes(*searchChannel, seventvGlobalEmotes, "SevenTV (Global)",
+                  MessageElementFlag::SevenTVEmote);
+    }
     if (!bttvGlobalEmotes.empty())
     {
         addEmotes(*searchChannel, bttvGlobalEmotes, "BetterTTV (Global)",
@@ -491,11 +488,31 @@ void EmotePopup::filterTwitchEmotes(std::shared_ptr<Channel> searchChannel,
         addEmotes(*searchChannel, ffzGlobalEmotes, "FrankerFaceZ (Global)",
                   MessageElementFlag::FfzEmote);
     }
-    if (!seventvGlobalEmotes.empty())
+
+    auto twitchEmoteSets =
+            getApp()->accounts->twitch.getCurrent()->accessEmotes()->emoteSets;
+    std::vector<std::shared_ptr<TwitchAccount::EmoteSet>> twitchGlobalEmotes{};
+
+    for (const auto &set : twitchEmoteSets)
     {
-        addEmotes(*searchChannel, seventvGlobalEmotes, "SevenTV (Global)",
-                  MessageElementFlag::SevenTVEmote);
+        auto setCopy = std::make_shared<TwitchAccount::EmoteSet>(*set);
+        auto setIt =
+                std::remove_if(setCopy->emotes.begin(), setCopy->emotes.end(),
+                               [searchText](auto &emote) {
+                                   return !emote.name.string.contains(
+                                           searchText, Qt::CaseInsensitive);
+                               });
+        setCopy->emotes.resize(std::distance(setCopy->emotes.begin(), setIt));
+
+        if (!setCopy->emotes.empty())
+        {
+            twitchGlobalEmotes.push_back(setCopy);
+        }
     }
+
+    // twitch
+    addTwitchEmoteSets(twitchGlobalEmotes, *searchChannel, *searchChannel,
+                       this->channel_->getName());
 
     if (this->twitchChannel_ == nullptr)
     {

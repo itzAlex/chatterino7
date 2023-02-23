@@ -70,8 +70,10 @@ protected:
 
     QColor usernameColor_ = {153, 153, 153};
 
+    bool messageHighlight = false;
     bool highlightAlert_ = false;
     bool highlightSound_ = false;
+    bool highlightEnabled_ = false;
 
     QUrl highlightSoundUrl_;
 };

@@ -118,7 +118,7 @@ int64_t parseDurationToSeconds(const QString &inputString,
  * @param mentionUsersWithComma postfix mentions with a comma. generally powered by getSettings()->mentionUsersWithComma
  **/
 QString formatUserMention(const QString &userName, bool isFirstWord,
-                          bool mentionUsersWithComma);
+                          bool mentionUsersWithComma, bool mentionUsersWithAt);
 
 template <typename T>
 std::vector<T> splitListIntoBatches(const T &list, int batchSize = 100)

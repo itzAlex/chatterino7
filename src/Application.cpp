@@ -229,6 +229,16 @@ int Application::run(QApplication &qtApp)
             this->twitch->reloadAllSevenTVChannelEmotes();
         },
         false);
+    getSettings()->enableHomiesGlobalEmotes.connect(
+            [this] {
+                this->twitch->reloadHomiesGlobalEmotes();
+            },
+            false);
+    getSettings()->enableHomiesChannelEmotes.connect(
+            [this] {
+                this->twitch->reloadAllHomiesChannelEmotes();
+            },
+            false);
 
     return qtApp.exec();
 }

@@ -5,6 +5,7 @@
 #include "common/Singleton.hpp"
 #include "providers/bttv/BttvEmotes.hpp"
 #include "providers/ffz/FfzEmotes.hpp"
+#include "providers/homies/HomiesEmotes.hpp"
 #include "providers/irc/AbstractIrcServer.hpp"
 #include "providers/seventv/SeventvEmotes.hpp"
 
@@ -41,6 +42,8 @@ public:
     void reloadAllBTTVChannelEmotes();
     void reloadFFZGlobalEmotes();
     void reloadAllFFZChannelEmotes();
+    void reloadHomiesGlobalEmotes();
+    void reloadAllHomiesChannelEmotes();
     void reloadSevenTVGlobalEmotes();
     void reloadAllSevenTVChannelEmotes();
 
@@ -73,6 +76,7 @@ public:
     const BttvEmotes &getBttvEmotes() const;
     const FfzEmotes &getFfzEmotes() const;
     const SeventvEmotes &getSeventvEmotes() const;
+    const HomiesEmotes &getHomiesEmotes() const;
 
 protected:
     virtual void initializeConnection(IrcConnection *connection,
@@ -110,6 +114,7 @@ private:
     BttvEmotes bttv;
     FfzEmotes ffz;
     SeventvEmotes seventv_;
+    HomiesEmotes homies;
     QTimer bulkLiveStatusTimer_;
 
     pajlada::Signals::SignalHolder signalHolder_;

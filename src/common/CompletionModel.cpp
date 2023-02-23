@@ -152,21 +152,38 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
     }
 
     // 7TV Global
-    for (const auto &emote :
-         *getApp()->twitch->getSeventvEmotes().globalEmotes())
+    if (getSettings()->enable7TVCompletion)
     {
-        addString(emote.first.string, TaggedString::Type::SeventvGlobalEmote);
+        for (const auto &emote:
+                *getApp()->twitch->getSeventvEmotes().globalEmotes()) {
+            addString(emote.first.string, TaggedString::Type::SeventvGlobalEmote);
+        }
     }
+
     // Bttv Global
-    for (const auto &emote : *getApp()->twitch->getBttvEmotes().emotes())
+    if (getSettings()->enableBTTVCompletion)
     {
-        addString(emote.first.string, TaggedString::Type::BTTVChannelEmote);
+        for (const auto &emote: *getApp()->twitch->getBttvEmotes().emotes()) {
+            addString(emote.first.string, TaggedString::Type::BTTVChannelEmote);
+        }
     }
 
     // Ffz Global
-    for (const auto &emote : *getApp()->twitch->getFfzEmotes().emotes())
+    if (getSettings()->enableFFZCompletion)
     {
-        addString(emote.first.string, TaggedString::Type::FFZChannelEmote);
+        for (const auto &emote: *getApp()->twitch->getFfzEmotes().emotes()) {
+            addString(emote.first.string, TaggedString::Type::FFZChannelEmote);
+        }
+    }
+
+    // Homies Global
+    if (getSettings()->enableHomiesCompletion)
+    {
+        for (auto &emote : *getApp()->twitch->getHomiesEmotes().emotes())
+        {
+            addString(emote.first.string,
+                      TaggedString::Type::HOMIESGlobalEmote);
+        }
     }
 
     // Emojis
@@ -197,8 +214,9 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
         for (const auto &name : chatters)
         {
             addString(
-                "@" + formatUserMention(name, isFirstWord,
-                                        getSettings()->mentionUsersWithComma),
+                formatUserMention(name, isFirstWord,
+                                    getSettings()->mentionUsersWithComma,
+                                    getSettings()->mentionUsersWithAt),
                 TaggedString::Type::Username);
         }
     }
@@ -209,7 +227,8 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
         for (const auto &name : chatters)
         {
             addString(formatUserMention(name, isFirstWord,
-                                        getSettings()->mentionUsersWithComma),
+                                        getSettings()->mentionUsersWithComma,
+                                        getSettings()->mentionUsersWithAt),
                       TaggedString::Type::Username);
         }
     }
@@ -229,6 +248,12 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
     for (const auto &emote : *tc->ffzEmotes())
     {
         addString(emote.first.string, TaggedString::Type::BTTVGlobalEmote);
+    }
+
+    // Homies Channel
+    for (auto &emote : *tc->homiesEmotes())
+    {
+        addString(emote.first.string, TaggedString::Type::HOMIESChannelEmote);
     }
 
     // Custom Chatterino commands

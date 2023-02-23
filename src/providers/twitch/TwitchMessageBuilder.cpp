@@ -201,6 +201,7 @@ MessagePtr TwitchMessageBuilder::build()
     }
 
     this->appendChannelName();
+    this->appendIsMod();
 
     if (this->tags.contains("rm-deleted"))
     {
@@ -545,6 +546,24 @@ void TwitchMessageBuilder::addTextOrEmoji(const QString &string_)
     }
 
     this->emplace<TextElement>(string, MessageElementFlag::Text, textColor);
+}
+
+void TwitchMessageBuilder::appendIsMod()
+{
+    bool hasUserType = this->tags.contains("user-type");
+
+    if (hasUserType)
+    {
+        QString userType = this->tags.value("user-type").toString();
+
+        if (userType == "mod")
+        {
+            this->message().isMod = true;
+            return;
+        }
+    }
+
+    this->message().isMod = false;
 }
 
 void TwitchMessageBuilder::parseMessageID()
@@ -1012,6 +1031,7 @@ Outcome TwitchMessageBuilder::tryAppendEmote(const EmoteName &name)
     const auto &globalBttvEmotes = app->twitch->getBttvEmotes();
     const auto &globalFfzEmotes = app->twitch->getFfzEmotes();
     const auto &globalSeventvEmotes = app->twitch->getSeventvEmotes();
+    const auto &globalHomiesEmotes = app->twitch->getHomiesEmotes();
 
     auto flags = MessageElementFlags();
     auto emote = boost::optional<EmotePtr>{};
@@ -1020,9 +1040,11 @@ Outcome TwitchMessageBuilder::tryAppendEmote(const EmoteName &name)
     //  - FrankerFaceZ Channel
     //  - BetterTTV Channel
     //  - 7TV Channel
+    //  - Homies Channel
     //  - FrankerFaceZ Global
     //  - BetterTTV Global
     //  - 7TV Global
+    //  - Homies Global
     if (this->twitchChannel && (emote = this->twitchChannel->ffzEmote(name)))
     {
         flags = MessageElementFlag::FfzEmote;
@@ -1036,6 +1058,15 @@ Outcome TwitchMessageBuilder::tryAppendEmote(const EmoteName &name)
              (emote = this->twitchChannel->seventvEmote(name)))
     {
         flags = MessageElementFlag::SevenTVEmote;
+        if (emote.value()->zeroWidth)
+        {
+            flags.set(MessageElementFlag::ZeroWidthEmote);
+        }
+    }
+    else if (this->twitchChannel &&
+             (emote = this->twitchChannel->homiesEmote(name)))
+    {
+        flags = MessageElementFlag::HomiesEmote;
         if (emote.value()->zeroWidth)
         {
             flags.set(MessageElementFlag::ZeroWidthEmote);
@@ -1057,6 +1088,15 @@ Outcome TwitchMessageBuilder::tryAppendEmote(const EmoteName &name)
     else if ((emote = globalSeventvEmotes.globalEmote(name)))
     {
         flags = MessageElementFlag::SevenTVEmote;
+        if (emote.value()->zeroWidth)
+        {
+            flags.set(MessageElementFlag::ZeroWidthEmote);
+        }
+    }
+    else if ((emote = globalHomiesEmotes.emote(name)))
+    {
+        flags = MessageElementFlag::HomiesEmote;
+
         if (emote.value()->zeroWidth)
         {
             flags.set(MessageElementFlag::ZeroWidthEmote);
@@ -1368,6 +1408,12 @@ bool TwitchMessageBuilder::shouldAddModerationElements() const
     {
         // You cannot timeout the broadcaster
         return false;
+    }
+
+    auto currentUser = getApp()->accounts->twitch.getCurrent();
+    if (this->channel->getName() == currentUser->getUserName())
+    {
+        return true;
     }
 
     if (this->tags.value("user-type").toString() == "mod" &&

@@ -10,6 +10,7 @@
 #include "providers/twitch/TwitchChannel.hpp"
 #include "providers/twitch/TwitchIrcServer.hpp"
 #include "singletons/Emotes.hpp"
+#include "singletons/Settings.hpp"
 #include "util/LayoutCreator.hpp"
 #include "widgets/listview/GenericListView.hpp"
 #include "widgets/splits/InputCompletionItem.hpp"
@@ -113,19 +114,42 @@ void InputCompletionPopup::updateEmotes(const QString &text, ChannelPtr channel)
             {
                 addEmotes(emotes, *seventv, text, "Channel 7TV");
             }
+            if (auto homies = tc->homiesEmotes())
+            {
+                addEmotes(emotes, *homies, text, "Channel Homies");
+            }
         }
 
-        if (auto bttvG = getApp()->twitch->getBttvEmotes().emotes())
+        if (getSettings()->enableBTTVCompletion)
         {
-            addEmotes(emotes, *bttvG, text, "Global BetterTTV");
+            if (auto bttvG = getApp()->twitch->getBttvEmotes().emotes())
+            {
+                addEmotes(emotes, *bttvG, text, "Global BetterTTV");
+            }
         }
-        if (auto ffzG = getApp()->twitch->getFfzEmotes().emotes())
+
+        if (getSettings()->enableFFZCompletion)
         {
-            addEmotes(emotes, *ffzG, text, "Global FrankerFaceZ");
+            if (auto ffzG = getApp()->twitch->getFfzEmotes().emotes())
+            {
+                addEmotes(emotes, *ffzG, text, "Global FrankerFaceZ");
+            }
         }
-        if (auto seventvG = getApp()->twitch->getSeventvEmotes().globalEmotes())
+
+        if (getSettings()->enable7TVCompletion)
         {
-            addEmotes(emotes, *seventvG, text, "Global 7TV");
+            if (auto seventvG = getApp()->twitch->getSeventvEmotes().globalEmotes())
+            {
+                addEmotes(emotes, *seventvG, text, "Global 7TV");
+            }
+        }
+
+        if (getSettings()->enableHomiesCompletion)
+        {
+            if (auto homiesG = getApp()->twitch->getHomiesEmotes().emotes())
+            {
+                addEmotes(emotes, *homiesG, text, "Global Homies");
+            }
         }
     }
 

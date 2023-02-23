@@ -97,6 +97,7 @@ private:
     void parseUsernameColor() override;
     void parseUsername() override;
     void parseMessageID();
+    void appendIsMod();
     void parseRoomID();
     // Parse & build thread information into the message
     // Will read information from thread_ or from IRC tags

@@ -21,13 +21,13 @@ class HomiesBadges : public Singleton
 public:
     virtual void initialize(Settings &settings, Paths &paths) override;
     HomiesBadges();
+    void loadHomiesBadges();
 
     boost::optional<EmotePtr> getBadge(const UserId &id);
     boost::optional<EmotePtr> getBadge2(const UserId &id);
     boost::optional<EmotePtr> getBadge3(const UserId &id);
 
 private:
-    void loadHomiesBadges();
     std::shared_mutex mutex_;
 
     std::unordered_map<QString, int> badgeMap;

@@ -136,6 +136,7 @@ enum class MessageElementFlag : int64_t {
     BitsAmount = (1LL << 21),
 
     ModeratorTools = (1LL << 22),
+    ModeratorUsercard = (1LL << 60),
 
     EmojiImage = (1LL << 23),
     EmojiText = (1LL << 24),
