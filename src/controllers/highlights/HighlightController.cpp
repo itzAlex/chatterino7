@@ -23,7 +23,7 @@ auto highlightPhraseCheck(const HighlightPhrase &highlight) -> HighlightCheck
         [highlight](const auto &args, const auto &badges,
                     const auto &senderName, const auto &originalMessage,
                     const auto &flags,
-                    const auto self) -> boost::optional<HighlightResult> {
+                    const auto self, const auto &channel) -> boost::optional<HighlightResult> {
             (void)args;        // unused
             (void)badges;      // unused
             (void)senderName;  // unused
@@ -36,6 +36,32 @@ auto highlightPhraseCheck(const HighlightPhrase &highlight) -> HighlightCheck
             }
 
             if (!highlight.isMatch(originalMessage))
+            {
+                return boost::none;
+            }
+
+            qDebug() << "HERE:" << channel;
+
+            // Check if the highlight is in the correct channel
+            std::vector<std::string> channels = highlight.getChannels();
+            std::vector<std::string> ExcludedChannels =
+                    highlight.getExcludedChannels();
+            std::string currentChannel = channel.toStdString();
+
+            const auto it =
+                    std::find_if(std::begin(channels), std::end(channels),
+                                 [&currentChannel](const auto &str) {
+                                     return boost::iequals(currentChannel, str);
+                                 });
+
+            const auto it2 = std::find_if(
+                    std::begin(ExcludedChannels), std::end(ExcludedChannels),
+                    [&currentChannel](const auto &str) {
+                        return boost::iequals(currentChannel, str);
+                    });
+
+            if (!((highlight.isGlobalHighlight() || it != std::end(channels)) &&
+                  it2 == std::end(ExcludedChannels)))
             {
                 return boost::none;
             }
@@ -73,12 +99,13 @@ void rebuildSubscriptionHighlights(Settings &settings,
         checks.emplace_back(HighlightCheck{
             [=](const auto &args, const auto &badges, const auto &senderName,
                 const auto &originalMessage, const auto &flags,
-                const auto self) -> boost::optional<HighlightResult> {
+                const auto self, const auto &channel) -> boost::optional<HighlightResult> {
                 (void)badges;           // unused
                 (void)senderName;       // unused
                 (void)originalMessage;  // unused
                 (void)flags;            // unused
                 (void)self;             // unused
+                (void)channel;          // unused
 
                 if (!args.isSubscriptionMessage)
                 {
@@ -119,12 +146,13 @@ void rebuildWhisperHighlights(Settings &settings,
         checks.emplace_back(HighlightCheck{
             [=](const auto &args, const auto &badges, const auto &senderName,
                 const auto &originalMessage, const auto &flags,
-                const auto self) -> boost::optional<HighlightResult> {
+                const auto self, const auto &channel) -> boost::optional<HighlightResult> {
                 (void)badges;           // unused
                 (void)senderName;       // unused
                 (void)originalMessage;  // unused
                 (void)flags;            // unused
                 (void)self;             // unused
+                (void)channel;          // unused
 
                 if (!args.isReceivedWhisper)
                 {
@@ -162,7 +190,7 @@ void rebuildReplyThreadHighlight(Settings &settings,
             [=](const auto & /*args*/, const auto & /*badges*/,
                 const auto & /*senderName*/, const auto & /*originalMessage*/,
                 const auto &flags,
-                const auto self) -> boost::optional<HighlightResult> {
+                const auto self, const auto &channel) -> boost::optional<HighlightResult> {
                 if (flags.has(MessageFlag::ParticipatedThread) && !self)
                 {
                     return HighlightResult{
@@ -218,12 +246,13 @@ void rebuildUserHighlights(Settings &settings,
             [showInMentions](
                 const auto &args, const auto &badges, const auto &senderName,
                 const auto &originalMessage, const auto &flags,
-                const auto self) -> boost::optional<HighlightResult> {
-                (void)args;             //unused
-                (void)badges;           //unused
-                (void)senderName;       //unused
-                (void)flags;            //unused
-                (void)originalMessage;  //unused
+                const auto self, const auto &channel) -> boost::optional<HighlightResult> {
+                (void)args;             // unused
+                (void)badges;           // unused
+                (void)senderName;       // unused
+                (void)flags;            // unused
+                (void)originalMessage;  // unused
+                (void)channel;          // unused
 
                 if (!self)
                 {
@@ -245,14 +274,39 @@ void rebuildUserHighlights(Settings &settings,
             [highlight](const auto &args, const auto &badges,
                         const auto &senderName, const auto &originalMessage,
                         const auto &flags,
-                        const auto self) -> boost::optional<HighlightResult> {
+                        const auto self, const auto &channel) -> boost::optional<HighlightResult> {
                 (void)args;             // unused
                 (void)badges;           // unused
                 (void)originalMessage;  // unused
                 (void)flags;            // unused
                 (void)self;             // unused
+                (void)channel;          // unused
 
                 if (!highlight.isMatch(senderName))
+                {
+                    return boost::none;
+                }
+
+                // Check if the highlight is in the correct channel
+                std::vector<std::string> channels = highlight.getChannels();
+                std::vector<std::string> ExcludedChannels =
+                        highlight.getExcludedChannels();
+                std::string currentChannel = channel.toStdString();
+
+                const auto it =
+                        std::find_if(std::begin(channels), std::end(channels),
+                                     [&currentChannel](const auto &str) {
+                                         return boost::iequals(currentChannel, str);
+                                     });
+
+                const auto it2 = std::find_if(
+                        std::begin(ExcludedChannels), std::end(ExcludedChannels),
+                        [&currentChannel](const auto &str) {
+                            return boost::iequals(currentChannel, str);
+                        });
+
+                if (!((highlight.isGlobalHighlight() || it != std::end(channels)) &&
+                      it2 == std::end(ExcludedChannels)))
                 {
                     return boost::none;
                 }
@@ -285,12 +339,13 @@ void rebuildBadgeHighlights(Settings &settings,
             [highlight](const auto &args, const auto &badges,
                         const auto &senderName, const auto &originalMessage,
                         const auto &flags,
-                        const auto self) -> boost::optional<HighlightResult> {
+                        const auto self, const auto &channel) -> boost::optional<HighlightResult> {
                 (void)args;             // unused
                 (void)senderName;       // unused
                 (void)originalMessage;  // unused
                 (void)flags;            // unused
                 (void)self;             // unused
+                (void)channel; // unused
 
                 for (const Badge &badge : badges)
                 {
@@ -497,7 +552,7 @@ void HighlightController::rebuildChecks(Settings &settings)
 std::pair<bool, HighlightResult> HighlightController::check(
     const MessageParseArgs &args, const std::vector<Badge> &badges,
     const QString &senderName, const QString &originalMessage,
-    const MessageFlags &messageFlags) const
+    const MessageFlags &messageFlags, const QString &channel) const
 {
     bool highlighted = false;
     auto result = HighlightResult::emptyResult();
@@ -511,7 +566,7 @@ std::pair<bool, HighlightResult> HighlightController::check(
     for (const auto &check : *checks)
     {
         if (auto checkResult = check.cb(args, badges, senderName,
-                                        originalMessage, messageFlags, self);
+                                        originalMessage, messageFlags, self, channel);
             checkResult)
         {
             highlighted = true;

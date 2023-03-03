@@ -16,6 +16,8 @@ namespace chatterino {
 
 EditableModelView::EditableModelView(QAbstractTableModel *model, bool movable)
     : tableView_(new QTableView(this))
+    , selectChannel(new QPushButton())
+    , excludeChannel(new QPushButton())
     , model_(model)
 {
     this->model_->setParent(this);
@@ -58,6 +60,13 @@ EditableModelView::EditableModelView(QAbstractTableModel *model, bool movable)
 
         for (auto &&row : rows)
             model_->removeRow(row);
+
+        selected = this->getTableView()->selectionModel()->selectedRows(0);
+        if (selected.size() == 0)
+        {
+            disableSelectChannelButton();
+            disableExcludeChannelButton();
+        }
     });
 
     if (movable)
@@ -130,6 +139,50 @@ QAbstractTableModel *EditableModelView::getModel()
 void EditableModelView::addCustomButton(QWidget *widget)
 {
     this->buttons_->addWidget(widget);
+}
+
+void EditableModelView::addSelectChannelHighlight()
+{
+    this->selectChannel->setText("Select channels");
+    this->disableSelectChannelButton();
+
+    this->buttons_->addWidget(this->selectChannel);
+
+    QObject::connect(selectChannel, &QPushButton::clicked, [this] {
+        this->selectChannelPressed.invoke();
+    });
+}
+
+void EditableModelView::disableSelectChannelButton()
+{
+    this->selectChannel->setEnabled(false);
+}
+
+void EditableModelView::enableSelectChannelButton()
+{
+    this->selectChannel->setEnabled(true);
+}
+
+void EditableModelView::addExcludeChannelHighlight()
+{
+    this->excludeChannel->setText("Exclude channels");
+    this->disableExcludeChannelButton();
+
+    this->buttons_->addWidget(this->excludeChannel);
+
+    QObject::connect(excludeChannel, &QPushButton::clicked, [this] {
+        this->excludeChannelPressed.invoke();
+    });
+}
+
+void EditableModelView::disableExcludeChannelButton()
+{
+    this->excludeChannel->setEnabled(false);
+}
+
+void EditableModelView::enableExcludeChannelButton()
+{
+    this->excludeChannel->setEnabled(true);
 }
 
 void EditableModelView::addRegexHelpLink()
