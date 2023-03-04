@@ -105,7 +105,7 @@ HighlightingPage::HighlightingPage()
                                            ->selectionModel()
                                            ->currentIndex()
                                            .row() -
-                                   5;
+                                   7;
 
                     auto selectUsernameWidget =
                             new SelectChannelWidget(selected, "messages");
@@ -119,7 +119,7 @@ HighlightingPage::HighlightingPage()
                                            ->selectionModel()
                                            ->currentIndex()
                                            .row() -
-                                   5;
+                                   7;
 
                     auto excludeChannelWidget =
                             new ExcludeChannelWidget(selected, "messages");
@@ -187,7 +187,7 @@ HighlightingPage::HighlightingPage()
                     int selected = view->getTableView()
                             ->selectionModel()
                             ->currentIndex()
-                            .row();
+                            .row() - 1;
 
                     auto selectUsernameWidget =
                             new SelectChannelWidget(selected, "users");
@@ -200,7 +200,7 @@ HighlightingPage::HighlightingPage()
                     int selected = view->getTableView()
                             ->selectionModel()
                             ->currentIndex()
-                            .row();
+                            .row() - 1;
 
                     auto excludeChannelWidget =
                             new ExcludeChannelWidget(selected, "users");

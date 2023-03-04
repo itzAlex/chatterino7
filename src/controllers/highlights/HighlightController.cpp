@@ -40,8 +40,6 @@ auto highlightPhraseCheck(const HighlightPhrase &highlight) -> HighlightCheck
                 return boost::none;
             }
 
-            qDebug() << "HERE:" << channel;
-
             // Check if the highlight is in the correct channel
             std::vector<std::string> channels = highlight.getChannels();
             std::vector<std::string> ExcludedChannels =
