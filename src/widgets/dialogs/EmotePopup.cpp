@@ -475,7 +475,7 @@ void EmotePopup::filterTwitchEmotes(std::shared_ptr<Channel> searchChannel,
     }
     if (!seventvGlobalEmotes.empty())
     {
-        addEmotes(*searchChannel, seventvGlobalEmotes, "SevenTV (Global)",
+        addEmotes(*searchChannel, seventvGlobalEmotes, "7TV (Global)",
                   MessageElementFlag::SevenTVEmote);
     }
     if (!bttvGlobalEmotes.empty())
@@ -525,8 +525,15 @@ void EmotePopup::filterTwitchEmotes(std::shared_ptr<Channel> searchChannel,
         filterEmoteMap(searchText, this->twitchChannel_->ffzEmotes());
     auto seventvChannelEmotes =
         filterEmoteMap(searchText, this->twitchChannel_->seventvEmotes());
+    auto homiesChannelEmotes =
+        filterEmoteMap(searchText, this->twitchChannel_->homiesEmotes());
 
     // channel
+    if (!homiesChannelEmotes.empty())
+    {
+        addEmotes(*searchChannel, homiesChannelEmotes, "Homies (Channel)",
+                  MessageElementFlag::HomiesEmote);
+    }
     if (!bttvChannelEmotes.empty())
     {
         addEmotes(*searchChannel, bttvChannelEmotes, "BetterTTV (Channel)",
@@ -539,7 +546,7 @@ void EmotePopup::filterTwitchEmotes(std::shared_ptr<Channel> searchChannel,
     }
     if (!seventvChannelEmotes.empty())
     {
-        addEmotes(*searchChannel, seventvChannelEmotes, "SevenTV (Channel)",
+        addEmotes(*searchChannel, seventvChannelEmotes, "7TV (Channel)",
                   MessageElementFlag::SevenTVEmote);
     }
 }

@@ -247,6 +247,8 @@ set(SOURCE_FILES
         providers/ffz/FfzBadges.hpp
         providers/ffz/FfzEmotes.cpp
         providers/ffz/FfzEmotes.hpp
+        providers/ffz/FfzUtil.cpp
+        providers/ffz/FfzUtil.hpp
 
         providers/irc/AbstractIrcServer.cpp
         providers/irc/AbstractIrcServer.hpp
@@ -271,6 +273,7 @@ set(SOURCE_FILES
 
         providers/seventv/SeventvBadges.cpp
         providers/seventv/SeventvBadges.hpp
+        providers/seventv/SeventvCosmetics.hpp
         providers/seventv/SeventvEmotes.cpp
         providers/seventv/SeventvEmotes.hpp
         providers/seventv/SeventvEventAPI.cpp
@@ -652,6 +655,14 @@ target_link_libraries(${LIBRARY_PROJECT}
         LRUCache
         MagicEnum
         )
+
+if (BUILD_WITH_QT6)
+    target_link_libraries(${LIBRARY_PROJECT}
+            PUBLIC
+            Qt${MAJOR_QT_VERSION}::Core5Compat
+            )
+endif ()
+
 if (BUILD_WITH_QTKEYCHAIN)
     target_link_libraries(${LIBRARY_PROJECT}
             PUBLIC
