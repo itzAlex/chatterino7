@@ -842,14 +842,14 @@ void TwitchMessageBuilder::runIgnoreReplaces(
     };
 
     auto addReplEmotes = [&twitchEmotes](const IgnorePhrase &phrase,
-                                         const QStringRef &midrepl,
+                                         const auto &midrepl,
                                          int startIndex) mutable {
         if (!phrase.containsEmote())
         {
             return;
         }
 
-        QVector<QStringRef> words = midrepl.split(' ');
+        auto words = midrepl.split(' ');
         int pos = 0;
         for (const auto &word : words)
         {
@@ -864,7 +864,7 @@ void TwitchMessageBuilder::runIgnoreReplaces(
                     }
                     twitchEmotes.push_back(TwitchEmoteOccurrence{
                         startIndex + pos,
-                        startIndex + pos + emote.first.string.length(),
+                        startIndex + pos + (int)emote.first.string.length(),
                         emote.second,
                         emote.first,
                     });
@@ -925,8 +925,13 @@ void TwitchMessageBuilder::runIgnoreReplaces(
 
                 shiftIndicesAfter(from + len, midsize - len);
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+                auto midExtendedRef =
+                    QStringView{this->originalMessage_}.mid(pos1, pos2 - pos1);
+#else
                 auto midExtendedRef =
                     this->originalMessage_.midRef(pos1, pos2 - pos1);
+#endif
 
                 for (auto &tup : vret)
                 {
@@ -990,8 +995,13 @@ void TwitchMessageBuilder::runIgnoreReplaces(
 
                 shiftIndicesAfter(from + len, replacesize - len);
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+                auto midExtendedRef =
+                    QStringView{this->originalMessage_}.mid(pos1, pos2 - pos1);
+#else
                 auto midExtendedRef =
                     this->originalMessage_.midRef(pos1, pos2 - pos1);
+#endif
 
                 for (auto &tup : vret)
                 {
