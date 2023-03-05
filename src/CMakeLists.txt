@@ -338,6 +338,8 @@ set(SOURCE_FILES
 
         providers/twitch/api/Helix.cpp
         providers/twitch/api/Helix.hpp
+        providers/twitch/api/GraphQL.cpp
+        providers/twitch/api/GraphQL.hpp
 
         singletons/Badges.cpp
         singletons/Badges.hpp

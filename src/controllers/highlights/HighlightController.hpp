@@ -4,10 +4,10 @@
 #include "common/Singleton.hpp"
 #include "common/UniqueAccess.hpp"
 
+#include <boost/algorithm/string/predicate.hpp>
 #include <boost/optional.hpp>
 #include <pajlada/settings.hpp>
 #include <pajlada/settings/settinglistener.hpp>
-#include <boost/algorithm/string/predicate.hpp>
 #include <QColor>
 #include <QUrl>
 

@@ -7,6 +7,7 @@
 #include "providers/Crashpad.hpp"
 #include "providers/IvrApi.hpp"
 #include "providers/NetworkConfigurationProvider.hpp"
+#include "providers/twitch/api/GraphQL.hpp"
 #include "providers/twitch/api/Helix.hpp"
 #include "RunGui.hpp"
 #include "singletons/Paths.hpp"
@@ -28,7 +29,7 @@ int main(int argc, char **argv)
 
     QCoreApplication::setApplicationName("chatterino");
     QCoreApplication::setApplicationVersion(CHATTERINO_VERSION);
-    QCoreApplication::setOrganizationDomain("chatterino.com");
+    QCoreApplication::setOrganizationDomain("chatterinohomies.com");
 
     Paths *paths{};
 
@@ -47,7 +48,7 @@ int main(int argc, char **argv)
                     "\n\nInfo: Portable mode requires the application to "
                     "be in a writeable location. If you don't want "
                     "portable mode reinstall the application. "
-                    "https://chatterino.com."));
+                    "https://chatterinohomies.com"));
         }
         else
         {
@@ -91,6 +92,7 @@ int main(int argc, char **argv)
 
         IvrApi::initialize();
         Helix::initialize();
+        GraphQL::initialize();
 
         Settings settings(paths->settingsDirectory);
 

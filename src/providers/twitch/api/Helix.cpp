@@ -168,6 +168,25 @@ void Helix::getUserFollowers(
                             std::move(failureCallback));
 }
 
+void Helix::getUserFollow(
+    QString userId, QString targetId,
+    ResultCallback<bool, HelixUsersFollowsRecord> successCallback,
+    HelixFailureCallback failureCallback)
+{
+    this->fetchUsersFollows(
+        std::move(userId), std::move(targetId),
+        [successCallback](const auto &response) {
+            if (response.data.empty())
+            {
+                successCallback(false, HelixUsersFollowsRecord());
+                return;
+            }
+
+            successCallback(true, response.data[0]);
+        },
+        std::move(failureCallback));
+}
+
 void Helix::fetchStreams(
     QStringList userIds, QStringList userLogins,
     ResultCallback<std::vector<HelixStream>> successCallback,
@@ -1360,16 +1379,6 @@ void Helix::removeChannelVIP(
         .execute();
 }
 
-// These changes are from the helix-command-migration/unban-untimeout branch
-// These changes are from the helix-command-migration/unban-untimeout branch
-// These changes are from the helix-command-migration/unban-untimeout branch
-// These changes are from the helix-command-migration/unban-untimeout branch
-// These changes are from the helix-command-migration/unban-untimeout branch
-// These changes are from the helix-command-migration/unban-untimeout branch
-// These changes are from the helix-command-migration/unban-untimeout branch
-// These changes are from the helix-command-migration/unban-untimeout branch
-// These changes are from the helix-command-migration/unban-untimeout branch
-// These changes are from the helix-command-migration/unban-untimeout branch
 void Helix::unbanUser(
     QString broadcasterID, QString moderatorID, QString userID,
     ResultCallback<> successCallback,
@@ -1465,17 +1474,6 @@ void Helix::unbanUser(
         })
         .execute();
 }  // These changes are from the helix-command-migration/unban-untimeout branch
-// These changes are from the helix-command-migration/unban-untimeout branch
-// These changes are from the helix-command-migration/unban-untimeout branch
-// These changes are from the helix-command-migration/unban-untimeout branch
-// These changes are from the helix-command-migration/unban-untimeout branch
-// These changes are from the helix-command-migration/unban-untimeout branch
-// These changes are from the helix-command-migration/unban-untimeout branch
-// These changes are from the helix-command-migration/unban-untimeout branch
-// These changes are from the helix-command-migration/unban-untimeout branch
-// These changes are from the helix-command-migration/unban-untimeout branch
-// These changes are from the helix-command-migration/unban-untimeout branch
-// These changes are from the helix-command-migration/unban-untimeout branch
 
 void Helix::startRaid(
     QString fromBroadcasterID, QString toBroadcasterID,
@@ -2503,6 +2501,7 @@ void Helix::update(QString clientId, QString oauthToken)
 {
     this->clientId = std::move(clientId);
     this->oauthToken = std::move(oauthToken);
+    getGraphQL()->update(clientId, oauthToken);
 }
 
 void Helix::initialize()

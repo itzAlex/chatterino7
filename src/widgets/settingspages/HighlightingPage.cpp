@@ -15,8 +15,8 @@
 #include "util/LayoutCreator.hpp"
 #include "widgets/dialogs/BadgePickerDialog.hpp"
 #include "widgets/dialogs/ColorPickerDialog.hpp"
-#include "widgets/helper/EditableModelView.hpp"
 #include "widgets/dialogs/SelectChannelHighlightPopup.hpp"
+#include "widgets/helper/EditableModelView.hpp"
 
 #include <QFileDialog>
 #include <QHeaderView>
@@ -102,13 +102,13 @@ HighlightingPage::HighlightingPage()
 
                 view->selectChannelPressed.connect([this, view] {
                     int selected = view->getTableView()
-                                           ->selectionModel()
-                                           ->currentIndex()
-                                           .row() -
+                                       ->selectionModel()
+                                       ->currentIndex()
+                                       .row() -
                                    7;
 
                     auto selectUsernameWidget =
-                            new SelectChannelWidget(selected, "messages");
+                        new SelectChannelWidget(selected, "messages");
 
                     selectUsernameWidget->show();
                     selectUsernameWidget->raise();
@@ -116,13 +116,13 @@ HighlightingPage::HighlightingPage()
 
                 view->excludeChannelPressed.connect([this, view] {
                     int selected = view->getTableView()
-                                           ->selectionModel()
-                                           ->currentIndex()
-                                           .row() -
+                                       ->selectionModel()
+                                       ->currentIndex()
+                                       .row() -
                                    7;
 
                     auto excludeChannelWidget =
-                            new ExcludeChannelWidget(selected, "messages");
+                        new ExcludeChannelWidget(selected, "messages");
 
                     excludeChannelWidget->show();
                     excludeChannelWidget->raise();
@@ -185,12 +185,13 @@ HighlightingPage::HighlightingPage()
 
                 view->selectChannelPressed.connect([this, view] {
                     int selected = view->getTableView()
-                            ->selectionModel()
-                            ->currentIndex()
-                            .row() - 1;
+                                       ->selectionModel()
+                                       ->currentIndex()
+                                       .row() -
+                                   1;
 
                     auto selectUsernameWidget =
-                            new SelectChannelWidget(selected, "users");
+                        new SelectChannelWidget(selected, "users");
 
                     selectUsernameWidget->show();
                     selectUsernameWidget->raise();
@@ -198,12 +199,13 @@ HighlightingPage::HighlightingPage()
 
                 view->excludeChannelPressed.connect([this, view] {
                     int selected = view->getTableView()
-                            ->selectionModel()
-                            ->currentIndex()
-                            .row() - 1;
+                                       ->selectionModel()
+                                       ->currentIndex()
+                                       .row() -
+                                   1;
 
                     auto excludeChannelWidget =
-                            new ExcludeChannelWidget(selected, "users");
+                        new ExcludeChannelWidget(selected, "users");
 
                     excludeChannelWidget->show();
                     excludeChannelWidget->raise();
@@ -428,7 +430,8 @@ void HighlightingPage::tableCellClicked(const QModelIndex &clicked,
     {
         case HighlightTab::Messages:
         case HighlightTab::Users: {
-            if (tab == HighlightTab::Messages) {
+            if (tab == HighlightTab::Messages)
+            {
                 if (clicked.row() >= 7)
                 {
                     view->enableSelectChannelButton();
@@ -439,10 +442,14 @@ void HighlightingPage::tableCellClicked(const QModelIndex &clicked,
                     view->disableSelectChannelButton();
                     view->disableExcludeChannelButton();
                 }
-            } else if (clicked.row() >= 1) {
+            }
+            else if (clicked.row() >= 1)
+            {
                 view->enableSelectChannelButton();
                 view->enableExcludeChannelButton();
-            } else {
+            }
+            else
+            {
                 view->disableSelectChannelButton();
                 view->disableExcludeChannelButton();
             }

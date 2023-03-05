@@ -2,6 +2,7 @@
 
 #include "common/Aliases.hpp"
 #include "common/NetworkRequest.hpp"
+#include "providers/twitch/api/GraphQL.hpp"
 #include "providers/twitch/TwitchEmotes.hpp"
 #include "util/QStringHash.hpp"
 
@@ -645,6 +646,11 @@ public:
         ResultCallback<HelixUsersFollowsResponse> successCallback,
         HelixFailureCallback failureCallback) = 0;
 
+    virtual void getUserFollow(
+        QString userId, QString targetId,
+        ResultCallback<bool, HelixUsersFollowsRecord> successCallback,
+        HelixFailureCallback failureCallback) = 0;
+
     // https://dev.twitch.tv/docs/api/reference#get-streams
     virtual void fetchStreams(
         QStringList userIds, QStringList userLogins,
@@ -932,6 +938,11 @@ public:
     void getUserFollowers(
         QString userId,
         ResultCallback<HelixUsersFollowsResponse> successCallback,
+        HelixFailureCallback failureCallback) final;
+
+    void getUserFollow(
+        QString userId, QString targetId,
+        ResultCallback<bool, HelixUsersFollowsRecord> successCallback,
         HelixFailureCallback failureCallback) final;
 
     // https://dev.twitch.tv/docs/api/reference#get-streams

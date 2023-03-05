@@ -22,6 +22,12 @@ struct TwitchUser;
 class Channel;
 using ChannelPtr = std::shared_ptr<Channel>;
 
+enum FollowResult {
+    FollowResult_Following,
+    FollowResult_NotFollowing,
+    FollowResult_Failed,
+};
+
 class TwitchAccount : public Account
 {
 public:
@@ -72,6 +78,8 @@ public:
     void loadBlocks();
     void blockUser(QString userId, std::function<void()> onSuccess,
                    std::function<void()> onFailure);
+    void checkFollow(const QString targetUserID,
+                     std::function<void(FollowResult)> onFinished);
     void unblockUser(QString userId, std::function<void()> onSuccess,
                      std::function<void()> onFailure);
 

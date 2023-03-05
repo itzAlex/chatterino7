@@ -17,6 +17,7 @@
 #include "messages/MessageThread.hpp"
 #include "providers/irc/IrcChannel2.hpp"
 #include "providers/irc/IrcServer.hpp"
+#include "providers/twitch/api/GraphQL.hpp"
 #include "providers/twitch/api/Helix.hpp"
 #include "providers/twitch/TwitchAccount.hpp"
 #include "providers/twitch/TwitchChannel.hpp"
@@ -748,6 +749,49 @@ void CommandController::initialize(Settings &, Paths &paths)
             "third-party applications. For more information, see "
             "https://github.com/Chatterino/chatterino2/issues/3076"));
         return "";
+
+        /*
+        auto currentUser = getApp()->accounts->twitch.getCurrent();
+
+        if (currentUser->isAnon())
+        {
+            channel->addMessage(
+                    makeSystemMessage("You must be logged in to follow someone!"));
+            return "";
+        }
+
+        if (words.size() < 2)
+        {
+            channel->addMessage(makeSystemMessage("Usage: /follow [user]"));
+            return "";
+        }
+
+        // User to follow
+        auto target = words.at(1);
+
+        getHelix()->getUserByName(
+                target,
+                [channel, target](const HelixUser &targetUser) {
+                    getGraphQL()->followUser(targetUser.id,
+                    [channel, target]() {
+                        channel->addMessage(makeSystemMessage(
+                                "You successfully followed " + target));
+                    },
+                    [channel, target]() {
+                        channel->addMessage(makeSystemMessage(
+                                QString(
+                                        "An error occurred trying to follow the user " + target)));
+                    });
+                },
+                [channel, target]() {
+                    channel->addMessage(
+                            makeSystemMessage(QString("User %1 could not be followed, "
+                                                      "no user with that name found!")
+                                                      .arg(target)));
+                });
+
+        return "";
+        */
     });
 
     this->registerCommand("/unfollow", [](const auto &words, auto channel) {

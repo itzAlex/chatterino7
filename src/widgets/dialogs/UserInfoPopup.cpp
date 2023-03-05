@@ -410,6 +410,7 @@ UserInfoPopup::UserInfoPopup(bool closeAutomatically, QWidget *parent,
     {
         user->addStretch(1);
 
+        // user.emplace<QCheckBox>("Follow").assign(&this->ui_.follow);
         user.emplace<QCheckBox>("Block").assign(&this->ui_.block);
         user.emplace<QCheckBox>("Ignore highlights")
             .assign(&this->ui_.ignoreHighlights);
@@ -794,6 +795,8 @@ void UserInfoPopup::updateLatestMessages()
 
 void UserInfoPopup::updateUserData()
 {
+    // this->ui_.follow->setEnabled(false);
+
     std::weak_ptr<bool> hack = this->lifetimeHack_;
     auto currentUser = getApp()->accounts->twitch.getCurrent();
 
@@ -871,6 +874,21 @@ void UserInfoPopup::updateUserData()
                 // on failure
             });
 
+        /*
+        // get follow state
+        currentUser->checkFollow(user.id, [this, hack](auto result) {
+            if (!hack.lock())
+            {
+                return;
+            }
+            if (result != FollowResult_Failed)
+            {
+                this->ui_.follow->setChecked(result == FollowResult_Following);
+                this->ui_.follow->setEnabled(true);
+            }
+        });
+        */
+
         // get ignore state
         bool isIgnoring = false;
 
@@ -947,6 +965,7 @@ void UserInfoPopup::updateUserData()
     getHelix()->getUserByName(this->userName_, onUserFetched,
                               onUserFetchFailed);
 
+    // this->ui_.follow->setEnabled(false);
     this->ui_.block->setEnabled(false);
     this->ui_.ignoreHighlights->setEnabled(false);
 }
