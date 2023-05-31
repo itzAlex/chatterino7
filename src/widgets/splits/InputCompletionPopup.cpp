@@ -6,6 +6,7 @@
 #include "providers/bttv/BttvEmotes.hpp"
 #include "providers/ffz/FfzEmotes.hpp"
 #include "providers/seventv/SeventvEmotes.hpp"
+#include "providers/seventv/SeventvPersonalEmotes.hpp"
 #include "providers/twitch/TwitchAccount.hpp"
 #include "providers/twitch/TwitchChannel.hpp"
 #include "providers/twitch/TwitchIrcServer.hpp"
@@ -18,12 +19,7 @@
 namespace {
 
 using namespace chatterino;
-
-struct CompletionEmote {
-    EmotePtr emote;
-    QString displayName;
-    QString providerName;
-};
+using namespace chatterino::detail;
 
 void addEmotes(std::vector<CompletionEmote> &out, const EmoteMap &map,
                const QString &text, const QString &providerName)
@@ -54,33 +50,18 @@ void addEmojis(std::vector<CompletionEmote> &out, const EmojiMap &map,
 
 }  // namespace
 
-namespace chatterino {
+namespace chatterino::detail {
 
-InputCompletionPopup::InputCompletionPopup(QWidget *parent)
-    : BasePopup({BasePopup::EnableCustomFrame, BasePopup::Frameless,
-                 BasePopup::DontFocus, BaseWindow::DisableLayoutSave},
-                parent)
-    , model_(this)
-{
-    this->initLayout();
-
-    QObject::connect(&this->redrawTimer_, &QTimer::timeout, this, [this] {
-        if (this->isVisible())
-        {
-            this->ui_.listView->doItemsLayout();
-        }
-    });
-    this->redrawTimer_.setInterval(33);
-}
-
-void InputCompletionPopup::updateEmotes(const QString &text, ChannelPtr channel)
+std::vector<CompletionEmote> buildCompletionEmoteList(const QString &text,
+                                                      ChannelPtr channel)
 {
     std::vector<CompletionEmote> emotes;
+    auto *app = getIApp();
     auto *tc = dynamic_cast<TwitchChannel *>(channel.get());
     // returns true also for special Twitch channels (/live, /mentions, /whispers, etc.)
     if (channel->isTwitchChannel())
     {
-        if (auto user = getApp()->accounts->twitch.getCurrent())
+        if (auto user = app->getAccounts()->twitch.getCurrent())
         {
             // Twitch Emotes available globally
             auto emoteData = user->accessEmotes();
@@ -101,6 +82,13 @@ void InputCompletionPopup::updateEmotes(const QString &text, ChannelPtr channel)
 
         if (tc)
         {
+            if (const auto map =
+                    getApp()->seventvPersonalEmotes->getEmoteSetForUser(
+                        getApp()->accounts->twitch.getCurrent()->getUserId()))
+            {
+                addEmotes(emotes, *map.get(), text, "Personal 7TV");
+            }
+
             // TODO extract "Channel {BetterTTV,7TV,FrankerFaceZ}" text into a #define.
             if (auto bttv = tc->bttvEmotes())
             {
@@ -122,7 +110,7 @@ void InputCompletionPopup::updateEmotes(const QString &text, ChannelPtr channel)
 
         if (getSettings()->enableBTTVCompletion)
         {
-            if (auto bttvG = getApp()->twitch->getBttvEmotes().emotes())
+            if (auto bttvG = app->getTwitch()->getBttvEmotes().emotes())
             {
                 addEmotes(emotes, *bttvG, text, "Global BetterTTV");
             }
@@ -130,7 +118,7 @@ void InputCompletionPopup::updateEmotes(const QString &text, ChannelPtr channel)
 
         if (getSettings()->enableFFZCompletion)
         {
-            if (auto ffzG = getApp()->twitch->getFfzEmotes().emotes())
+            if (auto ffzG = app->getTwitch()->getFfzEmotes().emotes())
             {
                 addEmotes(emotes, *ffzG, text, "Global FrankerFaceZ");
             }
@@ -139,7 +127,7 @@ void InputCompletionPopup::updateEmotes(const QString &text, ChannelPtr channel)
         if (getSettings()->enable7TVCompletion)
         {
             if (auto seventvG =
-                    getApp()->twitch->getSeventvEmotes().globalEmotes())
+                    app->getTwitch()->getSeventvEmotes().globalEmotes())
             {
                 addEmotes(emotes, *seventvG, text, "Global 7TV");
             }
@@ -147,14 +135,14 @@ void InputCompletionPopup::updateEmotes(const QString &text, ChannelPtr channel)
 
         if (getSettings()->enableHomiesCompletion)
         {
-            if (auto homiesG = getApp()->twitch->getHomiesEmotes().emotes())
+            if (auto homiesG = app->getTwitch()->getHomiesEmotes().emotes())
             {
                 addEmotes(emotes, *homiesG, text, "Global Homies");
             }
         }
     }
 
-    addEmojis(emotes, getApp()->emotes->emojis.emojis, text);
+    addEmojis(emotes, app->getEmotes()->getEmojis()->getEmojis(), text);
 
     // if there is an exact match, put that emote first
     for (size_t i = 1; i < emotes.size(); i++)
@@ -171,6 +159,34 @@ void InputCompletionPopup::updateEmotes(const QString &text, ChannelPtr channel)
             break;
         }
     }
+
+    return emotes;
+}
+
+}  // namespace chatterino::detail
+
+namespace chatterino {
+
+InputCompletionPopup::InputCompletionPopup(QWidget *parent)
+    : BasePopup({BasePopup::EnableCustomFrame, BasePopup::Frameless,
+                 BasePopup::DontFocus, BaseWindow::DisableLayoutSave},
+                parent)
+    , model_(this)
+{
+    this->initLayout();
+
+    QObject::connect(&this->redrawTimer_, &QTimer::timeout, this, [this] {
+        if (this->isVisible())
+        {
+            this->ui_.listView->doItemsLayout();
+        }
+    });
+    this->redrawTimer_.setInterval(33);
+}
+
+void InputCompletionPopup::updateEmotes(const QString &text, ChannelPtr channel)
+{
+    auto emotes = detail::buildCompletionEmoteList(text, std::move(channel));
 
     this->model_.clear();
 

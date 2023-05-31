@@ -10,6 +10,7 @@
 namespace chatterino {
 
 class TwitchIrcServer;
+class ITwitchIrcServer;
 class PubSub;
 
 class CommandController;
@@ -20,6 +21,9 @@ class HotkeyController;
 class IUserDataController;
 class UserDataController;
 class SoundController;
+#ifdef CHATTERINO_HAVE_PLUGINS
+class PluginController;
+#endif
 
 class Theme;
 class WindowManager;
@@ -36,6 +40,7 @@ class SeventvPaints;
 class FfzBadges;
 class HomiesBadges;
 class SeventvBadges;
+class SeventvPersonalEmotes;
 
 class IApplication
 {
@@ -55,7 +60,7 @@ public:
     virtual CommandController *getCommands() = 0;
     virtual HighlightController *getHighlights() = 0;
     virtual NotificationController *getNotifications() = 0;
-    virtual TwitchIrcServer *getTwitch() = 0;
+    virtual ITwitchIrcServer *getTwitch() = 0;
     virtual ChatterinoBadges *getChatterinoBadges() = 0;
     virtual FfzBadges *getFfzBadges() = 0;
     virtual HomiesBadges *getHomiesBadges() = 0;
@@ -98,8 +103,13 @@ public:
     HomiesBadges *const homiesBadges{};
     SeventvBadges *const seventvBadges{};
     SeventvPaints *const seventvPaints{};
+    SeventvPersonalEmotes *const seventvPersonalEmotes{};
     UserDataController *const userData{};
     SoundController *const sound{};
+
+#ifdef CHATTERINO_HAVE_PLUGINS
+    PluginController *const plugins{};
+#endif
 
     /*[[deprecated]]*/ Logging *const logging{};
 
@@ -140,10 +150,7 @@ public:
     {
         return this->highlights;
     }
-    TwitchIrcServer *getTwitch() override
-    {
-        return this->twitch;
-    }
+    ITwitchIrcServer *getTwitch() override;
     ChatterinoBadges *getChatterinoBadges() override
     {
         return this->chatterinoBadges;

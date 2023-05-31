@@ -64,6 +64,20 @@ struct Emote;
 using EmotePtr = std::shared_ptr<const Emote>;
 class EmoteMap;
 
+enum class SeventvEmoteSetKind : uint8_t {
+    Global,
+    Personal,
+    Channel,
+};
+
+enum class SeventvEmoteSetFlag : uint32_t {
+    Immutable = (1 << 0),
+    Privileged = (1 << 1),
+    Personal = (1 << 2),
+    Commercial = (1 << 3),
+};
+using SeventvEmoteSetFlags = FlagsEnum<SeventvEmoteSetFlag>;
+
 class SeventvEmotes final
 {
     static constexpr const char *apiUrlGQL = "https://7tv.io/v3/gql";
@@ -81,6 +95,7 @@ public:
     boost::optional<EmotePtr> globalEmote(const EmoteName &name) const;
     static void addEmote(QString emoteID, TwitchChannel *channel);
     void loadGlobalEmotes();
+    void setGlobalEmotes(std::shared_ptr<const EmoteMap> emotes);
     static void loadChannelEmotes(
         const std::weak_ptr<Channel> &channel, const QString &channelId,
         std::function<void(EmoteMap &&, ChannelInfo)> callback,
@@ -95,7 +110,8 @@ public:
      */
     static boost::optional<EmotePtr> addEmote(
         Atomic<std::shared_ptr<const EmoteMap>> &map,
-        const seventv::eventapi::EmoteAddDispatch &dispatch);
+        const seventv::eventapi::EmoteAddDispatch &dispatch,
+        SeventvEmoteSetKind kind = SeventvEmoteSetKind::Channel);
 
     /**
      * Updates an emote in this `map`.
@@ -106,7 +122,8 @@ public:
      */
     static boost::optional<EmotePtr> updateEmote(
         Atomic<std::shared_ptr<const EmoteMap>> &map,
-        const seventv::eventapi::EmoteUpdateDispatch &dispatch);
+        const seventv::eventapi::EmoteUpdateDispatch &dispatch,
+        SeventvEmoteSetKind kind = SeventvEmoteSetKind::Channel);
 
     /**
      * Removes an emote from this `map`.

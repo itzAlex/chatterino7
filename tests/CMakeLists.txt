@@ -24,6 +24,9 @@ set(test_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/src/SeventvEventAPI.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/BttvLiveUpdates.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/Updates.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/Filters.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/LinkParser.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/InputCompletion.cpp
     # Add your new file above this line!
     )
 
@@ -31,12 +34,9 @@ add_executable(${PROJECT_NAME} ${test_SOURCES})
 add_sanitizers(${PROJECT_NAME})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE chatterino-lib)
+target_link_libraries(${PROJECT_NAME} PRIVATE chatterino-mocks)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE gtest gmock)
-
-target_compile_definitions(${PROJECT_NAME} PRIVATE
-    CHATTERINO_TEST
-    )
 
 set_target_properties(${PROJECT_NAME}
     PROPERTIES

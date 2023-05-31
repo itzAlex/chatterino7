@@ -6,6 +6,8 @@
 #include <set>
 #include <shared_mutex>
 
+class InputCompletionTest;
+
 namespace chatterino {
 
 class Channel;
@@ -26,6 +28,7 @@ class CompletionModel : public QAbstractListModel
             HOMIESChannelEmote,
             SeventvGlobalEmote,
             SeventvChannelEmote,
+            SeventvPersonalEmote,
             TwitchGlobalEmote,
             TwitchLocalEmote,
             TwitchSubscriberEmote,
@@ -36,6 +39,9 @@ class CompletionModel : public QAbstractListModel
             CustomCommand,
             ChatterinoCommand,
             TwitchCommand,
+#ifdef CHATTERINO_HAVE_PLUGINS
+            PluginCommand,
+#endif
         };
 
         TaggedString(QString _string, Type type);
@@ -59,10 +65,14 @@ public:
     static bool compareStrings(const QString &a, const QString &b);
 
 private:
+    std::vector<QString> allItems() const;
+
     mutable std::shared_mutex itemsMutex_;
     std::set<TaggedString> items_;
 
     Channel &channel_;
+
+    friend class ::InputCompletionTest;
 };
 
 }  // namespace chatterino

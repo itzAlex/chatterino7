@@ -51,6 +51,8 @@ set(SOURCE_FILES
         common/WindowDescriptors.cpp
         common/WindowDescriptors.hpp
 
+        common/enums/MessageOverflow.hpp
+
         controllers/accounts/Account.cpp
         controllers/accounts/Account.hpp
         controllers/accounts/AccountController.cpp
@@ -58,8 +60,14 @@ set(SOURCE_FILES
         controllers/accounts/AccountModel.cpp
         controllers/accounts/AccountModel.hpp
 
+        controllers/commands/builtin/chatterino/Debugging.cpp
+        controllers/commands/builtin/chatterino/Debugging.hpp
         controllers/commands/builtin/twitch/ChatSettings.cpp
         controllers/commands/builtin/twitch/ChatSettings.hpp
+        controllers/commands/builtin/twitch/ShieldMode.cpp
+        controllers/commands/builtin/twitch/ShieldMode.hpp
+        controllers/commands/builtin/twitch/Shoutout.cpp
+        controllers/commands/builtin/twitch/Shoutout.hpp
         controllers/commands/CommandContext.hpp
         controllers/commands/CommandController.cpp
         controllers/commands/CommandController.hpp
@@ -74,12 +82,26 @@ set(SOURCE_FILES
         controllers/filters/FilterRecord.hpp
         controllers/filters/FilterSet.cpp
         controllers/filters/FilterSet.hpp
-        controllers/filters/parser/FilterParser.cpp
-        controllers/filters/parser/FilterParser.hpp
-        controllers/filters/parser/Tokenizer.cpp
-        controllers/filters/parser/Tokenizer.hpp
-        controllers/filters/parser/Types.cpp
-        controllers/filters/parser/Types.hpp
+        controllers/filters/lang/expressions/Expression.cpp
+        controllers/filters/lang/expressions/Expression.hpp
+        controllers/filters/lang/expressions/BinaryOperation.cpp
+        controllers/filters/lang/expressions/BinaryOperation.hpp
+        controllers/filters/lang/expressions/ListExpression.cpp
+        controllers/filters/lang/expressions/ListExpression.hpp
+        controllers/filters/lang/expressions/RegexExpression.cpp
+        controllers/filters/lang/expressions/RegexExpression.hpp
+        controllers/filters/lang/expressions/UnaryOperation.hpp
+        controllers/filters/lang/expressions/UnaryOperation.cpp
+        controllers/filters/lang/expressions/ValueExpression.cpp
+        controllers/filters/lang/expressions/ValueExpression.hpp
+        controllers/filters/lang/Filter.cpp
+        controllers/filters/lang/Filter.hpp
+        controllers/filters/lang/FilterParser.cpp
+        controllers/filters/lang/FilterParser.hpp
+        controllers/filters/lang/Tokenizer.cpp
+        controllers/filters/lang/Tokenizer.hpp
+        controllers/filters/lang/Types.cpp
+        controllers/filters/lang/Types.hpp
 
         controllers/highlights/BadgeHighlightModel.cpp
         controllers/highlights/BadgeHighlightModel.hpp
@@ -135,6 +157,15 @@ set(SOURCE_FILES
 
         controllers/pings/MutedChannelModel.cpp
         controllers/pings/MutedChannelModel.hpp
+
+        controllers/plugins/LuaAPI.cpp
+        controllers/plugins/LuaAPI.hpp
+        controllers/plugins/Plugin.cpp
+        controllers/plugins/Plugin.hpp
+        controllers/plugins/PluginController.hpp
+        controllers/plugins/PluginController.cpp
+        controllers/plugins/LuaUtilities.cpp
+        controllers/plugins/LuaUtilities.hpp
 
         controllers/userdata/UserDataController.cpp
         controllers/userdata/UserDataController.hpp
@@ -278,6 +309,8 @@ set(SOURCE_FILES
         providers/seventv/SeventvEmotes.hpp
         providers/seventv/SeventvEventAPI.cpp
         providers/seventv/SeventvEventAPI.hpp
+        providers/seventv/SeventvPersonalEmotes.cpp
+        providers/seventv/SeventvPersonalEmotes.hpp
 
         providers/seventv/eventapi/Client.cpp
         providers/seventv/eventapi/Client.hpp
@@ -445,6 +478,8 @@ set(SOURCE_FILES
         widgets/Scrollbar.hpp
         widgets/StreamView.cpp
         widgets/StreamView.hpp
+        widgets/TooltipEntryWidget.cpp
+        widgets/TooltipEntryWidget.hpp
         widgets/TooltipWidget.cpp
         widgets/TooltipWidget.hpp
         widgets/Window.cpp
@@ -574,6 +609,8 @@ set(SOURCE_FILES
         widgets/settingspages/NicknamesPage.hpp
         widgets/settingspages/NotificationPage.cpp
         widgets/settingspages/NotificationPage.hpp
+        widgets/settingspages/PluginsPage.cpp
+        widgets/settingspages/PluginsPage.hpp
         widgets/settingspages/SettingsPage.cpp
         widgets/settingspages/SettingsPage.hpp
         widgets/settingspages/HomiesPage.cpp
@@ -621,6 +658,14 @@ list(APPEND SOURCE_FILES ${RES_AUTOGEN_FILES})
 
 add_library(${LIBRARY_PROJECT} OBJECT ${SOURCE_FILES})
 
+if(CHATTERINO_PLUGINS)
+    target_compile_definitions(${LIBRARY_PROJECT}
+        PRIVATE
+        CHATTERINO_HAVE_PLUGINS
+    )
+    message(STATUS "Building Chatterino with lua plugin support enabled.")
+endif()
+
 if (CHATTERINO_GENERATE_COVERAGE)
     include(CodeCoverage)
     append_coverage_compiler_flags_to_target(${LIBRARY_PROJECT})
@@ -655,6 +700,9 @@ target_link_libraries(${LIBRARY_PROJECT}
         LRUCache
         MagicEnum
         )
+if (CHATTERINO_PLUGINS)
+    target_link_libraries(${LIBRARY_PROJECT} PUBLIC lua)
+endif()
 
 if (BUILD_WITH_QT6)
     target_link_libraries(${LIBRARY_PROJECT}

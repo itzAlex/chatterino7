@@ -174,6 +174,8 @@ Settings::Settings(const QString &settingsDirectory)
 
 Settings &Settings::instance()
 {
+    assert(instance_ != nullptr);
+
     return *instance_;
 }
 

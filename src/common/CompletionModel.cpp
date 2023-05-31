@@ -6,6 +6,7 @@
 #include "controllers/commands/Command.hpp"
 #include "controllers/commands/CommandController.hpp"
 #include "messages/Emote.hpp"
+#include "providers/seventv/SeventvPersonalEmotes.hpp"
 #include "providers/twitch/TwitchAccount.hpp"
 #include "providers/twitch/TwitchChannel.hpp"
 #include "providers/twitch/TwitchCommon.hpp"
@@ -92,6 +93,7 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
         return;
     }
 
+    auto *app = getIApp();
     // Twitch channel
     auto *tc = dynamic_cast<TwitchChannel *>(&this->channel_);
 
@@ -130,7 +132,7 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
         }
     };
 
-    if (auto account = getApp()->accounts->twitch.getCurrent())
+    if (auto account = app->getAccounts()->twitch.getCurrent())
     {
         // Twitch Emotes available globally
         for (const auto &emote : account->accessEmotes()->emotes)
@@ -155,7 +157,7 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
     if (getSettings()->enable7TVCompletion)
     {
         for (const auto &emote :
-             *getApp()->twitch->getSeventvEmotes().globalEmotes())
+             *app->getTwitch()->getSeventvEmotes().globalEmotes())
         {
             addString(emote.first.string,
                       TaggedString::Type::SeventvGlobalEmote);
@@ -165,7 +167,7 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
     // Bttv Global
     if (getSettings()->enableBTTVCompletion)
     {
-        for (const auto &emote : *getApp()->twitch->getBttvEmotes().emotes())
+        for (const auto &emote : *app->getTwitch()->getBttvEmotes().emotes())
         {
             addString(emote.first.string, TaggedString::Type::BTTVChannelEmote);
         }
@@ -174,7 +176,7 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
     // Ffz Global
     if (getSettings()->enableFFZCompletion)
     {
-        for (const auto &emote : *getApp()->twitch->getFfzEmotes().emotes())
+        for (const auto &emote : *app->getTwitch()->getFfzEmotes().emotes())
         {
             addString(emote.first.string, TaggedString::Type::FFZChannelEmote);
         }
@@ -183,7 +185,7 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
     // Homies Global
     if (getSettings()->enableHomiesCompletion)
     {
-        for (auto &emote : *getApp()->twitch->getHomiesEmotes().emotes())
+        for (auto &emote : *app->getTwitch()->getHomiesEmotes().emotes())
         {
             addString(emote.first.string,
                       TaggedString::Type::HOMIESGlobalEmote);
@@ -193,7 +195,8 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
     // Emojis
     if (prefix.startsWith(":"))
     {
-        const auto &emojiShortCodes = getApp()->emotes->emojis.shortCodes;
+        const auto &emojiShortCodes =
+            app->getEmotes()->getEmojis()->getShortCodes();
         for (const auto &m : emojiShortCodes)
         {
             addString(QString(":%1:").arg(m), TaggedString::Type::Emoji);
@@ -217,10 +220,11 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
 
         for (const auto &name : chatters)
         {
-            addString(formatUserMention(name, isFirstWord,
+            addString(
+                "@" + formatUserMention(name, isFirstWord,
                                         getSettings()->mentionUsersWithComma,
                                         getSettings()->mentionUsersWithAt),
-                      TaggedString::Type::Username);
+                TaggedString::Type::Username);
         }
     }
     else if (!getSettings()->userCompletionOnlyWithAt)
@@ -233,6 +237,17 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
                                         getSettings()->mentionUsersWithComma,
                                         getSettings()->mentionUsersWithAt),
                       TaggedString::Type::Username);
+        }
+    }
+
+    // 7TV Personal
+    if (const auto map = getApp()->seventvPersonalEmotes->getEmoteSetForUser(
+            getApp()->accounts->twitch.getCurrent()->getUserId()))
+    {
+        for (const auto &emote : *map.get())
+        {
+            addString(emote.first.string,
+                      TaggedString::Type::SeventvPersonalEmote);
         }
     }
 
@@ -254,20 +269,26 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
     }
 
     // Homies Channel
-    for (auto &emote : *tc->homiesEmotes())
+    for (const auto &emote : *tc->homiesEmotes())
     {
         addString(emote.first.string, TaggedString::Type::HOMIESChannelEmote);
     }
 
+#ifdef CHATTERINO_HAVE_PLUGINS
+    for (const auto &command : app->getCommands()->pluginCommands())
+    {
+        addString(command, TaggedString::PluginCommand);
+    }
+#endif
     // Custom Chatterino commands
-    for (const auto &command : getApp()->commands->items)
+    for (const auto &command : app->getCommands()->items)
     {
         addString(command.name, TaggedString::CustomCommand);
     }
 
     // Default Chatterino commands
     for (const auto &command :
-         getApp()->commands->getDefaultChatterinoCommandList())
+         app->getCommands()->getDefaultChatterinoCommandList())
     {
         addString(command, TaggedString::ChatterinoCommand);
     }
@@ -277,6 +298,19 @@ void CompletionModel::refresh(const QString &prefix, bool isFirstWord)
     {
         addString(command, TaggedString::TwitchCommand);
     }
+}
+
+std::vector<QString> CompletionModel::allItems() const
+{
+    std::shared_lock lock(this->itemsMutex_);
+
+    std::vector<QString> results;
+    results.reserve(this->items_.size());
+    for (const auto &item : this->items_)
+    {
+        results.push_back(item.string);
+    }
+    return results;
 }
 
 bool CompletionModel::compareStrings(const QString &a, const QString &b)

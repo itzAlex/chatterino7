@@ -24,7 +24,22 @@ class TwitchChannel;
 class BttvLiveUpdates;
 class SeventvEventAPI;
 
-class TwitchIrcServer final : public AbstractIrcServer, public Singleton
+class ITwitchIrcServer
+{
+public:
+    virtual ~ITwitchIrcServer() = default;
+
+    virtual const BttvEmotes &getBttvEmotes() const = 0;
+    virtual const FfzEmotes &getFfzEmotes() const = 0;
+    virtual const SeventvEmotes &getSeventvEmotes() const = 0;
+    virtual const HomiesEmotes &getHomiesEmotes() const = 0;
+
+    // Update this interface with TwitchIrcServer methods as needed
+};
+
+class TwitchIrcServer final : public AbstractIrcServer,
+                              public Singleton,
+                              public ITwitchIrcServer
 {
 public:
     TwitchIrcServer();
@@ -73,10 +88,10 @@ public:
     std::unique_ptr<BttvLiveUpdates> bttvLiveUpdates;
     std::unique_ptr<SeventvEventAPI> seventvEventAPI;
 
-    const BttvEmotes &getBttvEmotes() const;
-    const FfzEmotes &getFfzEmotes() const;
-    const SeventvEmotes &getSeventvEmotes() const;
-    const HomiesEmotes &getHomiesEmotes() const;
+    const BttvEmotes &getBttvEmotes() const override;
+    const FfzEmotes &getFfzEmotes() const override;
+    const SeventvEmotes &getSeventvEmotes() const override;
+    const HomiesEmotes &getHomiesEmotes() const override;
 
 protected:
     virtual void initializeConnection(IrcConnection *connection,
