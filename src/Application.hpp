@@ -49,7 +49,8 @@ class ChatterinoBadges;
 class SeventvBadges;
 class SeventvPaints;
 class FfzBadges;
-class SeventvBadges;
+class IHomiesBadges;
+class HomiesBadges;
 class SeventvPersonalEmotes;
 class ImageUploader;
 class SeventvAPI;
@@ -84,6 +85,7 @@ public:
     virtual Logging *getChatLogger() = 0;
     virtual IChatterinoBadges *getChatterinoBadges() = 0;
     virtual FfzBadges *getFfzBadges() = 0;
+    virtual IHomiesBadges *getHomiesBadges() = 0;
     virtual SeventvBadges *getSeventvBadges() = 0;
     virtual IUserDataController *getUserData() = 0;
     virtual ISoundController *getSound() = 0;
@@ -166,6 +168,7 @@ private:
     std::unique_ptr<PubSub> twitchPubSub;
     std::unique_ptr<TwitchBadges> twitchBadges;
     std::unique_ptr<ChatterinoBadges> chatterinoBadges;
+    std::unique_ptr<HomiesBadges> homiesBadges;
     std::unique_ptr<BttvEmotes> bttvEmotes;
     std::unique_ptr<FfzEmotes> ffzEmotes;
     std::unique_ptr<SeventvEmotes> seventvEmotes;
@@ -198,6 +201,7 @@ public:
     PubSub *getTwitchPubSub() override;
     Logging *getChatLogger() override;
     FfzBadges *getFfzBadges() override;
+    IHomiesBadges *getHomiesBadges() override;
     SeventvBadges *getSeventvBadges() override;
     IUserDataController *getUserData() override;
     ISoundController *getSound() override;

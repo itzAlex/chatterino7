@@ -16,6 +16,7 @@
 #include "widgets/settingspages/FiltersPage.hpp"
 #include "widgets/settingspages/GeneralPage.hpp"
 #include "widgets/settingspages/HighlightingPage.hpp"
+#include "widgets/settingspages/HomiesPage.hpp"
 #include "widgets/settingspages/IgnoresPage.hpp"
 #include "widgets/settingspages/KeyboardSettingsPage.hpp"
 #include "widgets/settingspages/ModerationPage.hpp"
@@ -232,6 +233,7 @@ void SettingsDialog::addTabs()
 
     // clang-format off
     this->addTab([]{return new GeneralPage;},          "General",        ":/settings/about.svg", SettingsTabId::General);
+    this->addTab([]{return new HomiesPage;}, "Homies", ":/settings/about.svg");
     this->ui_.tabContainer->addSpacing(16);
     this->addTab([]{return new AccountsPage;},         "Accounts",       ":/settings/accounts.svg", SettingsTabId::Accounts);
     this->addTab([]{return new NicknamesPage;},        "Nicknames",      ":/settings/accounts.svg");

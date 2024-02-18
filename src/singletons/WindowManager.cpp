@@ -108,6 +108,7 @@ WindowManager::WindowManager(const Paths &paths)
     this->wordFlagsListener_.addSetting(settings->showBadgesChatterino);
     this->wordFlagsListener_.addSetting(settings->showBadgesFfz);
     this->wordFlagsListener_.addSetting(settings->showBadgesSevenTV);
+    this->wordFlagsListener_.addSetting(settings->showBadgesHomies);
     this->wordFlagsListener_.addSetting(settings->enableEmoteImages);
     this->wordFlagsListener_.addSetting(settings->boldUsernames);
     this->wordFlagsListener_.addSetting(settings->lowercaseDomains);
@@ -172,6 +173,7 @@ void WindowManager::updateWordTypeMask()
                                              : MEF::None);
     flags.set(settings->showBadgesFfz ? MEF::BadgeFfz : MEF::None);
     flags.set(settings->showBadgesSevenTV ? MEF::BadgeSevenTV : MEF::None);
+    flags.set(settings->showBadgesHomies ? MEF::BadgeHomies : MEF::None);
 
     // username
     flags.set(MEF::Username);

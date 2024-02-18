@@ -30,6 +30,7 @@
 #include "providers/bttv/BttvLiveUpdates.hpp"
 #include "providers/chatterino/ChatterinoBadges.hpp"
 #include "providers/ffz/FfzBadges.hpp"
+#include "providers/homies/HomiesBadges.hpp"
 #include "providers/irc/Irc2.hpp"
 #include "providers/seventv/eventapi/Dispatch.hpp"
 #include "providers/seventv/eventapi/Subscription.hpp"
@@ -142,6 +143,7 @@ Application::Application(Settings &_settings, const Paths &paths,
     , twitchPubSub(new PubSub(TWITCH_PUBSUB_URL))
     , twitchBadges(new TwitchBadges)
     , chatterinoBadges(new ChatterinoBadges)
+    , homiesBadges(new HomiesBadges)
     , bttvEmotes(new BttvEmotes)
     , ffzEmotes(new FfzEmotes)
     , seventvEmotes(new SeventvEmotes)
@@ -182,14 +184,14 @@ void Application::initialize(Settings &settings, const Paths &paths)
         getSettings()->currentVersion.getValue() != "" &&
         getSettings()->currentVersion.getValue() != CHATTERINO_VERSION)
     {
-        auto *box = new QMessageBox(QMessageBox::Information, "Chatterino 2",
+        auto *box = new QMessageBox(QMessageBox::Information, "Chatterino Homies",
                                     "Show changelog?",
                                     QMessageBox::Yes | QMessageBox::No);
         box->setAttribute(Qt::WA_DeleteOnClose);
         if (box->exec() == QMessageBox::Yes)
         {
             QDesktopServices::openUrl(
-                QUrl("https://www.chatterino.com/changelog"));
+                QUrl("https://chatterinohomies.com"));
         }
     }
 
@@ -408,6 +410,14 @@ FfzBadges *Application::getFfzBadges()
     assertInGuiThread();
 
     return this->ffzBadges;
+}
+
+IHomiesBadges *Application::getHomiesBadges()
+{
+    assertInGuiThread();
+    assert(this->homiesBadges);
+
+    return this->homiesBadges.get();
 }
 
 SeventvBadges *Application::getSeventvBadges()

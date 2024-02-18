@@ -15,6 +15,7 @@
 #include "messages/MessageThread.hpp"
 #include "providers/bttv/BttvEmotes.hpp"
 #include "providers/chatterino/ChatterinoBadges.hpp"
+#include "providers/homies/HomiesBadges.hpp"
 #include "providers/colors/ColorProvider.hpp"
 #include "providers/ffz/FfzBadges.hpp"
 #include "providers/ffz/FfzEmotes.hpp"
@@ -525,6 +526,7 @@ MessagePtr TwitchMessageBuilder::build()
     this->appendChatterinoBadges();
     this->appendFfzBadges();
     this->appendSeventvBadges();
+    this->appendHomiesBadges();
 
     this->appendUsername();
 
@@ -1462,6 +1464,22 @@ void TwitchMessageBuilder::appendSeventvBadges()
     if (auto badge = getIApp()->getSeventvBadges()->getBadge({this->userId_}))
     {
         this->emplace<BadgeElement>(*badge, MessageElementFlag::BadgeSevenTV);
+    }
+}
+
+void TwitchMessageBuilder::appendHomiesBadges()
+{
+    if (auto badge = getIApp()->getHomiesBadges()->getBadge({this->userId_}))
+    {
+        this->emplace<BadgeElement>(*badge, MessageElementFlag::BadgeHomies);
+    }
+    if (auto badge = getIApp()->getHomiesBadges()->getBadge2({this->userId_}))
+    {
+        this->emplace<BadgeElement>(*badge, MessageElementFlag::BadgeHomies);
+    }
+    if (auto badge = getIApp()->getHomiesBadges()->getBadge3({this->userId_}))
+    {
+        this->emplace<BadgeElement>(*badge, MessageElementFlag::BadgeHomies);
     }
 }
 

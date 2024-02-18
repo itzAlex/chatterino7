@@ -120,6 +120,7 @@ public:
         "/appearance/tabVisibility",
         NotebookTabVisibility::AllTabs,
     };
+    BoolSetting grayOutRecents = {"/appearance/messages/grayOutRecents", true};
 
     //    BoolSetting collapseLongMessages =
     //    {"/appearance/messages/collapseLongMessages", false};
@@ -173,11 +174,12 @@ public:
     BoolSetting useCustomFfzVipBadges = {
         "/appearance/badges/useCustomFfzVipBadges", true};
     BoolSetting showBadgesSevenTV = {"/appearance/badges/seventv", true};
+    BoolSetting showBadgesHomies = {"/appearance/badges/homies", true};
 
     /// Behaviour
     BoolSetting allowDuplicateMessages = {"/behaviour/allowDuplicateMessages",
                                           true};
-    BoolSetting mentionUsersWithAt = {"/behaviour/mentionUsersWithAt", false};
+    BoolSetting mentionUsersWithAt = {"/behaviour/mentionUsersWithAt", true};
     BoolSetting showJoins = {"/behaviour/showJoins", false};
     BoolSetting showParts = {"/behaviour/showParts", false};
     FloatSetting mouseScrollMultiplier = {"/behaviour/mouseScrollMultiplier",
@@ -185,6 +187,7 @@ public:
     BoolSetting autoCloseUserPopup = {"/behaviour/autoCloseUserPopup", true};
     BoolSetting autoCloseThreadPopup = {"/behaviour/autoCloseThreadPopup",
                                         false};
+    QStringSetting searchEngine = {"/behaviour/searchEngine", "Google"};
 
     EnumSetting<UsernameRightClickBehavior> usernameRightClickBehavior = {
         "/behaviour/usernameRightClickBehavior",
@@ -223,6 +226,14 @@ public:
         "/experiments/useSmartEmoteCompletion",
         false,
     };
+    BoolSetting enableHomiesCompletion = {
+        "/behaviour/autocompletion/enableHomiesCompletion", true};
+    BoolSetting enableFFZCompletion = {
+        "/behaviour/autocompletion/enableFFZCompletion", true};
+    BoolSetting enableBTTVCompletion = {
+        "/behaviour/autocompletion/enableBTTVCompletion", true};
+    BoolSetting enable7TVCompletion = {
+        "/behaviour/autocompletion/enable7TVCompletion", true};
 
     FloatSetting pauseOnHoverDuration = {"/behaviour/pauseOnHoverDuration", 0};
     EnumSetting<Qt::KeyboardModifier> pauseChatModifier = {
@@ -230,6 +241,9 @@ public:
     BoolSetting autorun = {"/behaviour/autorun", false};
     BoolSetting mentionUsersWithComma = {"/behaviour/mentionUsersWithComma",
                                          true};
+    BoolSetting joinSeparatedLinks = {"/behaviour/joinSeparatedLinks", false};
+    BoolSetting separateClipsLinks = {"/behaviour/separateClipsLinks", false};
+    BoolSetting separateLinks = {"/behaviour/separateLinks", false};
 
     /// Commands
     BoolSetting allowCommandsAtEnd = {"/commands/allowCommandsAtEnd", false};
@@ -242,7 +256,7 @@ public:
     BoolSetting enableZeroWidthEmotes = {"/emotes/enableZeroWidthEmotes", true};
     FloatSetting emoteScale = {"/emotes/scale", 1.f};
     BoolSetting showUnlistedSevenTVEmotes = {
-        "/emotes/showUnlistedSevenTVEmotes", false};
+        "/emotes/showUnlistedSevenTVEmotes", true};
     /**
      * This setting is kept for backwards compatibility.
      */
@@ -265,7 +279,9 @@ public:
     BoolSetting enableSevenTVPersonalEmotes = {"/emotes/seventv/personal",
                                                true};
     BoolSetting enableSevenTVEventAPI = {"/emotes/seventv/eventapi", true};
-    BoolSetting sendSevenTVActivity = {"/emotes/seventv/sendActivity", true};
+    BoolSetting sendSevenTVActivity = {"/emotes/seventv/sendActivity", false};
+    BoolSetting enableHomiesGlobalEmotes = {"/emotes/homies/global", true};
+    BoolSetting enableHomiesChannelEmotes = {"/emotes/homies/channel", true};
 
     BoolSetting allowAvifImages = {"/emotes/allowAvif", true};
 
@@ -610,6 +626,8 @@ private:
         "/ignore/phrases"};
     ChatterinoSetting<std::vector<QString>> mutedChannelsSetting = {
         "/pings/muted"};
+    ChatterinoSetting<std::vector<QString>> separateLinksChannelsSetting = {
+        "/channels/separate"};
     ChatterinoSetting<std::vector<FilterRecordPtr>> filterRecordsSetting = {
         "/filtering/filters"};
     ChatterinoSetting<std::vector<Nickname>> nicknamesSetting = {"/nicknames"};
@@ -617,6 +635,7 @@ private:
         {"/moderation/actions"};
     ChatterinoSetting<std::vector<ChannelLog>> loggedChannelsSetting = {
         "/logging/channels"};
+
 
 public:
     SignalVector<HighlightPhrase> highlightedMessages;
@@ -629,12 +648,16 @@ public:
     SignalVector<Nickname> nicknames;
     SignalVector<ModerationAction> moderationActions;
     SignalVector<ChannelLog> loggedChannels;
+    SignalVector<QString> separateLinksChannels;
 
     bool isHighlightedUser(const QString &username);
     bool isBlacklistedUser(const QString &username);
     bool isMutedChannel(const QString &channelName);
     bool toggleMutedChannel(const QString &channelName);
     std::optional<QString> matchNickname(const QString &username);
+    bool isSeparatedLinksChannel(const QString &channelName);
+    void addSeparatedLinkChannel(const QString &channelName);
+    void clearSeparatedLinkChannels();
 
 private:
     void mute(const QString &channelName);

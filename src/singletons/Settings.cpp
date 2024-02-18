@@ -62,6 +62,30 @@ bool Settings::isHighlightedUser(const QString &username)
     return false;
 }
 
+bool Settings::isSeparatedLinksChannel(const QString &channelName)
+{
+    auto items = this->separateLinksChannels.readOnly();
+
+    for (const auto &channel : *items)
+    {
+        if (channelName.toLower() == channel.toLower())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void Settings::addSeparatedLinkChannel(const QString &channelName)
+{
+    separateLinksChannels.append(channelName);
+}
+
+void Settings::clearSeparatedLinkChannels()
+{
+    separateLinksChannels.clear();
+}
+
 bool Settings::isBlacklistedUser(const QString &username)
 {
     auto items = this->blacklistedUsers.readOnly();
@@ -175,6 +199,8 @@ Settings::Settings(const QString &settingsDirectory)
                            this->moderationActions);
     initializeSignalVector(this->signalHolder, this->loggedChannelsSetting,
                            this->loggedChannels);
+    initializeSignalVector(this->signalHolder, this->separateLinksChannelsSetting,
+                           this->separateLinksChannels);
 
     instance_ = this;
 
