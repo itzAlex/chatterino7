@@ -13,6 +13,7 @@
 #include "providers/seventv/eventapi/Subscription.hpp"
 #include "providers/seventv/SeventvEmotes.hpp"
 #include "providers/seventv/SeventvEventAPI.hpp"
+#include "providers/homies/HomiesEmotes.hpp"
 #include "providers/twitch/api/Helix.hpp"
 #include "providers/twitch/ChannelPointReward.hpp"
 #include "providers/twitch/IrcMessageHandler.hpp"
@@ -78,6 +79,7 @@ void TwitchIrcServer::initialize(Settings &settings, const Paths &paths)
     this->reloadBTTVGlobalEmotes();
     this->reloadFFZGlobalEmotes();
     this->reloadSevenTVGlobalEmotes();
+    this->reloadHomiesGlobalEmotes();
 }
 
 void TwitchIrcServer::initializeConnection(IrcConnection *connection,
@@ -551,6 +553,21 @@ void TwitchIrcServer::reloadAllFFZChannelEmotes()
         if (auto *channel = dynamic_cast<TwitchChannel *>(chan.get()))
         {
             channel->refreshFFZChannelEmotes(false);
+        }
+    });
+}
+
+void TwitchIrcServer::reloadHomiesGlobalEmotes()
+{
+    getIApp()->getHomiesEmotes()->loadEmotes();
+}
+
+void TwitchIrcServer::reloadAllHomiesChannelEmotes()
+{
+    this->forEachChannel([](const auto &chan) {
+        if (auto *channel = dynamic_cast<TwitchChannel *>(chan.get()))
+        {
+            channel->refreshHomiesChannelEmotes(false);
         }
     });
 }

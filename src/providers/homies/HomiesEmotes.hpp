@@ -1,16 +1,19 @@
 #pragma once
 
-#include "boost/optional.hpp"
 #include "common/Aliases.hpp"
 #include "common/Atomic.hpp"
-#include "providers/twitch/TwitchChannel.hpp"
+
+#include <QJsonObject>
 
 #include <memory>
+#include <optional>
 
 namespace chatterino {
+
 struct Emote;
 using EmotePtr = std::shared_ptr<const Emote>;
 class EmoteMap;
+class Channel;
 
 class HomiesEmotes final
 {
@@ -20,7 +23,7 @@ public:
     HomiesEmotes();
 
     std::shared_ptr<const EmoteMap> emotes() const;
-    boost::optional<EmotePtr> emote(const EmoteName &name) const;
+    std::optional<EmotePtr> emote(const EmoteName &name) const;
     void loadEmotes();
     static void loadChannel(std::weak_ptr<Channel> channel,
                             const QString &channelId,

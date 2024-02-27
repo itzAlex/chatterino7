@@ -16,33 +16,17 @@ namespace chatterino {
 struct Emote;
 using EmotePtr = std::shared_ptr<const Emote>;
 
-class IHomiesBadges
-{
-public:
-    IHomiesBadges() = default;
-    virtual ~IHomiesBadges() = default;
-
-    IHomiesBadges(const IHomiesBadges &) = delete;
-    IHomiesBadges(IHomiesBadges &&) = delete;
-    IHomiesBadges &operator=(const IHomiesBadges &) = delete;
-    IHomiesBadges &operator=(IHomiesBadges &&) = delete;
-
-    virtual boost::optional<EmotePtr> getBadge(const UserId &id) = 0;
-    virtual boost::optional<EmotePtr> getBadge2(const UserId &id) = 0;
-    virtual boost::optional<EmotePtr> getBadge3(const UserId &id) = 0;
-};
-
-class HomiesBadges : public IHomiesBadges
+class HomiesBadges : public Singleton
 {
 public:
     HomiesBadges();
+    void loadHomiesBadges();
 
-    boost::optional<EmotePtr> getBadge(const UserId &id) override;
-    boost::optional<EmotePtr> getBadge2(const UserId &id) override;
-    boost::optional<EmotePtr> getBadge3(const UserId &id) override;
+    boost::optional<EmotePtr> getBadge(const UserId &id);
+    boost::optional<EmotePtr> getBadge2(const UserId &id);
+    boost::optional<EmotePtr> getBadge3(const UserId &id);
 
 private:
-    void loadHomiesBadges();
     std::shared_mutex mutex_;
 
     std::unordered_map<QString, int> badgeMap;

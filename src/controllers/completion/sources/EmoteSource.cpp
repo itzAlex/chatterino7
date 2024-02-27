@@ -8,6 +8,7 @@
 #include "providers/ffz/FfzEmotes.hpp"
 #include "providers/seventv/SeventvEmotes.hpp"
 #include "providers/seventv/SeventvPersonalEmotes.hpp"
+#include "providers/homies/HomiesEmotes.hpp"
 #include "providers/twitch/TwitchAccount.hpp"
 #include "providers/twitch/TwitchChannel.hpp"
 #include "providers/twitch/TwitchIrcServer.hpp"
@@ -136,6 +137,10 @@ void EmoteSource::initializeFromChannel(const Channel *channel)
             {
                 addEmotes(emotes, *seventv, "Channel 7TV");
             }
+            if (auto homies = tc->homiesEmotes())
+            {
+                addEmotes(emotes, *homies, "Channel Homies");
+            }
         }
 
         if (auto bttvG = app->getBttvEmotes()->emotes())
@@ -149,6 +154,10 @@ void EmoteSource::initializeFromChannel(const Channel *channel)
         if (auto seventvG = app->getSeventvEmotes()->globalEmotes())
         {
             addEmotes(emotes, *seventvG, "Global 7TV");
+        }
+        if (auto homiesG = app->getHomiesEmotes()->emotes())
+        {
+            addEmotes(emotes, *homiesG, "Global Homies");
         }
     }
 

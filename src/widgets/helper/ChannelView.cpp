@@ -2338,11 +2338,14 @@ void ChannelView::handleMouseClick(QMouseEvent *event,
                             // Insert @username into split input
                             const bool commaMention =
                                 getSettings()->mentionUsersWithComma;
+                            const bool mentionWithAt =
+                                getSettings()->mentionUsersWithAt;
                             const bool isFirstWord =
                                 split->getInput().isEditFirstWord();
                             auto userMention = formatUserMention(
-                                link.value, isFirstWord, commaMention);
-                            insertText("@" + userMention + " ");
+                                link.value, isFirstWord, commaMention,
+                                mentionWithAt);
+                            insertText(userMention + " ");
                         }
                         break;
 

@@ -33,6 +33,8 @@
 #include <functional>
 
 namespace chatterino {
+static QRegularExpression validDomainRegex(
+    "(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]");
 
 SplitInput::SplitInput(Split *_chatWidget, bool enableInlineReplying)
     : SplitInput(_chatWidget, _chatWidget, _chatWidget->view_,
@@ -334,6 +336,27 @@ QString SplitInput::handleSendMessage(const std::vector<QString> &arguments)
         QString sendMessage =
             getIApp()->getCommands()->execCommand(message, c, false);
 
+        bool separateClip = true;
+        if (sendMessage.contains("https://clips.twitch.tv", Qt::CaseInsensitive))
+        {
+            if (!getSettings()->separateClipsLinks)
+            {
+                separateClip = false;
+            }
+        }
+
+        if (separateClip && getSettings()->separateLinks && getSettings()->isSeparatedLinksChannel(this->split_->getChannel()->getName()))
+        {
+            auto validDomainMatch = validDomainRegex.match(sendMessage);
+
+            if (validDomainMatch.hasMatch()) {
+                if (sendMessage.contains("https://", Qt::CaseInsensitive))
+                    sendMessage = sendMessage.replace("https://", "https:/ /");
+                if (sendMessage.contains("http://", Qt::CaseInsensitive))
+                    sendMessage = sendMessage.replace("http://", "http:/ /");
+            }
+        }
+
         c->sendMessage(sendMessage);
 
         this->postMessageSend(message, arguments);
@@ -365,6 +388,27 @@ QString SplitInput::handleSendMessage(const std::vector<QString> &arguments)
     message = message.replace('\n', ' ');
     QString sendMessage =
         getIApp()->getCommands()->execCommand(message, c, false);
+
+    bool separateClip = true;
+    if (sendMessage.contains("https://clips.twitch.tv", Qt::CaseInsensitive))
+    {
+        if (!getSettings()->separateClipsLinks)
+        {
+            separateClip = false;
+        }
+    }
+
+    if (separateClip && getSettings()->separateLinks && getSettings()->isSeparatedLinksChannel(this->split_->getChannel()->getName()))
+    {
+        auto validDomainMatch = validDomainRegex.match(sendMessage);
+
+        if (validDomainMatch.hasMatch()) {
+            if (sendMessage.contains("https://", Qt::CaseInsensitive))
+                sendMessage = sendMessage.replace("https://", "https:/ /");
+            if (sendMessage.contains("http://", Qt::CaseInsensitive))
+                sendMessage = sendMessage.replace("http://", "http:/ /");
+        }
+    }
 
     // Reply within TwitchChannel
     tc->sendReply(sendMessage, this->replyThread_->id);
@@ -845,8 +889,9 @@ void SplitInput::insertCompletionText(const QString &input_) const
         {
             const auto userMention =
                 formatUserMention(input_, edit.isFirstWord(),
-                                  getSettings()->mentionUsersWithComma);
-            input = "@" + userMention + " ";
+                                  getSettings()->mentionUsersWithComma,
+                                  getSettings()->mentionUsersWithAt);
+            input = userMention + " ";
             done = true;
         }
 

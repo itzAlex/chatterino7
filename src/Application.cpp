@@ -31,6 +31,7 @@
 #include "providers/chatterino/ChatterinoBadges.hpp"
 #include "providers/ffz/FfzBadges.hpp"
 #include "providers/homies/HomiesBadges.hpp"
+#include "providers/homies/HomiesEmotes.hpp"
 #include "providers/irc/Irc2.hpp"
 #include "providers/seventv/eventapi/Dispatch.hpp"
 #include "providers/seventv/eventapi/Subscription.hpp"
@@ -147,6 +148,7 @@ Application::Application(Settings &_settings, const Paths &paths,
     , bttvEmotes(new BttvEmotes)
     , ffzEmotes(new FfzEmotes)
     , seventvEmotes(new SeventvEmotes)
+    , homiesEmotes(new HomiesEmotes)
     , logging(new Logging(_settings))
 #ifdef CHATTERINO_HAVE_PLUGINS
     , plugins(&this->emplace(new PluginController(paths)))
@@ -172,6 +174,7 @@ void Application::fakeDtor()
     this->bttvEmotes.reset();
     this->ffzEmotes.reset();
     this->seventvEmotes.reset();
+    this->homiesEmotes.reset();
 }
 
 void Application::initialize(Settings &settings, const Paths &paths)
@@ -323,6 +326,16 @@ int Application::run(QApplication &qtApp)
             this->twitch->reloadAllSevenTVChannelEmotes();
         },
         false);
+    getSettings()->enableHomiesGlobalEmotes.connect(
+        [this] {
+            this->twitch->reloadHomiesGlobalEmotes();
+        },
+        false);
+    getSettings()->enableHomiesChannelEmotes.connect(
+        [this] {
+            this->twitch->reloadAllHomiesChannelEmotes();
+        },
+        false);
 
     return qtApp.exec();
 }
@@ -412,7 +425,7 @@ FfzBadges *Application::getFfzBadges()
     return this->ffzBadges;
 }
 
-IHomiesBadges *Application::getHomiesBadges()
+HomiesBadges *Application::getHomiesBadges()
 {
     assertInGuiThread();
     assert(this->homiesBadges);
@@ -530,6 +543,14 @@ SeventvEmotes *Application::getSeventvEmotes()
     assert(this->seventvEmotes);
 
     return this->seventvEmotes.get();
+}
+
+HomiesEmotes *Application::getHomiesEmotes()
+{
+    assertInGuiThread();
+    assert(this->homiesEmotes);
+
+    return this->homiesEmotes.get();
 }
 
 void Application::save()

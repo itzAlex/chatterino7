@@ -21,6 +21,7 @@ class SeventvEventAPI;
 class BttvEmotes;
 class FfzEmotes;
 class SeventvEmotes;
+class HomiesEmotes;
 
 class ITwitchIrcServer
 {
@@ -52,6 +53,8 @@ public:
     void reloadAllFFZChannelEmotes();
     void reloadSevenTVGlobalEmotes();
     void reloadAllSevenTVChannelEmotes();
+    void reloadHomiesGlobalEmotes();
+    void reloadAllHomiesChannelEmotes();
 
     /** Calls `func` with all twitch channels that have `emoteSetId` added. */
     void forEachSeventvEmoteSet(const QString &emoteSetId,

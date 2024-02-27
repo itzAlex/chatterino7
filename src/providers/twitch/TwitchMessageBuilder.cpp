@@ -15,10 +15,11 @@
 #include "messages/MessageThread.hpp"
 #include "providers/bttv/BttvEmotes.hpp"
 #include "providers/chatterino/ChatterinoBadges.hpp"
-#include "providers/homies/HomiesBadges.hpp"
 #include "providers/colors/ColorProvider.hpp"
 #include "providers/ffz/FfzBadges.hpp"
 #include "providers/ffz/FfzEmotes.hpp"
+#include "providers/homies/HomiesBadges.hpp"
+#include "providers/homies/HomiesEmotes.hpp"
 #include "providers/seventv/SeventvBadges.hpp"
 #include "providers/seventv/SeventvEmotes.hpp"
 #include "providers/seventv/SeventvPersonalEmotes.hpp"
@@ -1284,6 +1285,7 @@ Outcome TwitchMessageBuilder::tryAppendEmote(const EmoteName &name)
     const auto *globalBttvEmotes = app->getBttvEmotes();
     const auto *globalFfzEmotes = app->getFfzEmotes();
     const auto *globalSeventvEmotes = app->getSeventvEmotes();
+    const auto *globalHomiesEmotes = app->getHomiesEmotes();
 
     auto flags = MessageElementFlags();
     auto emote = std::optional<EmotePtr>{};
@@ -1294,9 +1296,11 @@ Outcome TwitchMessageBuilder::tryAppendEmote(const EmoteName &name)
     //  - FrankerFaceZ Channel
     //  - BetterTTV Channel
     //  - 7TV Channel
+    //  - Homies Channel
     //  - FrankerFaceZ Global
     //  - BetterTTV Global
     //  - 7TV Global
+    //  - Homies Global
     if (this->twitchChannel != nullptr &&
         (emote = app->getSeventvPersonalEmotes()->getEmoteForUser(this->userId_,
                                                                   name)))
@@ -1319,6 +1323,12 @@ Outcome TwitchMessageBuilder::tryAppendEmote(const EmoteName &name)
         flags = MessageElementFlag::SevenTVEmote;
         zeroWidth = emote.value()->zeroWidth;
     }
+    else if (this->twitchChannel != nullptr &&
+             (emote = this->twitchChannel->homiesEmote(name)))
+    {
+        flags = MessageElementFlag::HomiesEmote;
+        zeroWidth = emote.value()->zeroWidth;
+    }
     else if ((emote = globalFfzEmotes->emote(name)))
     {
         flags = MessageElementFlag::FfzEmote;
@@ -1331,6 +1341,11 @@ Outcome TwitchMessageBuilder::tryAppendEmote(const EmoteName &name)
     else if ((emote = globalSeventvEmotes->globalEmote(name)))
     {
         flags = MessageElementFlag::SevenTVEmote;
+        zeroWidth = emote.value()->zeroWidth;
+    }
+    else if ((emote = globalHomiesEmotes->emote(name)))
+    {
+        flags = MessageElementFlag::HomiesEmote;
         zeroWidth = emote.value()->zeroWidth;
     }
 

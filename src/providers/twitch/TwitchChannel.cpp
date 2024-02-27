@@ -20,11 +20,13 @@
 #include "providers/bttv/BttvLiveUpdates.hpp"
 #include "providers/bttv/liveupdates/BttvLiveUpdateMessages.hpp"
 #include "providers/ffz/FfzEmotes.hpp"
+#include "providers/homies/HomiesBadges.hpp"
 #include "providers/recentmessages/Api.hpp"
 #include "providers/seventv/eventapi/Dispatch.hpp"
 #include "providers/seventv/SeventvAPI.hpp"
 #include "providers/seventv/SeventvEmotes.hpp"
 #include "providers/seventv/SeventvEventAPI.hpp"
+#include "providers/homies/HomiesEmotes.hpp"
 #include "providers/twitch/api/Helix.hpp"
 #include "providers/twitch/ChannelPointReward.hpp"
 #include "providers/twitch/IrcMessageHandler.hpp"
@@ -87,6 +89,7 @@ TwitchChannel::TwitchChannel(const QString &name)
     , bttvEmotes_(std::make_shared<EmoteMap>())
     , ffzEmotes_(std::make_shared<EmoteMap>())
     , seventvEmotes_(std::make_shared<EmoteMap>())
+    , homiesEmotes_(std::make_shared<EmoteMap>())
 {
     qCDebug(chatterinoTwitch) << "[TwitchChannel" << name << "] Opened";
 
@@ -364,6 +367,29 @@ void TwitchChannel::refreshSevenTVChannelEmotes(bool manualRefresh)
         manualRefresh);
 }
 
+void TwitchChannel::refreshBadgesProviders()
+{
+    getApp()->getHomiesBadges()->loadHomiesBadges();
+    this->addMessage(makeSystemMessage("Badges reloaded."));
+}
+
+void TwitchChannel::refreshHomiesChannelEmotes(bool manualRefresh)
+{
+    if (!Settings::instance().enableHomiesChannelEmotes)
+    {
+        this->homiesEmotes_.set(EMPTY_EMOTE_MAP);
+        return;
+    }
+
+    HomiesEmotes::loadChannel(
+        weakOf<Channel>(this), this->roomId(),
+        [this, weak = weakOf<Channel>(this)](auto &&emoteMap) {
+            if (auto shared = weak.lock())
+                this->setHomiesEmotes(std::make_shared<const EmoteMap>(emoteMap));
+        },
+        manualRefresh);
+}
+
 void TwitchChannel::setBttvEmotes(std::shared_ptr<const EmoteMap> &&map)
 {
     this->bttvEmotes_.set(std::move(map));
@@ -377,6 +403,11 @@ void TwitchChannel::setFfzEmotes(std::shared_ptr<const EmoteMap> &&map)
 void TwitchChannel::setSeventvEmotes(std::shared_ptr<const EmoteMap> &&map)
 {
     this->seventvEmotes_.set(std::move(map));
+}
+
+void TwitchChannel::setHomiesEmotes(std::shared_ptr<const EmoteMap> &&map)
+{
+    this->homiesEmotes_.set(std::move(map));
 }
 
 void TwitchChannel::addQueuedRedemption(const QString &rewardId,
@@ -572,6 +603,7 @@ void TwitchChannel::roomIdChanged()
     this->refreshFFZChannelEmotes(false);
     this->refreshBTTVChannelEmotes(false);
     this->refreshSevenTVChannelEmotes(false);
+    this->refreshHomiesChannelEmotes(false);
     this->joinBttvChannel();
     this->listenSevenTVCosmetics();
     getIApp()->getTwitchLiveController()->add(
@@ -842,6 +874,18 @@ std::optional<EmotePtr> TwitchChannel::seventvEmote(const EmoteName &name) const
     return it->second;
 }
 
+std::optional<EmotePtr> TwitchChannel::homiesEmote(const EmoteName &name) const
+{
+    auto emotes = this->homiesEmotes_.get();
+    auto it = emotes->find(name);
+
+    if (it == emotes->end())
+    {
+        return std::nullopt;
+    }
+    return it->second;
+}
+
 std::shared_ptr<const EmoteMap> TwitchChannel::bttvEmotes() const
 {
     return this->bttvEmotes_.get();
@@ -850,6 +894,11 @@ std::shared_ptr<const EmoteMap> TwitchChannel::bttvEmotes() const
 std::shared_ptr<const EmoteMap> TwitchChannel::ffzEmotes() const
 {
     return this->ffzEmotes_.get();
+}
+
+std::shared_ptr<const EmoteMap> TwitchChannel::homiesEmotes() const
+{
+    return this->homiesEmotes_.get();
 }
 
 std::shared_ptr<const EmoteMap> TwitchChannel::seventvEmotes() const

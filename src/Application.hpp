@@ -49,7 +49,6 @@ class ChatterinoBadges;
 class SeventvBadges;
 class SeventvPaints;
 class FfzBadges;
-class IHomiesBadges;
 class HomiesBadges;
 class SeventvPersonalEmotes;
 class ImageUploader;
@@ -58,6 +57,7 @@ class CrashHandler;
 class BttvEmotes;
 class FfzEmotes;
 class SeventvEmotes;
+class HomiesEmotes;
 
 class IApplication
 {
@@ -85,7 +85,7 @@ public:
     virtual Logging *getChatLogger() = 0;
     virtual IChatterinoBadges *getChatterinoBadges() = 0;
     virtual FfzBadges *getFfzBadges() = 0;
-    virtual IHomiesBadges *getHomiesBadges() = 0;
+    virtual HomiesBadges *getHomiesBadges() = 0;
     virtual SeventvBadges *getSeventvBadges() = 0;
     virtual IUserDataController *getUserData() = 0;
     virtual ISoundController *getSound() = 0;
@@ -103,6 +103,7 @@ public:
     virtual BttvEmotes *getBttvEmotes() = 0;
     virtual FfzEmotes *getFfzEmotes() = 0;
     virtual SeventvEmotes *getSeventvEmotes() = 0;
+    virtual HomiesEmotes *getHomiesEmotes() = 0;
 };
 
 class Application : public IApplication
@@ -172,6 +173,7 @@ private:
     std::unique_ptr<BttvEmotes> bttvEmotes;
     std::unique_ptr<FfzEmotes> ffzEmotes;
     std::unique_ptr<SeventvEmotes> seventvEmotes;
+    std::unique_ptr<HomiesEmotes> homiesEmotes;
     const std::unique_ptr<Logging> logging;
 #ifdef CHATTERINO_HAVE_PLUGINS
     PluginController *const plugins{};
@@ -201,7 +203,7 @@ public:
     PubSub *getTwitchPubSub() override;
     Logging *getChatLogger() override;
     FfzBadges *getFfzBadges() override;
-    IHomiesBadges *getHomiesBadges() override;
+    HomiesBadges *getHomiesBadges() override;
     SeventvBadges *getSeventvBadges() override;
     IUserDataController *getUserData() override;
     ISoundController *getSound() override;
@@ -233,6 +235,7 @@ public:
     BttvEmotes *getBttvEmotes() override;
     FfzEmotes *getFfzEmotes() override;
     SeventvEmotes *getSeventvEmotes() override;
+    HomiesEmotes *getHomiesEmotes() override;
 
     pajlada::Signals::NoArgSignal streamerModeChanged;
 

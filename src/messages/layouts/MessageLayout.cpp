@@ -226,7 +226,8 @@ MessagePaintResult MessageLayout::paint(const MessagePaintContext &ctx)
                              ctx.messageColors.disabled);
     }
 
-    if (this->message_->flags.has(MessageFlag::RecentMessage))
+    if (this->message_->flags.has(MessageFlag::RecentMessage) &&
+        getSettings()->grayOutRecents)
     {
         ctx.painter.fillRect(0, ctx.y, pixmap->width(), pixmap->height(),
                              ctx.messageColors.disabled);

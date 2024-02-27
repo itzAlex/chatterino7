@@ -132,9 +132,10 @@ int64_t parseDurationToSeconds(const QString &inputString,
  * @param userName a user's name
  * @param isFirstWord signifies whether this mention would be the first word in a message
  * @param mentionUsersWithComma postfix mentions with a comma. generally powered by getSettings()->mentionUsersWithComma
+ * @param mentionUsersWithAt mentions with a @. generally powered by getSettings()->mentionUsersWithComma
  **/
 QString formatUserMention(const QString &userName, bool isFirstWord,
-                          bool mentionUsersWithComma);
+                          bool mentionUsersWithComma, bool mentionUsersWithAt);
 
 template <typename T>
 std::vector<T> splitListIntoBatches(const T &list, int batchSize = 100)

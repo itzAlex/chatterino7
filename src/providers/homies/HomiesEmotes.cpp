@@ -110,14 +110,15 @@ std::shared_ptr<const EmoteMap> HomiesEmotes::emotes() const
     return this->global_.get();
 }
 
-boost::optional<EmotePtr> HomiesEmotes::emote(const EmoteName &name) const
+std::optional<EmotePtr> HomiesEmotes::emote(const EmoteName &name) const
 {
     auto emotes = this->global_.get();
     auto it = emotes->find(name);
-
-    if (it == emotes->end())
-        return boost::none;
-    return it->second;
+    if (it != emotes->end())
+    {
+        return it->second;
+    }
+    return std::nullopt;
 }
 
 void HomiesEmotes::loadEmotes()
