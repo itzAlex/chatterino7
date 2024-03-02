@@ -955,6 +955,20 @@ void TwitchModerationElement::addToContainer(MessageLayoutContainer &container,
             }
         }
     }
+
+    if (flags.has(MessageElementFlag::ModeratorUsercard))
+    {
+        QSize size(int(container.getScale() * 16),
+                   int(container.getScale() * 16));
+
+        auto action = ModerationAction("/delete {msg-id}");
+
+        auto image = action.getImage();
+
+        container.addElement(
+            (new ImageLayoutElement(*this, *image, size))
+                ->setLink(Link(Link::UserAction, action.getAction())));
+    }
 }
 
 std::unique_ptr<MessageElement> TwitchModerationElement::clone() const

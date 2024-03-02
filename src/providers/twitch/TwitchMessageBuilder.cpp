@@ -832,6 +832,24 @@ void TwitchMessageBuilder::addTextOrEmoji(const QString &string_)
     this->emplace<TextElement>(string, MessageElementFlag::Text, textColor);
 }
 
+void TwitchMessageBuilder::appendIsMod()
+{
+    bool hasUserType = this->tags.contains("user-type");
+
+    if (hasUserType)
+    {
+        QString userType = this->tags.value("user-type").toString();
+
+        if (userType == "mod")
+        {
+            this->message().isMod = true;
+            return;
+        }
+    }
+
+    this->message().isMod = false;
+}
+
 void TwitchMessageBuilder::parseMessageID()
 {
     auto iterator = this->tags.find("id");
@@ -1591,6 +1609,12 @@ bool TwitchMessageBuilder::shouldAddModerationElements() const
     {
         // You cannot timeout the broadcaster
         return false;
+    }
+
+    auto currentUser = getIApp()->getAccounts()->twitch.getCurrent();
+    if (this->channel->getName() == currentUser->getUserName())
+    {
+        return true;
     }
 
     if (this->tags.value("user-type").toString() == "mod" &&

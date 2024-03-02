@@ -164,6 +164,7 @@ public:
      **/
     void showUserInfoPopup(const QString &userName,
                            QString alternativePopoutChannel = QString());
+    void setModerationModeUsercard();
 
     /**
      * @brief This method is meant to be used when filtering out channels.
@@ -292,6 +293,7 @@ private:
     uint32_t pauseSelectionOffset_ = 0;
 
     std::optional<MessageElementFlags> overrideFlags_;
+    bool moderationModeUsercard = false;
     MessageLayoutPtr lastReadMessage_;
 
     ThreadGuard snapshotGuard_;

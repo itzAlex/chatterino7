@@ -20,6 +20,9 @@
 #include "messages/MessageThread.hpp"
 #include "providers/colors/ColorProvider.hpp"
 #include "providers/LinkResolver.hpp"
+#include "providers/bttv/BttvEmotes.hpp"
+#include "providers/homies/HomiesEmotes.hpp"
+#include "providers/seventv/SeventvEmotes.hpp"
 #include "providers/twitch/TwitchAccount.hpp"
 #include "providers/twitch/TwitchChannel.hpp"
 #include "providers/twitch/TwitchIrcServer.hpp"
@@ -133,6 +136,36 @@ void addEmoteContextMenuItems(QMenu *menu, const Emote &emote,
     {
         addPageLink("7TV");
     }
+    else if (creatorFlags.has(MessageElementFlag::HomiesEmote))
+    {
+        addPageLink("Homies");
+    }
+}
+
+QString getSearchEngineURL(QString searchEngine)
+{
+    if (searchEngine == "Google")
+        return "https://www.google.com/search?q=";
+    else if (searchEngine == "Bing")
+        return "https://www.bing.com/search?q=";
+    else if (searchEngine == "DuckDuckGo")
+        return "https://duckduckgo.com/?q=";
+    else if (searchEngine == "Qwant")
+        return "https://www.qwant.com/?q=";
+    else if (searchEngine == "Startpage")
+        return "https://www.startpage.com/do/search?query=";
+    else if (searchEngine == "Yahoo")
+        return "https://search.yahoo.com/search?p=";
+    else if (searchEngine == "Yandex")
+        return "https://yandex.com/search/?text=";
+    else if (searchEngine == "Ecosia")
+        return "https://www.ecosia.org/search?q=";
+    else if (searchEngine == "Baidu")
+        return "https://www.baidu.com/s?wd=";
+    else if (searchEngine == "Ask")
+        return "https://www.ask.com/web?q=";
+    else if (searchEngine == "Aol")
+        return "https://search.aol.com/aol/search?q=";
 }
 
 void addImageContextMenuItems(QMenu *menu,
@@ -1329,6 +1362,11 @@ void ChannelView::setSelection(const SelectionItem &start,
     this->setSelection({start, end});
 }
 
+void ChannelView::setModerationModeUsercard()
+{
+    this->moderationModeUsercard = true;
+}
+
 MessageElementFlags ChannelView::getFlags() const
 {
     auto *app = getApp();
@@ -1370,6 +1408,11 @@ MessageElementFlags ChannelView::getFlags() const
         this->sourceChannel_ == app->twitch->automodChannel)
     {
         flags.set(MessageElementFlag::ChannelName);
+    }
+
+    if (this->moderationModeUsercard)
+    {
+        flags.set(MessageElementFlag::ModeratorUsercard);
     }
 
     if (this->context_ == Context::ReplyThread ||
@@ -2436,6 +2479,12 @@ void ChannelView::addMessageContextMenuItems(QMenu *menu,
         menu->addAction("&Copy selection", [this] {
             crossPlatformCopy(this->getSelectedText());
         });
+
+        QString searchEngine = getSettings()->searchEngine.getValue();
+        menu->addAction("&Search in " + searchEngine, [=] {
+            QDesktopServices::openUrl(QUrl(getSearchEngineURL(searchEngine) +
+                                           this->getSelectedText().trimmed()));
+        });
     }
 
     menu->addAction("Copy &message", [layout] {
@@ -2793,7 +2842,9 @@ void ChannelView::handleLinkClick(QMouseEvent *event, const Link &link,
         case Link::UserAction: {
             QString value = link.value;
 
-            ChannelPtr channel = this->underlyingChannel_;
+            ChannelPtr channel = this->hasSourceChannel()
+                                     ? this->sourceChannel_
+                                     : this->underlyingChannel_;
             auto *searchPopup =
                 dynamic_cast<SearchPopup *>(this->parentWidget());
             if (searchPopup != nullptr)

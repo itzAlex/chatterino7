@@ -93,6 +93,7 @@ struct Message {
     QString timeoutUser;
     QString channelName;
     QColor usernameColor;
+    bool isMod;
     QDateTime serverReceivedTime;
     std::vector<Badge> badges;
     std::unordered_map<QString, QString> badgeInfos;
