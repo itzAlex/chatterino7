@@ -11,6 +11,7 @@
 
 @header Maintainers
 
+itzAlexPL | https://github.com/itzAlex | :/avatars/itzalex.png
 fourtf | https://fourtf.com | :/avatars/fourtf.png
 pajlada | https://pajlada.se | :/avatars/pajlada.png
 

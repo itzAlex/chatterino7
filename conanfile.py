@@ -21,7 +21,7 @@ class Chatterino(ConanFile):
     generators = "CMakeDeps"
 
     def requirements(self):
-        self.requires("boost/1.87.0")
+        self.requires("boost/1.86.0")
 
         if self.settings.os != "Windows":
             return
@@ -30,7 +30,7 @@ class Chatterino(ConanFile):
         if self.options.get_safe("with_benchmark", False):
             self.requires("benchmark/1.9.0")
 
-        self.requires("openssl/3.4.1")
+        self.requires("openssl/3.3.2")
 
     def generate(self):
         tc = CMakeToolchain(self)
