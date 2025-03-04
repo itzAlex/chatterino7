@@ -147,6 +147,7 @@ public:
         "/appearance/tabVisibility",
         NotebookTabVisibility::AllTabs,
     };
+    BoolSetting grayOutRecents = {"/appearance/messages/grayOutRecents", true};
 
     //    BoolSetting collapseLongMessages =
     //    {"/appearance/messages/collapseLongMessages", false};
@@ -228,6 +229,7 @@ public:
     BoolSetting showBadgesSevenTV = {"/appearance/badges/seventv", true};
     BoolSetting animateSevenTVBadges = {"/appearance/badges/animateSeventv",
                                         true};
+    BoolSetting showBadgesHomies = {"/appearance/badges/homies", true};
     QSizeSetting lastPopupSize = {
         "/appearance/lastPopup/size",
         {300, 500},
@@ -254,6 +256,7 @@ public:
     BoolSetting autoCloseUserPopup = {"/behaviour/autoCloseUserPopup", true};
     BoolSetting autoCloseThreadPopup = {"/behaviour/autoCloseThreadPopup",
                                         false};
+    QStringSetting searchEngine = {"/behaviour/searchEngine", "Google"};
 
     EnumSetting<UsernameRightClickBehavior> usernameRightClickBehavior = {
         "/behaviour/usernameRightClickBehavior",
@@ -296,6 +299,14 @@ public:
         "/experiments/useSmartEmoteCompletion",
         false,
     };
+    BoolSetting enableHomiesCompletion = {
+        "/behaviour/autocompletion/enableHomiesCompletion", true};
+    BoolSetting enableFFZCompletion = {
+        "/behaviour/autocompletion/enableFFZCompletion", true};
+    BoolSetting enableBTTVCompletion = {
+        "/behaviour/autocompletion/enableBTTVCompletion", true};
+    BoolSetting enable7TVCompletion = {
+        "/behaviour/autocompletion/enable7TVCompletion", true};
 
     FloatSetting pauseOnHoverDuration = {"/behaviour/pauseOnHoverDuration", 0};
     EnumSetting<Qt::KeyboardModifier> pauseChatModifier = {
@@ -312,7 +323,7 @@ public:
     BoolSetting enableZeroWidthEmotes = {"/emotes/enableZeroWidthEmotes", true};
     FloatSetting emoteScale = {"/emotes/scale", 1.f};
     BoolSetting showUnlistedSevenTVEmotes = {
-        "/emotes/showUnlistedSevenTVEmotes", false};
+        "/emotes/showUnlistedSevenTVEmotes", true};
     /**
      * This setting is kept for backwards compatibility.
      */
@@ -335,7 +346,9 @@ public:
     BoolSetting enableSevenTVPersonalEmotes = {"/emotes/seventv/personal",
                                                true};
     BoolSetting enableSevenTVEventAPI = {"/emotes/seventv/eventapi", true};
-    BoolSetting sendSevenTVActivity = {"/emotes/seventv/sendActivity", true};
+    BoolSetting sendSevenTVActivity = {"/emotes/seventv/sendActivity", false};
+    BoolSetting enableHomiesGlobalEmotes = {"/emotes/homies/global", true};
+    BoolSetting enableHomiesChannelEmotes = {"/emotes/homies/channel", true};
 
     BoolSetting allowAvifImages = {"/emotes/allowAvif", true};
 

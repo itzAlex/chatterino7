@@ -24,6 +24,7 @@ class TwitchChannel;
 class BttvEmotes;
 class FfzEmotes;
 class SeventvEmotes;
+class HomiesEmotes;
 class RatelimitBucket;
 
 class ITwitchIrcServer
@@ -98,6 +99,7 @@ public:
     void reloadAllBTTVChannelEmotes();
     void reloadAllFFZChannelEmotes();
     void reloadAllSevenTVChannelEmotes();
+    void reloadAllHomiesChannelEmotes();
 
     /** Calls `func` with all twitch channels that have `emoteSetId` added. */
     void forEachSeventvEmoteSet(const QString &emoteSetId,

@@ -49,7 +49,7 @@ namespace chatterino {
 Updates::Updates(const Paths &paths_, Settings &settings)
     : paths(paths_)
     , currentVersion_(CHATTERINO_VERSION)
-    , updateGuideLink_("https://chatterino.com")
+    , updateGuideLink_("https://chatterinohomies.com")
 {
     qCDebug(chatterinoUpdate) << "init UpdateManager";
 
@@ -122,14 +122,14 @@ void Updates::installUpdates()
 
 #ifdef Q_OS_MACOS
     QMessageBox *box = new QMessageBox(
-        QMessageBox::Information, "Chatterino Update",
+        QMessageBox::Information, "Chatterino Homies Update",
         "A link will open in your browser. Download and install to update.");
     box->setAttribute(Qt::WA_DeleteOnClose);
     box->open();
     QDesktopServices::openUrl(this->updateExe_);
 #elif defined Q_OS_LINUX
     QMessageBox *box =
-        new QMessageBox(QMessageBox::Information, "Chatterino Update",
+        new QMessageBox(QMessageBox::Information, "Chatterino Homies Update",
                         "Automatic updates are currently not available on "
                         "Linux. Please redownload the app to update.");
     box->setAttribute(Qt::WA_DeleteOnClose);
@@ -139,7 +139,7 @@ void Updates::installUpdates()
     if (Modes::instance().isPortable)
     {
         QMessageBox *box =
-            new QMessageBox(QMessageBox::Information, "Chatterino Update",
+            new QMessageBox(QMessageBox::Information, "Chatterino Homies Update",
                             "Chatterino is downloading the update "
                             "in the background and will run the "
                             "updater once it is finished.");
@@ -154,7 +154,7 @@ void Updates::installUpdates()
 
                 postToThread([] {
                     QMessageBox *box = new QMessageBox(
-                        QMessageBox::Information, "Chatterino Update",
+                        QMessageBox::Information, "Chatterino Homies Update",
                         "Failed while trying to download the update.");
                     box->setAttribute(Qt::WA_DeleteOnClose);
                     box->show();
@@ -165,7 +165,7 @@ void Updates::installUpdates()
                 if (result.status() != 200)
                 {
                     auto *box = new QMessageBox(
-                        QMessageBox::Information, "Chatterino Update",
+                        QMessageBox::Information, "Chatterino Homies Update",
                         QStringLiteral("The update couldn't be downloaded "
                                        "(Error: %1).")
                             .arg(result.formatError()));
@@ -202,7 +202,7 @@ void Updates::installUpdates()
     else
     {
         QMessageBox *box =
-            new QMessageBox(QMessageBox::Information, "Chatterino Update",
+            new QMessageBox(QMessageBox::Information, "Chatterino Homies Update",
                             "Chatterino is downloading the update "
                             "in the background and will run the "
                             "updater once it is finished.");
@@ -216,7 +216,7 @@ void Updates::installUpdates()
                 this->setStatus_(DownloadFailed);
 
                 QMessageBox *box = new QMessageBox(
-                    QMessageBox::Information, "Chatterino Update",
+                    QMessageBox::Information, "Chatterino Homies Update",
                     "Failed to download the update. \n\nTry manually "
                     "downloading the update.");
                 box->setAttribute(Qt::WA_DeleteOnClose);
@@ -226,7 +226,7 @@ void Updates::installUpdates()
                 if (result.status() != 200)
                 {
                     auto *box = new QMessageBox(
-                        QMessageBox::Information, "Chatterino Update",
+                        QMessageBox::Information, "Chatterino Homies Update",
                         QStringLiteral("The update couldn't be downloaded "
                                        "(Error: %1).")
                             .arg(result.formatError()));
@@ -246,7 +246,7 @@ void Updates::installUpdates()
                 {
                     this->setStatus_(WriteFileFailed);
                     QMessageBox *box = new QMessageBox(
-                        QMessageBox::Information, "Chatterino Update",
+                        QMessageBox::Information, "Chatterino Homies Update",
                         "Failed to save the update file. This could be due to "
                         "window settings or antivirus software.\n\nTry "
                         "manually "
@@ -267,7 +267,7 @@ void Updates::installUpdates()
                 else
                 {
                     QMessageBox *box = new QMessageBox(
-                        QMessageBox::Information, "Chatterino Update",
+                        QMessageBox::Information, "Chatterino Homies Update",
                         "Failed to execute update binary. This could be due to "
                         "window "
                         "settings or antivirus software.\n\nTry manually "
@@ -310,138 +310,79 @@ void Updates::checkForUpdates()
         return;
     }
 
-    // See https://github.com/SevenTV/SevenTV/issues/48#issue-2193272289
-    // for the proposed structure of the response.
-    auto onSuccess = [this](const NetworkResult &result) {
-        const auto object = result.parseJson();
-        if (object.empty())
-        {
-            return;  // this should only happen on the v4 url as it's not really mapped
-        }
+    QString url = "https://chatterinohomies.com/api/latest-release";
 
-        /// Version available on every platform
-        auto version = object["version"];
+    NetworkRequest(url)
+        .timeout(60000)
+        .onSuccess([this](auto result) {
+            const auto object = result.parseJson();
+            /// Version available on every platform
+            auto version = object["tag_name"];
 
-        if (!version.isString())
-        {
-            this->setStatus_(SearchFailed);
-            qCDebug(chatterinoUpdate)
-                << "error checking version - missing 'version'" << object;
-            return;
-        }
+            if (!version.isString())
+            {
+                this->setStatus_(SearchFailed);
+                qCDebug(chatterinoUpdate)
+                    << "error checking version - missing 'tag_name'" << object;
+                return;
+            }
 
-#    if defined(Q_OS_WIN) || defined(Q_OS_MACOS)
-        /// Downloads an installer for the new version
-        auto updateExeUrl = object["updateexe"_L1];
-
-#        if defined(Q_PROCESSOR_ARM)
-
-        if (object["update_arm"_L1].isString())
-        {
-            updateExeUrl = object["update_arm"_L1];
-        }
-
-#        elif defined(Q_PROCESSOR_X86)
-
-        if (object["update_x86"_L1].isString())
-        {
-            updateExeUrl = object["update_x86"_L1];
-        }
-
-#        endif
-
-        if (!updateExeUrl.isString())
-        {
-            this->setStatus_(SearchFailed);
-            qCDebug(chatterinoUpdate)
-                << "error checking version - missing 'updateexe'" << object;
-            return;
-        }
-
-        this->updateExe_ = updateExeUrl.toString();
+#    if defined Q_OS_WIN || defined Q_OS_MACOS
+            /// Downloads an installer for the new version
+            auto updateExeUrl = object.value("download")
+                                    .toObject()
+                                    .value("installer")
+                                    .toObject()
+                                    .value("url");
+            if (!updateExeUrl.isString())
+            {
+                this->setStatus_(SearchFailed);
+                qCDebug(chatterinoUpdate)
+                    << "error checking version - missing 'download'" << object;
+                return;
+            }
+            this->updateExe_ = updateExeUrl.toString();
 
 #        ifdef Q_OS_WIN
-        /// Windows portable
-        auto portableUrl = object["portable_download"];
-        if (!portableUrl.isString())
-        {
-            this->setStatus_(SearchFailed);
-            qCDebug(chatterinoUpdate)
-                << "error checking version - missing 'portable_download'"
-                << object;
-            return;
-        }
-        this->updatePortable_ = portableUrl.toString();
+            /// Windows portable
+            auto portableUrl = object.value("download")
+                                   .toObject()
+                                   .value("installer")
+                                   .toObject()
+                                   .value("url");
+            if (!portableUrl.isString())
+            {
+                this->setStatus_(SearchFailed);
+                qCDebug(chatterinoUpdate)
+                    << "error checking version - missing 'download'"
+                    << object;
+                return;
+            }
+            this->updatePortable_ = portableUrl.toString();
 #        endif
 
-#    elif defined(Q_OS_LINUX)
-        QJsonValue updateGuide = object.value("updateguide");
-        if (updateGuide.isString())
-        {
-            this->updateGuideLink_ = updateGuide.toString();
-        }
+#    elif defined Q_OS_LINUX
+            this->updateGuideLink_ = "https://chatterinohomies.com"
 #    else
-        return;
+            return;
 #    endif
 
-        /// Current version
-        this->onlineVersion_ = version.toString();
+            /// Current version
+            this->onlineVersion_ = version.toString();
 
-        /// Update available :)
-        if (this->currentVersion_ != this->onlineVersion_)
-        {
-            this->setStatus_(UpdateAvailable);
-            this->isDowngrade_ = Updates::isDowngradeOf(this->onlineVersion_,
-                                                        this->currentVersion_);
-        }
-        else
-        {
-            this->setStatus_(NoUpdateAvailable);
-        }
-    };
-
-    // We're trying v2, v3, ~~and v4~~ to get updates.
-    // The first successful one will be used
-    // TODO: remove this once v3 has the endpoint
-    auto apiVersion = std::make_shared<uint8_t>(2);
-    constexpr auto maxApiVersion =
-        3;  // don't try v4 yet (we don't know the API scheme yet)
-    auto fmtUrl = [apiVersion]() -> QString {
-        return u"https://7tv.io/v" % QString::number(*apiVersion) %
-               "/chatterino/version/" % CHATTERINO_OS % "/" % currentBranch();
-    };
-
-    auto onError = std::make_shared<std::function<void(NetworkResult)>>();
-    // We need to avoid cyclic ownership, so we pass onError as a weak pointer.
-    // During the request, it's kept alive by the finally handler, which will
-    // always be called after onError and onSuccess.
-    auto makeRequest = [onSuccess,
-                        onErrorWeak = std::weak_ptr(onError)](auto url) {
-        auto onError = onErrorWeak.lock();
-        if (!onError)
-        {
-            return;
-        }
-        qCDebug(chatterinoUpdate) << "Requesting updates from" << url;
-        NetworkRequest(url)
-            .timeout(60000)
-            .followRedirects(true)
-            .onSuccess(onSuccess)
-            .onError(*onError)
-            .finally([onError]() {})
-            .execute();
-    };
-
-    *onError = [apiVersion, fmtUrl, makeRequest](const auto &) mutable {
-        if (*apiVersion >= maxApiVersion)
-        {
-            return;  // nothing returned a response, we're done
-        }
-        (*apiVersion)++;
-        makeRequest(fmtUrl());
-    };
-    makeRequest(fmtUrl());
-
+            /// Update available :)
+            if ("v." + this->currentVersion_ != this->onlineVersion_)
+            {
+                this->setStatus_(UpdateAvailable);
+                this->isDowngrade_ = Updates::isDowngradeOf(
+                    this->onlineVersion_, this->currentVersion_);
+            }
+            else
+            {
+                this->setStatus_(NoUpdateAvailable);
+            }
+        })
+        .execute();
     this->setStatus_(Searching);
 #endif
 }

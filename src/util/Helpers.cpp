@@ -202,7 +202,7 @@ QColor getRandomColor(const QString &userId)
 }
 
 QString formatUserMention(const QString &userName, bool isFirstWord,
-                          bool mentionUsersWithComma)
+                          bool mentionUsersWithComma, bool mentionUsersWithAt)
 {
     QString result = userName;
 
@@ -211,7 +211,7 @@ QString formatUserMention(const QString &userName, bool isFirstWord,
         result += ",";
     }
 
-    return result;
+    return mentionUsersWithAt ? '@' + result : result;
 }
 
 int64_t parseDurationToSeconds(const QString &inputString,

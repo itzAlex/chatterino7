@@ -681,6 +681,14 @@ void GeneralPage::initLayout(GeneralPageView &layout)
                      "is sent and others won't see your cosmetics.")
         ->addKeywords({"seventv"})
         ->addTo(layout);
+    SettingWidget::checkbox("Show Homies global emotes",
+                            s.enableHomiesGlobalEmotes)
+        ->addKeywords({"homies"})
+        ->addTo(layout);
+    SettingWidget::checkbox("Show Homies channel emotes",
+                            s.enableHomiesGlobalEmotes)
+        ->addKeywords({"homies"})
+        ->addTo(layout);
 
     layout.addTitle("Streamer Mode");
     layout.addDescription(

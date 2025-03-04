@@ -45,6 +45,7 @@ class SeventvPaints;
 class FfzBadges;
 class SeventvBadges;
 class SeventvPersonalEmotes;
+class HomiesBadges;
 class ImageUploader;
 class SeventvAPI;
 class CrashHandler;
@@ -53,6 +54,7 @@ class BttvLiveUpdates;
 class FfzEmotes;
 class SeventvEmotes;
 class SeventvEventAPI;
+class HomiesEmotes;
 class ILinkResolver;
 class IStreamerMode;
 class ITwitchUsers;
@@ -94,6 +96,7 @@ public:
     virtual ILogging *getChatLogger() = 0;
     virtual IChatterinoBadges *getChatterinoBadges() = 0;
     virtual FfzBadges *getFfzBadges() = 0;
+    virtual HomiesBadges *getHomiesBadges() = 0;
     virtual SeventvBadges *getSeventvBadges() = 0;
     virtual IUserDataController *getUserData() = 0;
     virtual ISoundController *getSound() = 0;
@@ -113,6 +116,7 @@ public:
     virtual FfzEmotes *getFfzEmotes() = 0;
     virtual SeventvEmotes *getSeventvEmotes() = 0;
     virtual SeventvEventAPI *getSeventvEventAPI() = 0;
+    virtual HomiesEmotes *getHomiesEmotes() = 0;
     virtual ILinkResolver *getLinkResolver() = 0;
     virtual IStreamerMode *getStreamerMode() = 0;
     virtual ITwitchUsers *getTwitchUsers() = 0;
@@ -177,11 +181,13 @@ private:
     std::unique_ptr<PubSub> twitchPubSub;
     std::unique_ptr<TwitchBadges> twitchBadges;
     std::unique_ptr<ChatterinoBadges> chatterinoBadges;
+    std::unique_ptr<HomiesBadges> homiesBadges;
     std::unique_ptr<BttvEmotes> bttvEmotes;
     std::unique_ptr<BttvLiveUpdates> bttvLiveUpdates;
     std::unique_ptr<FfzEmotes> ffzEmotes;
     std::unique_ptr<SeventvEmotes> seventvEmotes;
     std::unique_ptr<SeventvEventAPI> seventvEventAPI;
+    std::unique_ptr<HomiesEmotes> homiesEmotes;
     std::unique_ptr<ILinkResolver> linkResolver;
     std::unique_ptr<IStreamerMode> streamerMode;
     std::unique_ptr<ITwitchUsers> twitchUsers;
@@ -214,6 +220,7 @@ public:
     PubSub *getTwitchPubSub() override;
     ILogging *getChatLogger() override;
     FfzBadges *getFfzBadges() override;
+    HomiesBadges *getHomiesBadges() override;
     SeventvBadges *getSeventvBadges() override;
     IUserDataController *getUserData() override;
     ISoundController *getSound() override;
@@ -235,6 +242,7 @@ public:
     FfzEmotes *getFfzEmotes() override;
     SeventvEmotes *getSeventvEmotes() override;
     SeventvEventAPI *getSeventvEventAPI() override;
+    HomiesEmotes *getHomiesEmotes() override;
     pronouns::Pronouns *getPronouns() override;
     eventsub::IController *getEventSub() override;
 

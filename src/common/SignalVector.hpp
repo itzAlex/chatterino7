@@ -150,6 +150,13 @@ public:
         return false;
     }
 
+    void clear()
+    {
+        assertInGuiThread();
+
+        this->items_.clear();
+    }
+
     const std::vector<T> &raw() const
     {
         assertInGuiThread();

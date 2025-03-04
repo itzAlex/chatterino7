@@ -42,7 +42,7 @@ void UserSource::addToStringList(QStringList &list, size_t maxCount,
     addVecToStringList(this->output_, list, maxCount,
                        [this, isFirstWord, mentionComma](const UserItem &user) {
                            const auto userMention = formatUserMention(
-                               user.second, isFirstWord, mentionComma);
+                               user.second, isFirstWord, mentionComma, false);
                            QString strTemplate = this->prependAt_
                                                      ? QStringLiteral("@%1 ")
                                                      : QStringLiteral("%1 ");

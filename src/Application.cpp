@@ -35,6 +35,8 @@
 #include "providers/bttv/BttvLiveUpdates.hpp"
 #include "providers/chatterino/ChatterinoBadges.hpp"
 #include "providers/ffz/FfzBadges.hpp"
+#include "providers/homies/HomiesBadges.hpp"
+#include "providers/homies/HomiesEmotes.hpp"
 #include "providers/seventv/eventapi/Dispatch.hpp"
 #include "providers/seventv/eventapi/Subscription.hpp"
 #include "providers/seventv/SeventvBadges.hpp"
@@ -192,10 +194,12 @@ Application::Application(Settings &_settings, const Paths &paths,
     , twitchPubSub(new PubSub(TWITCH_PUBSUB_URL))
     , twitchBadges(new TwitchBadges)
     , chatterinoBadges(new ChatterinoBadges)
+    , homiesBadges(new HomiesBadges)
     , bttvEmotes(new BttvEmotes)
     , bttvLiveUpdates(makeBttvLiveUpdates(_settings))
     , ffzEmotes(new FfzEmotes)
     , seventvEmotes(new SeventvEmotes)
+    , homiesEmotes(new HomiesEmotes)
     , seventvEventAPI(makeSeventvEventAPI(_settings))
     , linkResolver(new LinkResolver)
     , streamerMode(new StreamerMode)
@@ -229,15 +233,14 @@ void Application::initialize(Settings &settings, const Paths &paths)
         if (Version::instance().isRunningInRosetta())
         {
             auto *armBox =
-                new QMessageBox(QMessageBox::Information, "Chatterino 7",
+                new QMessageBox(QMessageBox::Information, "Chatterino Homies",
                                 "It looks like you're running the x86-64 "
                                 "version of Chatterio on "
                                 "Apple Silicon (ARM) using Rosetta2 emulation. "
-                                "There are native "
-                                "builds "
-                                "available (suffix: arm64).<br>Do you want to "
+                                "Our fork does not support this environment."
+                                "<br>Do you want to "
                                 "switch to the native "
-                                "version?",
+                                "version of the 7TV Chatterino?",
                                 QMessageBox::Yes | QMessageBox::No);
             armBox->setAttribute(Qt::WA_DeleteOnClose);
             if (armBox->exec() == QMessageBox::Yes)
@@ -261,14 +264,14 @@ void Application::initialize(Settings &settings, const Paths &paths)
         }
 #endif
 
-        auto *box = new QMessageBox(QMessageBox::Information, "Chatterino 7",
+        auto *box = new QMessageBox(QMessageBox::Information, "Chatterino Homies",
                                     "Show changelog?",
                                     QMessageBox::Yes | QMessageBox::No);
         box->setAttribute(Qt::WA_DeleteOnClose);
         if (box->exec() == QMessageBox::Yes)
         {
             QDesktopServices::openUrl(
-                QUrl("https://www.chatterino.com/changelog"));
+                QUrl("https://chatterinohomies.com"));
         }
     }
 
@@ -287,6 +290,7 @@ void Application::initialize(Settings &settings, const Paths &paths)
     this->bttvEmotes->loadEmotes();
     this->ffzEmotes->loadEmotes();
     this->seventvEmotes->loadGlobalEmotes();
+    this->homiesEmotes->loadEmotes();
 
     this->twitch->initialize();
 
@@ -364,6 +368,11 @@ int Application::run()
     getSettings()->enableSevenTVChannelEmotes.connect(
         [this] {
             this->twitch->reloadAllSevenTVChannelEmotes();
+        },
+        false);
+    getSettings()->enableHomiesChannelEmotes.connect(
+        [this] {
+            this->twitch->reloadAllHomiesChannelEmotes();
         },
         false);
 
@@ -464,6 +473,14 @@ FfzBadges *Application::getFfzBadges()
     assert(this->ffzBadges);
 
     return this->ffzBadges.get();
+}
+
+HomiesBadges *Application::getHomiesBadges()
+{
+    assertInGuiThread();
+    assert(this->homiesBadges);
+
+    return this->homiesBadges.get();
 }
 
 SeventvBadges *Application::getSeventvBadges()
@@ -637,6 +654,14 @@ SeventvEventAPI *Application::getSeventvEventAPI()
     // seventvEventAPI may be nullptr if it's not enabled
 
     return this->seventvEventAPI.get();
+}
+
+HomiesEmotes *Application::getHomiesEmotes()
+{
+    assertInGuiThread();
+    assert(this->homiesEmotes);
+
+    return this->homiesEmotes.get();
 }
 
 pronouns::Pronouns *Application::getPronouns()

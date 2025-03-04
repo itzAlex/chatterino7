@@ -58,10 +58,16 @@ enum class MessageElementFlag : int64_t {
     SevenTVEmoteText = (1LL << 35),
     SevenTVEmote = SevenTVEmoteImage | SevenTVEmoteText,
 
+    HomiesEmoteImage = (1LL << 62),
+    HomiesEmoteText = (1LL << 63),
+    HomiesEmote = HomiesEmoteImage | HomiesEmoteText,
+
     EmoteImages =
-        TwitchEmoteImage | BttvEmoteImage | FfzEmoteImage | SevenTVEmoteImage,
+        TwitchEmoteImage | BttvEmoteImage | FfzEmoteImage | SevenTVEmoteImage |
+        HomiesEmoteImage,
     EmoteText =
-        TwitchEmoteText | BttvEmoteText | FfzEmoteText | SevenTVEmoteText,
+        TwitchEmoteText | BttvEmoteText | FfzEmoteText | SevenTVEmoteText |
+        HomiesEmoteText,
 
     BitsStatic = (1LL << 11),
     BitsAnimated = (1LL << 12),
@@ -121,9 +127,17 @@ enum class MessageElementFlag : int64_t {
     // - FFZ donator badge
     BadgeFfz = (1LL << 19),
 
+    // Slot 8: Homies
+    // - Homies developer
+    // - Homies mod
+    // - Homies founder
+    // - Homies supporter (both founder & normal)
+    // - Homies custom badge
+    BadgeHomies = (1LL << 61),
+
     Badges = BadgeGlobalAuthority | BadgePredictions | BadgeChannelAuthority |
              BadgeSubscription | BadgeVanity | BadgeChatterino | BadgeSevenTV |
-             BadgeFfz | BadgeSharedChannel,
+             BadgeFfz | BadgeSharedChannel | BadgeHomies,
 
     ChannelName = (1LL << 20),
 
@@ -161,8 +175,8 @@ enum class MessageElementFlag : int64_t {
     // SevenTVEmoteImage, SevenTVEmoteText, and BadgeSevenTV,
 
     Default = Timestamp | Badges | Username | BitsStatic | FfzEmoteImage |
-              BttvEmoteImage | SevenTVEmoteImage | TwitchEmoteImage |
-              BitsAmount | Text | AlwaysShow,
+              BttvEmoteImage | SevenTVEmoteImage | HomiesEmoteImage |
+              TwitchEmoteImage | BitsAmount | Text | AlwaysShow,
 };
 using MessageElementFlags = FlagsEnum<MessageElementFlag>;
 

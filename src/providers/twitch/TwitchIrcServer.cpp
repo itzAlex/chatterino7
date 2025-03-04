@@ -15,6 +15,7 @@
 #include "providers/irc/IrcConnection2.hpp"
 #include "providers/seventv/SeventvEmotes.hpp"
 #include "providers/seventv/SeventvEventAPI.hpp"
+#include "providers/homies/HomiesEmotes.hpp"
 #include "providers/twitch/api/Helix.hpp"
 #include "providers/twitch/IrcMessageHandler.hpp"
 #include "providers/twitch/PubSubActions.hpp"
@@ -1366,6 +1367,16 @@ void TwitchIrcServer::reloadAllSevenTVChannelEmotes()
         if (auto *channel = dynamic_cast<TwitchChannel *>(chan.get()))
         {
             channel->refreshSevenTVChannelEmotes(false);
+        }
+    });
+}
+
+void TwitchIrcServer::reloadAllHomiesChannelEmotes()
+{
+    this->forEachChannel([](const auto &chan) {
+        if (auto *channel = dynamic_cast<TwitchChannel *>(chan.get()))
+        {
+            channel->refreshHomiesChannelEmotes(false);
         }
     });
 }

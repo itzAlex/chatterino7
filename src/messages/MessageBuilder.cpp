@@ -17,6 +17,8 @@
 #include "messages/MessageThread.hpp"
 #include "providers/bttv/BttvEmotes.hpp"
 #include "providers/chatterino/ChatterinoBadges.hpp"
+#include "providers/homies/HomiesBadges.hpp"
+#include "providers/homies/HomiesEmotes.hpp"
 #include "providers/colors/ColorProvider.hpp"
 #include "providers/ffz/FfzBadges.hpp"
 #include "providers/ffz/FfzEmotes.hpp"
@@ -406,13 +408,16 @@ std::tuple<std::optional<EmotePtr>, MessageElementFlags, bool> parseEmote(
     //  - FrankerFaceZ Channel
     //  - BetterTTV Channel
     //  - 7TV Channel
+    //  - Homies Channel
     //  - FrankerFaceZ Global
     //  - BetterTTV Global
     //  - 7TV Global
+    //  - Homies Global
 
     const auto *globalFfzEmotes = getApp()->getFfzEmotes();
     const auto *globalBttvEmotes = getApp()->getBttvEmotes();
     const auto *globalSeventvEmotes = getApp()->getSeventvEmotes();
+    const auto *globalHomiesEmotes = getApp()->getHomiesEmotes();
 
     std::optional<EmotePtr> emote{};
 
@@ -459,6 +464,16 @@ std::tuple<std::optional<EmotePtr>, MessageElementFlags, bool> parseEmote(
                 emote.value()->zeroWidth,
             };
         }
+
+        emote = twitchChannel->homiesEmote(name);
+        if (emote)
+        {
+            return {
+                emote,
+                MessageElementFlag::HomiesEmote,
+                emote.value()->zeroWidth,
+            };
+        }
     }
 
     // Check for global emotes
@@ -489,6 +504,16 @@ std::tuple<std::optional<EmotePtr>, MessageElementFlags, bool> parseEmote(
         return {
             emote,
             MessageElementFlag::SevenTVEmote,
+            emote.value()->zeroWidth,
+        };
+    }
+
+    emote = globalHomiesEmotes->emote(name);
+    if (emote)
+    {
+        return {
+            emote,
+            MessageElementFlag::HomiesEmote,
             emote.value()->zeroWidth,
         };
     }
@@ -2230,6 +2255,7 @@ std::pair<MessagePtrMut, HighlightAlert> MessageBuilder::makeIrcMessage(
     builder.appendChatterinoBadges(userID);
     builder.appendFfzBadges(twitchChannel, userID);
     builder.appendSeventvBadges(userID);
+    builder.appendHomiesBadges(userID);
 
     builder.appendUsername(tags, args);
 
@@ -3028,6 +3054,22 @@ void MessageBuilder::appendSeventvBadges(const QString &userID)
     if (auto badge = getApp()->getSeventvBadges()->getBadge({userID}))
     {
         this->emplace<BadgeElement>(*badge, MessageElementFlag::BadgeSevenTV);
+    }
+}
+
+void MessageBuilder::appendHomiesBadges(const QString &userID)
+{
+    if (auto badge = getApp()->getHomiesBadges()->getBadge({userID}))
+    {
+        this->emplace<BadgeElement>(*badge, MessageElementFlag::BadgeHomies);
+    }
+    if (auto badge = getApp()->getHomiesBadges()->getBadge2({userID}))
+    {
+        this->emplace<BadgeElement>(*badge, MessageElementFlag::BadgeHomies);
+    }
+    if (auto badge = getApp()->getHomiesBadges()->getBadge3({userID}))
+    {
+        this->emplace<BadgeElement>(*badge, MessageElementFlag::BadgeHomies);
     }
 }
 

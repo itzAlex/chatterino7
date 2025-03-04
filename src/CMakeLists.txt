@@ -350,6 +350,11 @@ set(SOURCE_FILES
         providers/chatterino/ChatterinoBadges.cpp
         providers/chatterino/ChatterinoBadges.hpp
 
+        providers/homies/HomiesBadges.cpp
+        providers/homies/HomiesBadges.hpp
+        providers/homies/HomiesEmotes.cpp
+        providers/homies/HomiesEmotes.hpp
+
         providers/colors/ColorProvider.cpp
         providers/colors/ColorProvider.hpp
 
@@ -641,6 +646,8 @@ set(SOURCE_FILES
         widgets/dialogs/UserInfoPopup.hpp
         widgets/dialogs/WelcomeDialog.cpp
         widgets/dialogs/WelcomeDialog.hpp
+        widgets/dialogs/SelectChannelHighlightPopup.cpp
+        widgets/dialogs/SelectChannelHighlightPopup.hpp
         widgets/dialogs/switcher/NewPopupItem.cpp
         widgets/dialogs/switcher/NewPopupItem.hpp
         widgets/dialogs/switcher/NewTabItem.cpp
@@ -756,6 +763,8 @@ set(SOURCE_FILES
         widgets/settingspages/SettingsPage.hpp
         widgets/settingspages/SettingWidget.cpp
         widgets/settingspages/SettingWidget.hpp
+        widgets/settingspages/HomiesPage.cpp
+        widgets/settingspages/HomiesPage.hpp
 
         widgets/splits/ClosedSplits.cpp
         widgets/splits/ClosedSplits.hpp
