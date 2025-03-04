@@ -302,6 +302,7 @@ private:
                        TwitchChannel *twitchChannel,
                        bool trimSubscriberUsername);
     void parseMessageID(const QVariantMap &tags);
+    void appendIsMod(const QVariantMap &tags);
 
     /// Parses the room-ID this message was received in
     ///

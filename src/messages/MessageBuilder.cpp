@@ -2176,6 +2176,7 @@ std::pair<MessagePtrMut, HighlightAlert> MessageBuilder::makeIrcMessage(
     builder->channelName = channel->getName();
 
     builder.parseMessageID(tags);
+    builder.appendIsMod(tags);
 
     MessageBuilder::parseRoomID(tags, twitchChannel);
     twitchChannel = builder.parseSharedChatInfo(tags, twitchChannel);
@@ -2234,6 +2235,12 @@ std::pair<MessagePtrMut, HighlightAlert> MessageBuilder::makeIrcMessage(
         {
             // You cannot timeout the broadcaster
             return false;
+        }
+
+        auto currentUser = getApp()->getAccounts()->twitch.getCurrent();
+        if (ircMessage->nick() == currentUser->getUserName())
+        {
+            return true;
         }
 
         if (tags.value("user-type").toString() == "mod" &&
@@ -2444,6 +2451,8 @@ void MessageBuilder::addTextOrEmote(TextState &state, QString string)
     this->appendOrEmplaceText(string, textColor);
 }
 
+
+
 bool MessageBuilder::isEmpty() const
 {
     return this->message_->elements.empty();
@@ -2530,6 +2539,24 @@ void MessageBuilder::parseUsername(const Communi::IrcMessage *ircMessage,
     {
         currentUser->setColor(this->message_->usernameColor);
     }
+}
+
+void MessageBuilder::appendIsMod(const QVariantMap &tags)
+{
+    bool hasUserType = tags.contains("user-type");
+
+    if (hasUserType)
+    {
+        QString userType = tags.value("user-type").toString();
+
+        if (userType == "mod")
+        {
+            this->message().isMod = true;
+            return;
+        }
+    }
+
+    this->message().isMod = false;
 }
 
 void MessageBuilder::parseMessageID(const QVariantMap &tags)
