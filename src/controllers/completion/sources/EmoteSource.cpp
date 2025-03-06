@@ -1,6 +1,7 @@
 #include "controllers/completion/sources/EmoteSource.hpp"
 
 #include "Application.hpp"
+#include "singletons/Settings.hpp"
 #include "controllers/accounts/AccountController.hpp"
 #include "controllers/completion/sources/Helpers.hpp"
 #include "providers/bttv/BttvEmotes.hpp"
@@ -133,21 +134,32 @@ void EmoteSource::initializeFromChannel(const Channel *channel)
             }
         }
 
-        if (auto bttvG = app->getBttvEmotes()->emotes())
+        if (getSettings()->enableBTTVCompletion)
         {
-            addEmotes(emotes, *bttvG, "Global BetterTTV");
+            if (auto bttvG = app->getBttvEmotes()->emotes())
+            {
+                addEmotes(emotes, *bttvG, "Global BetterTTV");
+            }
         }
-        if (auto ffzG = app->getFfzEmotes()->emotes())
+        if (getSettings()->enableFFZCompletion)
         {
-            addEmotes(emotes, *ffzG, "Global FrankerFaceZ");
+            if (auto ffzG = app->getFfzEmotes()->emotes())
+            {
+                addEmotes(emotes, *ffzG, "Global FrankerFaceZ");
+            }
         }
-        if (auto seventvG = app->getSeventvEmotes()->globalEmotes())
+        if (getSettings()->enable7TVCompletion)
         {
-            addEmotes(emotes, *seventvG, "Global 7TV");
+            if (auto seventvG = app->getSeventvEmotes()->globalEmotes())
+            {
+                addEmotes(emotes, *seventvG, "Global 7TV");
+            }
         }
-        if (auto homiesG = app->getHomiesEmotes()->emotes())
-        {
-            addEmotes(emotes, *homiesG, "Global Homies");
+        if (getSettings()->enableHomiesCompletion) {
+            if (auto homiesG = app->getHomiesEmotes()->emotes())
+            {
+                addEmotes(emotes, *homiesG, "Global Homies");
+            }
         }
     }
 

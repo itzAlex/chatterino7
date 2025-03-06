@@ -686,7 +686,7 @@ void GeneralPage::initLayout(GeneralPageView &layout)
         ->addKeywords({"homies"})
         ->addTo(layout);
     SettingWidget::checkbox("Show Homies channel emotes",
-                            s.enableHomiesGlobalEmotes)
+                            s.enableHomiesChannelEmotes)
         ->addKeywords({"homies"})
         ->addTo(layout);
 
