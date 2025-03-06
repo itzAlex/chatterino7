@@ -14,6 +14,10 @@
 #include <memory>
 #include <optional>
 #include <utility>
+#include <algorithm>
+#include <cctype>
+#include <string>
+#include <vector>
 
 namespace chatterino {
 
@@ -79,7 +83,7 @@ struct HighlightCheck {
     using Checker = std::function<std::optional<HighlightResult>(
         const MessageParseArgs &args, const std::vector<Badge> &badges,
         const QString &senderName, const QString &originalMessage,
-        const MessageFlags &messageFlags, bool self)>;
+        const MessageFlags &messageFlags, bool self, const QString &channel)>;
     Checker cb;
 };
 
@@ -94,7 +98,7 @@ public:
     [[nodiscard]] std::pair<bool, HighlightResult> check(
         const MessageParseArgs &args, const std::vector<Badge> &badges,
         const QString &senderName, const QString &originalMessage,
-        const MessageFlags &messageFlags) const;
+        const MessageFlags &messageFlags, const QString &channel  = "") const;
 
 private:
     /**

@@ -1820,7 +1820,7 @@ std::pair<MessagePtr, MessagePtr> MessageBuilder::makeAutomodMessage(
     // and when the message is added to the channel
     // We do this a bit weird since the message comes in from PubSub and not the normal message route
     auto [highlighted, highlightResult] = getApp()->getHighlights()->check(
-        {}, {}, action.target.login, action.message, message2->flags);
+        {}, {}, action.target.login, action.message, message2->flags, channelName);
     if (highlighted)
     {
         actuallyTriggerHighlights(
@@ -2754,7 +2754,7 @@ HighlightAlert MessageBuilder::parseHighlights(const QVariantMap &tags,
     auto badges = parseBadgeTag(tags);
     auto [highlighted, highlightResult] = getApp()->getHighlights()->check(
         args, badges, this->message().loginName, originalMessage,
-        this->message().flags);
+        this->message().flags, this->message().channelName);
 
     if (!highlighted)
     {
