@@ -1,8 +1,11 @@
 #pragma once
 
 #include <pajlada/signals/signal.hpp>
+#include <QKeySequence>
 #include <QWidget>
 #include <QPushButton>
+
+#include <span>
 
 class QAbstractTableModel;
 class QTableView;
@@ -35,6 +38,10 @@ public:
     void disableExcludeChannelButton();
     void enableExcludeChannelButton();
     void addRegexHelpLink();
+
+    bool filterSearchResults(const QString &query,
+                             std::span<const int> columnSelect);
+    void filterSearchResultsHotkey(const QKeySequence &keySequenceQuery);
 
 private:
     QTableView *tableView_{};

@@ -2,6 +2,8 @@
 
 ## Unversioned
 
+- Minor: Added an option to allow multiple user-selected extensions to interact with Chatterino. (#5997)
+- Minor: Add `Set highlight sounds` and `Open subscription page` split hotkeys. (#5856, #6030)
 - Minor: `/clear` messages are now stacked like timeouts. (#5806)
 - Minor: Treat all browsers starting with `firefox` as a Firefox browser. (#5805)
 - Minor: Remove incognito browser support for `opera/launcher` (this should no longer be a thing). (#5805)
@@ -9,6 +11,8 @@
 - Minor: When (re-)connecting, visible channels are now joined first. (#5850)
 - Minor: Added the ability to filter on messages by the author's user ID (example: `author.user_id == "22484632"`). (#5862)
 - Minor: Improved error messaging of the `/clip` command. (#5879)
+- Minor: Clicking on a live notification can now open the channel in a custom player. (#5880)
+- Minor: Added searchable hotkeys to global search and make keybinds searchable in the Hotkeys settings. (#5884)
 - Minor: Added Linux support for Live Notifications toasts. (#5881, #5971, #5976)
 - Minor: Messages can now be deleted from the context menu in a channel. (#5956)
 - Minor: Overlay windows now inherit the global zoom level and can be zoomed independently. (#6016)
@@ -33,7 +37,7 @@
 - Bugfix: Fixed color input thinking blue is also red. (#5982)
 - Bugfix: Fixed an issue where commands would sometimes reset if Chatterino was improperly shut down. (#6011)
 - Dev: Subscriptions to PubSub channel points redemption topics now use no auth token, making it continue to work during PubSub shutdown. (#5947)
-- Dev: Add initial experimental EventSub support. (#5837, #5895, #5897, #5904, #5910, #5903, #5915, #5916, #5930, #5935, #5932, #5943, #5952, #5953, #5968, #5973, #5974, #5980, #5981, #5985, #5990, #5992, #5993, #5996, #5995, #6000, #6001, #6002, #6003, #6005, #6007, #6010, #6008, #6012, #6013, #6015, #6017)
+- Dev: Add initial experimental EventSub support. (#5837, #5895, #5897, #5904, #5910, #5903, #5915, #5916, #5930, #5935, #5932, #5943, #5952, #5953, #5968, #5973, #5974, #5980, #5981, #5985, #5990, #5992, #5993, #5996, #5995, #6000, #6001, #6002, #6003, #6005, #6007, #6010, #6008, #6012, #6013, #6015, #6017, #6027, #6028, #6035)
 - Dev: Remove unneeded platform specifier for toasts. (#5914)
 - Dev: Highlight checks now use non-capturing groups for the boundaries. (#5784)
 - Dev: Removed unused PubSub whisper code. (#5898)
@@ -51,7 +55,11 @@
 - Dev: Fixed duplicate CMake configure in clean builds. (#5940)
 - Dev: BTTV emotes are now loaded as WEBP. (#5957)
 - Dev: Reduced time we wait for PubSub connections to cleanly exit from 1s to 100ms. (#6019)
+- Dev: Build with Qt 6.4.3 in CI. (#6032)
+- Dev: Refactored some settings styles/APIs. (#6023)
 - Dev: Added snapshot tests for EventSub. (#5965)
+- Dev: Updated crashpad. (#6026)
+- Dev: Removed dead code and some MSVC warnings. (#6024)
 
 ## 2.5.2
 

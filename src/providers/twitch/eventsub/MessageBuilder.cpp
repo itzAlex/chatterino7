@@ -10,6 +10,8 @@
 #include "singletons/StreamerMode.hpp"
 #include "util/Helpers.hpp"
 
+#include <QStringBuilder>
+
 namespace {
 
 using namespace chatterino;
@@ -35,8 +37,7 @@ void makeModeMessage(EventSubMessageBuilder &builder,
         builder.emplaceSystemTextAndUpdate(duration, text);
     }
 
-    builder.message().messageText = text;
-    builder.message().searchText = text;
+    builder.setMessageAndSearchText(text);
 }
 
 QString stringifyAutomodReason(const lib::automod::AutomodReason &reason,
@@ -174,6 +175,15 @@ void EventSubMessageBuilder::appendUser(const lib::String &userName,
     }
 }
 
+void EventSubMessageBuilder::setMessageAndSearchText(const QString &text)
+{
+    assert(this->message().messageText.isNull());
+    assert(this->message().searchText.isNull());
+
+    this->message().messageText = text;
+    this->message().searchText = text;
+}
+
 void makeModerateMessage(EventSubMessageBuilder &builder,
                          const lib::payload::channel_moderate::v2::Event &event,
                          const lib::payload::channel_moderate::v2::Vip &action)
@@ -185,8 +195,7 @@ void makeModerateMessage(EventSubMessageBuilder &builder,
     builder.appendUser(action.userName, action.userLogin, text);
     builder.emplaceSystemTextAndUpdate("as a VIP of this channel.", text);
 
-    builder.message().messageText = text;
-    builder.message().searchText = text;
+    builder.setMessageAndSearchText(text);
 }
 
 void makeModerateMessage(
@@ -201,8 +210,7 @@ void makeModerateMessage(
     builder.appendUser(action.userName, action.userLogin, text);
     builder.emplaceSystemTextAndUpdate("as a VIP of this channel.", text);
 
-    builder.message().messageText = text;
-    builder.message().searchText = text;
+    builder.setMessageAndSearchText(text);
 }
 
 void makeModerateMessage(EventSubMessageBuilder &builder,
@@ -240,8 +248,7 @@ void makeModerateMessage(EventSubMessageBuilder &builder,
         builder.emplaceSystemTextAndUpdate(reasons.join(", "), text);
     }
 
-    builder.message().messageText = text;
-    builder.message().searchText = text;
+    builder.setMessageAndSearchText(text);
 }
 
 void makeModerateMessage(EventSubMessageBuilder &builder,
@@ -272,8 +279,7 @@ void makeModerateMessage(EventSubMessageBuilder &builder,
         builder.emplaceSystemTextAndUpdate(action.reason.qt(), text);
     }
 
-    builder->messageText = text;
-    builder->searchText = text;
+    builder.setMessageAndSearchText(text);
     builder->timeoutUser = action.userLogin.qt();
 }
 
@@ -298,8 +304,33 @@ void makeModerateMessage(
 
     builder.emplaceSystemTextAndUpdate(".", text);
 
-    builder->messageText = text;
-    builder->searchText = text;
+    builder.setMessageAndSearchText(text);
+    builder->timeoutUser = action.userLogin.qt();
+}
+
+void makeModerateMessage(
+    EventSubMessageBuilder &builder,
+    const lib::payload::channel_moderate::v2::Event &event,
+    const lib::payload::channel_moderate::v2::Untimeout &action)
+{
+    QString text;
+    bool isShared = event.isFromSharedChat();
+
+    builder->flags.set(MessageFlag::Timeout);
+    builder.appendUser(event.moderatorUserName, event.moderatorUserLogin, text);
+    builder.emplaceSystemTextAndUpdate("untimedout", text);
+    builder.appendUser(action.userName, action.userLogin, text, isShared);
+
+    if (isShared)
+    {
+        builder.emplaceSystemTextAndUpdate("in", text);
+        builder.appendUser(*event.sourceBroadcasterUserName,
+                           *event.sourceBroadcasterUserLogin, text, false);
+    }
+
+    builder.emplaceSystemTextAndUpdate(".", text);
+
+    builder.setMessageAndSearchText(text);
     builder->timeoutUser = action.userLogin.qt();
 }
 
@@ -345,8 +376,7 @@ void makeModerateMessage(
         text.append(action.messageBody.qt());
     }
 
-    builder->messageText = text;
-    builder->searchText = text;
+    builder.setMessageAndSearchText(text);
     builder->timeoutUser = action.userLogin.qt();
 }
 
@@ -489,8 +519,7 @@ void makeModerateMessage(
     }
     builder.emplaceSystemTextAndUpdate(u"on AutoMod."_s, text);
 
-    builder.message().messageText = text;
-    builder.message().searchText = text;
+    builder.setMessageAndSearchText(text);
 }
 
 void makeModerateMessage(EventSubMessageBuilder &builder,
@@ -504,8 +533,7 @@ void makeModerateMessage(EventSubMessageBuilder &builder,
     builder.appendUser(action.userName, action.userLogin, text, false);
     builder.emplaceSystemTextAndUpdate(u"."_s, text);
 
-    builder.message().messageText = text;
-    builder.message().searchText = text;
+    builder.setMessageAndSearchText(text);
 }
 
 void makeModerateMessage(
@@ -520,8 +548,7 @@ void makeModerateMessage(
     builder.appendUser(action.userName, action.userLogin, text, false);
     builder.emplaceSystemTextAndUpdate(u"."_s, text);
 
-    builder.message().messageText = text;
-    builder.message().searchText = text;
+    builder.setMessageAndSearchText(text);
 }
 
 void makeModerateMessage(EventSubMessageBuilder &builder,
@@ -535,8 +562,7 @@ void makeModerateMessage(EventSubMessageBuilder &builder,
     builder.appendUser(action.userName, action.userLogin, text, false);
     builder.emplaceSystemTextAndUpdate(".", text);
 
-    builder.message().messageText = text;
-    builder.message().searchText = text;
+    builder.setMessageAndSearchText(text);
 }
 
 void makeModerateMessage(
@@ -551,8 +577,7 @@ void makeModerateMessage(
     builder.appendUser(action.userName, action.userLogin, text, false);
     builder.emplaceSystemTextAndUpdate(".", text);
 
-    builder.message().messageText = text;
-    builder.message().searchText = text;
+    builder.setMessageAndSearchText(text);
 }
 
 MessagePtr makeAutomodHoldMessageHeader(
@@ -598,11 +623,10 @@ MessagePtr makeAutomodHoldMessageHeader(
                               MessageColor(QColor(255, 0, 0)),
                               FontStyle::ChatMediumBold)
         ->setLink({Link::AutoModDeny, event.messageID.qt()});
-    auto text = u"AutoMod: Held a message for reason: " % reason %
-                u". Allow will post "
-                "it in chat. Allow Deny";
-    builder->messageText = text;
-    builder->searchText = text;
+
+    builder.setMessageAndSearchText(
+        u"AutoMod: Held a message for reason: " % reason %
+        u". Allow will post it in chat. Allow Deny");
 
     return builder.release();
 }
@@ -640,9 +664,9 @@ MessagePtr makeAutomodHoldMessageBody(
     // XXX: add the structured message here
     builder.emplace<TextElement>(event.message.text.qt(),
                                  MessageElementFlag::Text, MessageColor::Text);
-    auto text = displayName % u": " % event.message.text.qt();
-    builder->messageText = text;
-    builder->searchText = text;
+
+    builder.setMessageAndSearchText(displayName % u": " %
+                                    event.message.text.qt());
 
     return builder.release();
 }
@@ -707,8 +731,8 @@ MessagePtr makeSuspiciousUserMessageHeader(
 
     builder.emplace<TextElement>(headerMessage, MessageElementFlag::Text,
                                  MessageColor::Text);
-    builder->messageText = prefix % u" " % headerMessage;
-    builder->searchText = prefix % u" " % headerMessage;
+
+    builder.setMessageAndSearchText(prefix % u" " % headerMessage);
 
     return builder.release();
 }
@@ -749,9 +773,8 @@ MessagePtr makeSuspiciousUserMessageBody(
     builder.emplace<TextElement>(event.message.text.qt(),
                                  MessageElementFlag::Text, MessageColor::Text);
 
-    auto text = event.userName.qt() % u": " % event.message.text.qt();
-    builder.message().messageText = text;
-    builder.message().searchText = text;
+    builder.setMessageAndSearchText(event.userName.qt() % u": " %
+                                    event.message.text.qt());
 
     return builder.release();
 }
@@ -794,8 +817,7 @@ MessagePtr makeSuspiciousUserUpdate(
         break;
     }
 
-    builder->messageText = text;
-    builder->searchText = text;
+    builder.setMessageAndSearchText(text);
 
     return builder.release();
 }
@@ -824,8 +846,7 @@ MessagePtr makeUserMessageHeldMessage(
         "Hey! Your message is being checked by mods and has not been sent.",
         MessageElementFlag::Text, MessageColor::Text);
 
-    builder->messageText = text;
-    builder->searchText = text;
+    builder.setMessageAndSearchText(text);
 
     return builder.release();
 }
@@ -876,8 +897,7 @@ MessagePtr makeUserMessageUpdateMessage(
             break;
     }
 
-    builder->messageText = text;
-    builder->searchText = text;
+    builder.setMessageAndSearchText(text);
 
     return builder.release();
 }
