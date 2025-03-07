@@ -22,12 +22,12 @@ HighlightPhrase getRow(QString type, int selected)
 {
     if (type == "messages")
     {
-        return getSettings()->highlightedMessages[selected - 3];
+        return getSettings()->highlightedMessages[selected];
     }
 
     else if (type == "users")
     {
-        return getSettings()->highlightedUsers[selected - 2];
+        return getSettings()->highlightedUsers[selected];
     }
 }
 
@@ -170,9 +170,9 @@ SelectChannelWidget::SelectChannelWidget(int selected, QString type,
                                 row.isCaseSensitive(),
                                 row.getSoundUrl().toString(), row.getColor(),
                                 checkbox->isChecked(), channels},
-                selected - 3);
+                selected);
 
-            getSettings()->highlightedMessages.removeAt(selected - 2);
+            getSettings()->highlightedMessages.removeAt(selected + 1);
         }
 
         if (type == "users")
@@ -183,9 +183,9 @@ SelectChannelWidget::SelectChannelWidget(int selected, QString type,
                                 row.isCaseSensitive(),
                                 row.getSoundUrl().toString(), row.getColor(),
                                 checkbox->isChecked(), channels},
-                selected) - 2;
+                selected);
 
-            getSettings()->highlightedUsers.removeAt(selected - 1);
+            getSettings()->highlightedUsers.removeAt(selected + 1);
         }
 
         this->accept();
@@ -325,9 +325,9 @@ ExcludeChannelWidget::ExcludeChannelWidget(int selected, QString type,
                                 row.getSoundUrl().toString(), row.getColor(),
                                 row.isGlobalHighlight(), row.getChannels(),
                                 ExcludedChannels},
-                selected - 3);
+                selected);
 
-            getSettings()->highlightedMessages.removeAt(selected - 2);
+            getSettings()->highlightedMessages.removeAt(selected + 1);
         }
 
         if (type == "users")
@@ -339,9 +339,9 @@ ExcludeChannelWidget::ExcludeChannelWidget(int selected, QString type,
                                 row.getSoundUrl().toString(), row.getColor(),
                                 row.isGlobalHighlight(), row.getChannels(),
                                 ExcludedChannels},
-                selected - 2);
+                selected);
 
-            getSettings()->highlightedUsers.removeAt(selected - 1);
+            getSettings()->highlightedUsers.removeAt(selected + 1);
         }
 
         this->accept();

@@ -106,7 +106,7 @@ HighlightingPage::HighlightingPage()
                                        ->selectionModel()
                                        ->currentIndex()
                                        .row() -
-                                   5;
+                                   8;
 
                     auto selectUsernameWidget =
                         new SelectChannelWidget(selected, "messages");
@@ -120,7 +120,7 @@ HighlightingPage::HighlightingPage()
                                        ->selectionModel()
                                        ->currentIndex()
                                        .row() -
-                                   5;
+                                   8;
 
                     auto excludeChannelWidget =
                         new ExcludeChannelWidget(selected, "messages");
@@ -191,7 +191,7 @@ HighlightingPage::HighlightingPage()
                     int selected = view->getTableView()
                                        ->selectionModel()
                                        ->currentIndex()
-                                       .row();
+                                       .row() - 1;
 
                     auto selectUsernameWidget =
                         new SelectChannelWidget(selected, "users");
@@ -204,7 +204,7 @@ HighlightingPage::HighlightingPage()
                     int selected = view->getTableView()
                                        ->selectionModel()
                                        ->currentIndex()
-                                       .row();
+                                       .row() - 1;
 
                     auto excludeChannelWidget =
                         new ExcludeChannelWidget(selected, "users");
@@ -215,7 +215,7 @@ HighlightingPage::HighlightingPage()
 
                 QObject::connect(view->getTableView()->selectionModel(), &QItemSelectionModel::currentChanged,
                                  [this, view](const QModelIndex &current, const QModelIndex &/*previous*/) {
-                                     this->tableCellClicked(current, view, HighlightTab::Messages);
+                                     this->tableCellClicked(current, view, HighlightTab::Users);
                                  });
             }
 
@@ -272,7 +272,7 @@ HighlightingPage::HighlightingPage()
 
                 QObject::connect(view->getTableView()->selectionModel(), &QItemSelectionModel::currentChanged,
                                  [this, view](const QModelIndex &current, const QModelIndex &/*previous*/) {
-                                     this->tableCellClicked(current, view, HighlightTab::Messages);
+                                     this->tableCellClicked(current, view, HighlightTab::Badges);
                                  });
             }
 
