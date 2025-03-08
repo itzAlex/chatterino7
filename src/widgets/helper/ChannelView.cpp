@@ -2575,13 +2575,13 @@ void ChannelView::addMessageContextMenuItems(QMenu *menu,
         menu->addAction("&Copy selection", [this] {
             crossPlatformCopy(this->getSelectedText());
         });
-    }
 
-    QString searchEngine = getSettings()->searchEngine.getValue();
-    menu->addAction("&Search in " + searchEngine, [=] {
-        QDesktopServices::openUrl(QUrl(getSearchEngineURL(searchEngine) +
-                                       this->getSelectedText().trimmed()));
-    });
+        QString searchEngine = getSettings()->searchEngine.getValue();
+        menu->addAction("&Search in " + searchEngine, [=] {
+            QDesktopServices::openUrl(QUrl(getSearchEngineURL(searchEngine) +
+                                           this->getSelectedText().trimmed()));
+        });
+    }
 
     menu->addAction("Copy &message", [layout] {
         QString copyString;
