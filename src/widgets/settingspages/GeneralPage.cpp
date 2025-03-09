@@ -189,6 +189,16 @@ void GeneralPage::initLayout(GeneralPageView &layout)
         [](auto args) {
             return fuzzyToInt(args.value, 10);
         });
+    layout.addDropdown<int>(
+        "Font weight",
+        {"100", "200", "300", "400", "500", "600", "700", "800", "900"},
+        s.chatFontWeight,
+        [](auto val) {
+            return QString::number(val);
+        },
+        [](auto args) {
+            return fuzzyToInt(args.value, 400);
+        });
     layout.addDropdown<float>(
         "Zoom", ZOOM_LEVELS, s.uiScale,
         [](auto val) {
@@ -738,6 +748,13 @@ void GeneralPage::initLayout(GeneralPageView &layout)
     layout.addCheckbox(
         "Hide moderation actions", s.streamerModeHideModActions, false,
         "Hide bans, timeouts, and automod messages from appearing in chat.");
+
+    SettingWidget::checkbox("Hide messages from suspicious users",
+                            s.streamerModeHideSuspiciousUsers)
+        ->setTooltip("Suspicious users are users who are marked as either "
+                     "restricted or monitored by you or Twitch's AutoMod")
+        ->addTo(layout);
+
     layout.addCheckbox(
         "Hide blocked terms", s.streamerModeHideBlockedTermText, false,
         "Hide blocked terms from showing up in places like AutoMod messages. "

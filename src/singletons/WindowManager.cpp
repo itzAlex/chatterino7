@@ -148,6 +148,8 @@ WindowManager::WindowManager(const Paths &paths, Settings &settings,
     this->forceLayoutChannelViewsListener.add(settings.hideModerated);
     this->forceLayoutChannelViewsListener.add(
         settings.streamerModeHideModActions);
+    this->forceLayoutChannelViewsListener.add(
+        settings.streamerModeHideSuspiciousUsers);
 
     this->layoutChannelViewsListener.add(settings.timestampFormat);
     this->layoutChannelViewsListener.add(fonts.fontChanged);
