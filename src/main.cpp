@@ -25,6 +25,9 @@
 #include <QSslSocket>
 #include <QStringList>
 #include <QtCore/QtPlugin>
+#ifdef Q_OS_WIN
+#    include <shobjidl_core.h>
+#endif
 
 #include <memory>
 
@@ -41,6 +44,9 @@ int main(int argc, char **argv)
     QCoreApplication::setApplicationName("chatterino");
     QCoreApplication::setApplicationVersion(CHATTERINO_VERSION);
     QCoreApplication::setOrganizationDomain("chatterino.com");
+#ifdef Q_OS_WIN
+    SetCurrentProcessExplicitAppUserModelID(L"ChatterinoTeam.Chatterino");
+#endif
 
     std::unique_ptr<Paths> paths;
 

@@ -18,6 +18,7 @@
 #include "providers/twitch/TwitchChannel.hpp"
 #include "singletons/Emotes.hpp"
 #include "singletons/Settings.hpp"
+#include "singletons/Theme.hpp"
 #include "singletons/WindowManager.hpp"
 #include "util/Helpers.hpp"
 #include "widgets/helper/ChannelView.hpp"
@@ -317,6 +318,8 @@ EmotePopup::EmotePopup(QWidget *parent)
             }
             this->reloadEmotes();
         });
+
+    this->themeChangedEvent();
 }
 
 void EmotePopup::addShortcuts()
@@ -702,6 +705,16 @@ void EmotePopup::moveEvent(QMoveEvent *event)
 {
     this->saveBounds();
     BasePopup::moveEvent(event);
+}
+
+void EmotePopup::themeChangedEvent()
+{
+    BasePopup::themeChangedEvent();
+
+    // NOTE: This currently overrides the QLineEdit's font size.
+    // If the dialog is open when the theme is changed, things will look a bit off.
+    // This can be alleviated by us using a single application-wide style sheet for these things.
+    this->search_->setStyleSheet(this->theme->splits.input.styleSheet);
 }
 
 void EmotePopup::closeEvent(QCloseEvent *event)

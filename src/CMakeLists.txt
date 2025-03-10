@@ -571,6 +571,8 @@ set(SOURCE_FILES
         util/Twitch.cpp
         util/Twitch.hpp
         util/TypeName.hpp
+        util/UnixSignalHandler.cpp
+        util/UnixSignalHandler.hpp
         util/Variant.hpp
         util/VectorMessageSink.cpp
         util/VectorMessageSink.hpp

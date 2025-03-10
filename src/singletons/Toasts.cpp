@@ -286,9 +286,11 @@ void Toasts::ensureInitialized()
     auto *instance = WinToast::instance();
     instance->setAppName(L"Chatterino7");
     instance->setAppUserModelId(
-        WinToast::configureAUMI(L"", L"Chatterino 2", L"",
-                                Version::instance().version().toStdWString()));
-    instance->setShortcutPolicy(WinToast::SHORTCUT_POLICY_IGNORE);
+        WinToast::configureAUMI(L"ChatterinoTeam", L"Chatterino", L"", L""));
+    if (!getSettings()->createShortcutForToasts)
+    {
+        instance->setShortcutPolicy(WinToast::SHORTCUT_POLICY_IGNORE);
+    }
     WinToast::WinToastError error{};
     instance->initialize(&error);
 
