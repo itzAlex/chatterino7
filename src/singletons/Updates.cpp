@@ -362,7 +362,7 @@ void Updates::checkForUpdates()
 #        endif
 
 #    elif defined Q_OS_LINUX
-            this->updateGuideLink_ = "https://chatterinohomies.com"
+            this->updateGuideLink_ = "https://chatterinohomies.com";
 #    else
             return;
 #    endif
