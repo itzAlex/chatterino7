@@ -42,6 +42,8 @@
 #include "util/QStringHash.hpp"
 
 #include <QString>
+#include <QDesktopServices>
+#include <QUrl>
 
 #include <unordered_map>
 
@@ -381,6 +383,21 @@ CommandController::CommandController(const Paths &paths)
 
     this->registerCommand("/openurl", &commands::openURL);
 
+    this->registerCommand("/vanity", [](const QStringList &words, const ChannelPtr &channel) {
+        if (words.size() < 2)
+        {
+            channel->addSystemMessage("Usage: /vanity <username>");
+            return QString();
+        }
+
+        QString username = words[1];
+        QString url = QString("https://vanity.zonian.dev/?u=%1").arg(username);
+        
+        QDesktopServices::openUrl(QUrl(url));
+        
+        return QString();
+    });
+
     this->registerCommand("/raw", &commands::sendRawMessage);
 
     this->registerCommand("/reply", &commands::sendReply);
@@ -700,10 +717,3 @@ QString CommandController::execCustomCommand(
 
     return result.replace("{{", "{");
 }
-
-QStringList CommandController::getDefaultChatterinoCommandList()
-{
-    return this->defaultChatterinoCommandAutoCompletions_;
-}
-
-}  // namespace chatterino
